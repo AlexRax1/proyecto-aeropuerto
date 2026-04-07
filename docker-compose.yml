@@ -1,0 +1,20 @@
+services:
+  postgres-aeropuerto:
+    image: postgres:15-alpine
+    container_name: aeropuerto_db_local
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      # 1. Montamos la carpeta entera de SQL para que el contenedor pueda leer los archivos
+      - ./sql:/scripts:z
+      # 2. Le pasamos el script bash a la carpeta especial de auto-arranque de Postgres
+      - ./sql/init-dbs.sh:/docker-entrypoint-initdb.d/init-dbs.sh:z
+      # 3. Guardamos los datos permanentemente para no perderlos al apagar la PC
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

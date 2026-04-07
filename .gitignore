@@ -1,0 +1,41 @@
+
+#generado, revisar detenidamente despues
+
+# ==========================================
+# 1. Archivos de Entornos de Desarrollo (IDEs)
+# ==========================================
+.idea/
+*.iml
+*.iws
+.vscode/
+
+# ==========================================
+# 2. Compilación de Java (Spring Boot / Maven)
+# ==========================================
+target/
+*.jar
+*.war
+*.class
+*.log
+
+# ==========================================
+# 3. Frontend (Angular / Node)
+# ==========================================
+node_modules/
+dist/
+.angular/
+
+# ==========================================
+# 4. Archivos de Sistemas Operativos (Tú vs tu compañero)
+# ==========================================
+# Windows
+Thumbs.db
+Desktop.ini
+# Linux / macOS
+.DS_Store
+.Trash-*
+
+# ==========================================
+# 5. Seguridad (Por si acaso en el futuro)
+# ==========================================
+*.env
