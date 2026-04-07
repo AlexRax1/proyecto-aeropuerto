@@ -39,3 +39,6 @@ Desktop.ini
 # 5. Seguridad (Por si acaso en el futuro)
 # ==========================================
 *.env
+
+
+*.bak
