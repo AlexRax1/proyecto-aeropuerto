@@ -1,3 +1,5 @@
+--db_reservas
+
 CREATE TABLE boleto( 
 	boleto_id serial primary key,
 	vuelo_id int, 

@@ -3,9 +3,9 @@ spring:
     name: operaciones
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/db_operaciones
-    username: admin
-    password: admin123
+    url: jdbc:postgresql://localhost:5432/proyecto_aeropuerto
+    username: postgres
+    password: ConPostgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
