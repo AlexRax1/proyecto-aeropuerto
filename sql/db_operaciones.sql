@@ -38,24 +38,27 @@ create table modelo_avion(
 	--cant pisos, filas columnas segundo piso, cantidad de filas columnas dispareja entre 2 pisos 
 );
 
-create table aviones( 
+create table aviones(
 	avion_id serial primary key,
 	aerolinea_id int,
 	modelo_avion_id int,
 	marca varchar(100),
 	ano varchar(4),
 	cant_asientos_economica int,
-	cant_asientos_ejecutiva int, 
+	cant_asientos_ejecutiva int,
 	cant_vuelos int,
 	estado varchar(30),--activo/inactivo, no maneja si el avion esta en vuelo u otras cosas
 
-	
-	fecha_hora_creacion timestamp, 
+
+	fecha_hora_creacion timestamp,
 	usuario_creacion varchar(150),
 	fecha_hora_modificacion timestamp,
-	usuario_modificacion varchar(150)
-	
-	
+	usuario_modificacion varchar(150),
+
+	constraint fk_avion_aerolinea foreign key (aerolinea_id) references aerolineas(aerolinea_id),
+    constraint fk_avion_modelo foreign key (modelo_avion_id) references modelo_avion(modelo_avion_id)
+
+
 );
 
 create table vuelos(
