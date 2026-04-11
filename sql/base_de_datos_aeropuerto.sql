@@ -102,7 +102,14 @@ create table aviones(
 	fecha_hora_creacion timestamp,
 	usuario_creacion varchar(150),
 	fecha_hora_modificacion timestamp,
+<<<<<<< HEAD
 	usuario_modificacion varchar(150)
+=======
+	usuario_modificacion varchar(150),
+
+	constraint fk_avion_aerolinea foreign key (aerolinea_id) references aerolineas(aerolinea_id),
+    constraint fk_avion_modelo foreign key (modelo_avion_id) references modelo_avion(modelo_avion_id)
+>>>>>>> 1e84a6313c7645cbdfa6e0d5f4f2b3539a6d4e8b
 
 
 );
