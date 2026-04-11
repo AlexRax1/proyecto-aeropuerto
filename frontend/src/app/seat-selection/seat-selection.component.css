@@ -1,0 +1,44 @@
+.plane-container {
+  text-align: center;
+  font-family: Arial;
+}
+
+.legend {
+  margin: 10px;
+}
+
+.seat-map {
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  background-color: #ccc;
+  border-radius: 5px;
+  line-height: 40px;
+  cursor: pointer;
+}
+
+.seat.selected {
+  background-color: green;
+  color: white;
+}
+
+.seat.occupied {
+  background-color: red;
+  cursor: not-allowed;
+}
+
+.btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+}

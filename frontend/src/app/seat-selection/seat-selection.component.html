@@ -1,0 +1,16 @@
+<div class="plane">
+  <h2>Selecciona tus asientos</h2>
+  <h1>FUNCIONA SEAT SELECTION</h1>
+  <div class="seat-map">
+    <div *ngFor="let row of seats; let i = index" class="row">
+      <div 
+        *ngFor="let seat of row"
+        class="seat"
+        [class.selected]="seat.selected"
+        [class.occupied]="seat.occupied"
+        (click)="selectSeat(seat)">
+        {{ seat.label }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,2 @@
+# Forzar a que los scripts de bash siempre mantengan el formato de Linux (LF)
+*.sh text eol=lf
