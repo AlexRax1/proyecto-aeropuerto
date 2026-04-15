@@ -163,9 +163,9 @@ create table personal_tripulacion(
 
 create table asignacion_tripulacion(
 	asignacion_id serial primary key,
-	vuelo_id int,
+	avion_id int,
 	tripulacion_id int,
-	foreign key (vuelo_id) references vuelos(vuelo_id),
+	foreign key (avion_id) references aviones(avion_id),
 	foreign key (tripulacion_id) references personal_tripulacion(personal_tripulacion_id)
 );
 
