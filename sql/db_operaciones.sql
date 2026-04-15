@@ -74,7 +74,7 @@ create table vuelos(
 	precio_clase_economica numeric(10,2), 
 	precio_clase_ejecutiva numeric(10,2), 
 	monto_extra_ventana numeric(10,2),
-	montro_extra_pasillo numeric(10,2),
+	monto_extra_pasillo numeric(10,2),
 	asientos_disponibles int, --por si se venden pasajes sin asignar asientos
 	
 	
@@ -114,9 +114,9 @@ create table personal_tripulacion(
 
 create table asignacion_tripulacion( 
 	asignacion_id serial primary key,
-	vuelo_id int,
+	avion_id int,
 	tripulacion_id int,
-	foreign key (vuelo_id) references vuelos(vuelo_id),
+	foreign key (avion_id) references aviones(avion_id),
 	foreign key (tripulacion_id) references personal_tripulacion(personal_tripulacion_id)
 );
 

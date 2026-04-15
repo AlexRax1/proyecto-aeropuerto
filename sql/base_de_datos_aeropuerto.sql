@@ -123,7 +123,7 @@ create table vuelos(
 	precio_clase_economica numeric(10,2),
 	precio_clase_ejecutiva numeric(10,2),
 	monto_extra_ventana numeric(10,2),
-	montro_extra_pasillo numeric(10,2),
+	monto_extra_pasillo numeric(10,2),
 	asientos_disponibles int, --por si se venden pasajes sin asignar asientos
 
 

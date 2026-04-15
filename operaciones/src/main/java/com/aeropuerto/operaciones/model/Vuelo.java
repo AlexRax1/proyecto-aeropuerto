@@ -57,7 +57,7 @@ public class Vuelo extends Auditoria {
     @Column(name = "monto_extra_ventana")
     private BigDecimal montoExtraVentana;
 
-    @Column(name = "montro_extra_pasillo")
+    @Column(name = "monto_extra_pasillo")
     private BigDecimal montoExtraPasillo;
 
     @Column(name = "asientos_disponibles")
