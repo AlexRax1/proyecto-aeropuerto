@@ -1,0 +1,51 @@
+# 1. Comportamiento por defecto: Git detecta texto y normaliza a LF automáticamente
+* text=auto
+
+# 2. Forzar explícitamente LF para el código fuente y configuraciones
+*.java text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.properties text eol=lf
+
+# 3. Scripts y documentación siempre en LF
+*.sh text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# 4. Archivos de Windows
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 5. Declarar archivos binarios para que Git NUNCA intente cambiar sus saltos de línea
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.zip binary
+
+
+# Archivos de Frontend (Web)
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.vue text eol=lf
+
+
+# Scripts de base de datos y despliegue
+*.sql text eol=lf
+Dockerfile text eol=lf
+.gitignore text eol=lf
+
+# Fuentes tipográficas e íconos
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.eot binary

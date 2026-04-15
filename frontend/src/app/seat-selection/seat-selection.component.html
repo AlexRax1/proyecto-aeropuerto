@@ -1,0 +1,26 @@
+<div class="plane">
+  <h2>Selecciona tus asientos</h2>
+
+  <!-- Leyenda -->
+  <div class="legend">
+    <span class="seat available"></span> Disponible
+    <span class="seat selected"></span> Seleccionado
+    <span class="seat occupied"></span> Ocupado
+  </div>
+
+  <div class="seat-map">
+    <div *ngFor="let row of seats" class="row">
+      <button 
+        *ngFor="let seat of row"
+        class="seat"
+        [ngClass]="{
+          'selected': seat.selected,
+          'occupied': seat.occupied
+        }"
+        [disabled]="seat.occupied"
+        (click)="selectSeat(seat)">
+        {{ seat.label }}
+      </button>
+    </div>
+  </div>
+</div>
