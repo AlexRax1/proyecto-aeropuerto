@@ -1,26 +1,55 @@
-<div class="plane">
+<div class="container">
   <h2>Selecciona tus asientos</h2>
 
-  <!-- Leyenda -->
+  <p>Total filas: {{ seats.length }}</p>
+
+  <!-- LEYENDA -->
   <div class="legend">
-    <span class="seat available"></span> Disponible
-    <span class="seat selected"></span> Seleccionado
-    <span class="seat occupied"></span> Ocupado
+    <div><span class="seat available"></span> Disponible</div>
+    <div><span class="seat selected"></span> Seleccionado</div>
+    <div><span class="seat occupied"></span> Ocupado</div>
   </div>
 
-  <div class="seat-map">
-    <div *ngFor="let row of seats" class="row">
+  <!-- MAPA -->
+  <div *ngFor="let row of seats; let i = index" class="row">
+    
+    <div class="row-label">Fila {{ i + 1 }}</div>
+
+    <div class="row-seats">
       <button 
         *ngFor="let seat of row"
+        (click)="selectSeat(seat)"
+        [disabled]="seat.occupied"
         class="seat"
         [ngClass]="{
           'selected': seat.selected,
           'occupied': seat.occupied
-        }"
-        [disabled]="seat.occupied"
-        (click)="selectSeat(seat)">
+        }">
+
         {{ seat.label }}
+
       </button>
     </div>
+  </div>
+
+  <div *ngIf="selectedSeatInfo.length > 0" class="seat-info">
+  <h3>Asientos Seleccionados</h3>
+
+  <div *ngFor="let seat of selectedSeatInfo" class="seat-detail">
+    <p><strong>ID:</strong> {{seat.idAsiento}}</p>
+    <p><strong>Fila:</strong> {{seat.fila}}</p>
+    <p><strong>Columna:</strong> {{seat.columna}}</p>
+    <p><strong>Categoría:</strong> {{seat.categoria}}</p>
+    <p><strong>Tipo:</strong> {{seat.tipo}}</p>
+    <p><strong>Estado:</strong> {{seat.estado}}</p>
+    <hr>
+  </div>
+</div>
+
+  <!-- BOTÓN -->
+  <div class="actions">
+    <button class="reserve-btn" (click)="confirmSelection()">
+      Reservar
+    </button>
   </div>
 </div>

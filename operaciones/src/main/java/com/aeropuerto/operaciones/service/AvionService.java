@@ -122,7 +122,7 @@
             List<Asiento> asientosAGuardar = new ArrayList<>();
 
             // Un arreglo simple para mapear números a letras (0=A, 1=B, etc.)
-            String[] letras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+            String[] letras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J","K"};
 
             for (int fila = 1; fila <= modelo.getCantFilas(); fila++) {
                 for (int col = 0; col < modelo.getCantColumnas(); col++) {

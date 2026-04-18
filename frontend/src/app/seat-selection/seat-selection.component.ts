@@ -6,6 +6,13 @@ interface Seat {
   label: string;
   selected: boolean;
   occupied: boolean;
+
+  categoria?: string;
+  tipo?: string;
+  estado?: string;
+  fila?: string;
+  columna?: string;
+  idAsiento?: number;
 }
 
 @Component({
@@ -23,10 +30,7 @@ export class SeatSelectionComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.generateSeats();
-    this.mockOccupiedSeats();
-
-    this.loadOccupiedSeats();
+    this.loadSeats(1);
   }
 
   generateSeats() {
@@ -66,18 +70,25 @@ export class SeatSelectionComponent implements OnInit {
     return this.seats.flat().filter(s => s.selected).length;
   }
 
+  selectedSeatInfo: Seat[] = [];
+
   selectSeat(seat: Seat) {
-    if (seat.occupied) return;
+  if (seat.occupied) return;
 
-    const selectedCount = this.getSelectedCount();
+  const selectedCount = this.getSelectedCount();
 
-    // Si intenta seleccionar más del límite
-    if (!seat.selected && selectedCount >= this.maxSelection) {
-      alert(`Solo puedes seleccionar ${this.maxSelection} asientos`);
-      return;
-    }
+  if (!seat.selected && selectedCount >= this.maxSelection) {
+    alert(`Solo puedes seleccionar ${this.maxSelection} asientos`);
+    return;
+  }
 
-    seat.selected = !seat.selected;
+  seat.selected = !seat.selected;
+
+  if (seat.selected) {
+    this.selectedSeatInfo.push(seat);
+  } else {
+    this.selectedSeatInfo = this.selectedSeatInfo.filter(s => s !== seat);
+  }
   }
 
   confirmSelection() {
@@ -96,21 +107,33 @@ export class SeatSelectionComponent implements OnInit {
     alert(`Asientos reservados: ${selectedSeats.join(', ')}`);
   }
 
-  loadOccupiedSeats() {
-    this.http.get<any>('http://localhost:8083/aviones/1/asientos')
-      .subscribe({
-        next: (data) => {
-          this.seats = data.matrizAsientos.map((row: any[]) =>
-            row.map(seat => ({
-              label: `${seat.fila}${seat.columna}`,
-              selected: false,
-              occupied: seat.estado !== 'LIBRE'
-            }))
-          );
-        },
-        error: (err) => {
-          console.warn('No se pudo cargar del backend, usando mock');
-        }
-      });
+  loadSeats(avionId: number) {
+  this.http.get<any>(`http://localhost:8083/aviones/${avionId}/asientos`)
+    .subscribe({
+      next: (data) => {
+
+        console.log("DATA BACKEND:", data);
+
+        this.seats = data.matrizAsientos.map((row: any[]) =>
+          row.map(seat => ({
+            label: `${seat.fila}${seat.columna}`,
+            selected: false,
+            occupied: seat.estado !== 'LIBRE',
+
+            categoria: seat.categoria,
+            tipo: seat.tipo,
+            estado: seat.estado,
+            fila: seat.fila,
+            columna: seat.columna,
+            idAsiento: seat.idAsiento
+          }))
+        );
+
+        console.log("MATRIZ FINAL:", this.seats);
+      },
+      error: (err) => {
+        console.error('Error cargando asientos', err);
+      }
+    });
   }
 }
