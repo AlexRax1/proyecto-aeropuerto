@@ -1,26 +1,27 @@
-<div class="plane">
-  <h2>Selecciona tus asientos</h2>
+<div class="plane-container" *ngIf="seats.length > 0">
+  <h2>Selecciona tus asientaoeudhtnaoeudhtnaoeudhtnaueoos - Avión {{configAvion?.idAvion}}</h2>
 
-  <!-- Leyenda -->
-  <div class="legend">
-    <span class="seat available"></span> Disponible
-    <span class="seat selected"></span> Seleccionado
-    <span class="seat occupied"></span> Ocupado
-  </div>
+  <div class="cabin">
+    <div *ngFor="let row of seats; let i = index" class="seat-row">
+      <span class="row-number">{{ i + 1 }}</span>
 
-  <div class="seat-map">
-    <div *ngFor="let row of seats" class="row">
-      <button 
-        *ngFor="let seat of row"
+      <div 
+        *ngFor="let seat of row" 
         class="seat"
         [ngClass]="{
+          'occupied': seat.occupied,
           'selected': seat.selected,
-          'occupied': seat.occupied
+          'vip': seat.categoria === 'EJECUTIVA'
         }"
-        [disabled]="seat.occupied"
         (click)="selectSeat(seat)">
         {{ seat.label }}
-      </button>
+      </div>
     </div>
+  </div>
+
+  <div class="actions">
+    <button (click)="confirmSelection()" class="btn-confirm">
+      Confirmar Selección222
+    </button>
   </div>
 </div>

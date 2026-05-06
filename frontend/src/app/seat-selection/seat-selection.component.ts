@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
 interface Seat {
+  idAsiento: number;
   label: string;
   selected: boolean;
   occupied: boolean;
+  categoria: string;
 }
 
 @Component({
@@ -18,62 +20,51 @@ interface Seat {
 export class SeatSelectionComponent implements OnInit {
 
   seats: Seat[][] = [];
-  maxSelection = 5; 
+  maxSelection = 5;
+  
+  // Variables para info adicional del avión
+  configAvion: any = null;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.generateSeats();
-    this.mockOccupiedSeats();
-
     this.loadOccupiedSeats();
   }
 
-  generateSeats() {
-    this.seats = []; 
+  loadOccupiedSeats() {
+    // URL de tu microservicio de operaciones/aviones
+    const endpoint = 'http://localhost:8083/aviones/1/asientos';
 
-    const rows = 30;
-    const cols = ['A','B','C','D','E','F'];
-
-    for (let i = 1; i <= rows; i++) {
-      const row: Seat[] = [];
-
-      for (let col of cols) {
-        row.push({
-          label: `${i}${col}`,
-          selected: false,
-          occupied: false
-        });
+    this.http.get<any>(endpoint).subscribe({
+      next: (data) => {
+        this.configAvion = data; // Guardamos la info general (idAvion, aerolinea, etc.)
+        
+        // Mapeamos la matriz que viene del backend
+        this.seats = data.matrizAsientos.map((row: any[]) =>
+          row.map(seat => ({
+            idAsiento: seat.idAsiento,
+            label: `${seat.fila}${seat.columna}`,
+            selected: false,
+            occupied: seat.estado !== 'LIBRE',
+            categoria: seat.categoria
+          }))
+        );
+      },
+      error: (err) => {
+        console.error('Error cargando asientos:', err);
+        // Aquí podrías llamar a un método de emergencia que genere 
+        // una matriz vacía si el backend falla.
       }
-
-      this.seats.push(row);
-    }
-  }
-
-  mockOccupiedSeats() {
-    const data = ["1A", "2B", "3C", "5D"];
-
-    this.seats.forEach(row => {
-      row.forEach(seat => {
-        if (data.includes(seat.label)) {
-          seat.occupied = true;
-        }
-      });
     });
-  }
-
-  getSelectedCount(): number {
-    return this.seats.flat().filter(s => s.selected).length;
   }
 
   selectSeat(seat: Seat) {
     if (seat.occupied) return;
 
-    const selectedCount = this.getSelectedCount();
+    const selectedCount = this.seats.flat().filter(s => s.selected).length;
 
-    // Si intenta seleccionar más del límite
     if (!seat.selected && selectedCount >= this.maxSelection) {
-      alert(`Solo puedes seleccionar ${this.maxSelection} asientos`);
+      alert(`Solo puedes seleccionar hasta ${this.maxSelection} asientos`);
       return;
     }
 
@@ -83,34 +74,15 @@ export class SeatSelectionComponent implements OnInit {
   confirmSelection() {
     const selectedSeats = this.seats
       .flat()
-      .filter(seat => seat.selected)
-      .map(seat => seat.label);
+      .filter(seat => seat.selected);
 
     if (selectedSeats.length === 0) {
       alert('Debes seleccionar al menos un asiento');
       return;
     }
 
-    console.log("Asientos seleccionados:", selectedSeats);
-
-    alert(`Asientos reservados: ${selectedSeats.join(', ')}`);
-  }
-
-  loadOccupiedSeats() {
-    this.http.get<any>('http://localhost:8083/aviones/1/asientos')
-      .subscribe({
-        next: (data) => {
-          this.seats = data.matrizAsientos.map((row: any[]) =>
-            row.map(seat => ({
-              label: `${seat.fila}${seat.columna}`,
-              selected: false,
-              occupied: seat.estado !== 'LIBRE'
-            }))
-          );
-        },
-        error: (err) => {
-          console.warn('No se pudo cargar del backend, usando mock');
-        }
-      });
+    // Aquí enviarías los IDs al microservicio de Reservas
+    console.log("IDs a reservar:", selectedSeats.map(s => s.idAsiento));
+    alert(`Reservando: ${selectedSeats.map(s => s.label).join(', ')}`);
   }
 }

@@ -131,7 +131,7 @@
                     asiento.setAvion(nuevoAvion);
                     asiento.setFila(String.valueOf(fila));
                     asiento.setColumna(letras[col]);
-                    asiento.setEstado("LIBRE"); // Estado inicial
+                    asiento.setEstado("LIBRE"); // manejar luego
 
                     // simplificado
                     asiento.setCategoria("ECONOMICA");
