@@ -12,6 +12,7 @@ CREATE TABLE credenciales(
 	usuario_creacion varchar(150),
 	fecha_modificacion timestamp,
 	usuario_modificacion varchar(150),
+	username varchar(200) unique,
 	constraint user_rol foreign key (rol_id) references rol_user(rol_user_id)
 );
 
