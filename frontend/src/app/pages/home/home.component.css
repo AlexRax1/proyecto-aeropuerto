@@ -1,0 +1,37 @@
+.hero {
+  height: 90vh;
+  background: linear-gradient(to right, #0b1f3a, #123c73);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 50px;
+}
+
+.search-box {
+  margin-top: 30px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.search-box input {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+}
+
+.search-box button {
+  background: #00bfff;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+}
