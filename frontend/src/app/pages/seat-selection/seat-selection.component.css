@@ -1,52 +1,92 @@
-.plane-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.container {
+  text-align: center;
   padding: 20px;
+  font-family: Arial, sans-serif;
 }
 
-.seat-row {
+.legend {
   display: flex;
-  gap: 10px;
-  margin-bottom: 8px;
-  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
-.row-number {
-  width: 30px;
+.row {
+  margin-bottom: 10px;
+}
+
+.row-label {
+  margin-bottom: 5px;
   font-weight: bold;
-  color: #666;
+}
+
+.row-seats {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
 .seat {
   width: 40px;
-  height: 45px;
-  border: 1px solid #ccc;
-  border-radius: 5px 5px 15px 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: white;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.2s;
+  transition: 0.2s;
 }
 
-.seat:hover:not(.occupied) {
-  background-color: #e0e0e0;
+.seat:hover {
+  transform: scale(1.1);
 }
 
-.occupied {
-  background-color: #ff4d4d !important;
+/* 🟢 seleccionado */
+.seat.selected {
+  background-color: green;
+  color: white;
+}
+
+/* 🔴 ocupado */
+.seat.occupied {
+  background-color: red;
+  color: white;
   cursor: not-allowed;
-  color: white;
 }
 
-.selected {
-  background-color: #4CAF50 !important;
-  color: white;
-  border-color: #2e7d32;
+/* ⚪ disponible */
+.seat.available {
+  background-color: white;
 }
 
-.vip {
-  border: 2px solid gold;
+/* INFO */
+.seat-info {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+/* BOTÓN */
+.actions {
+  margin-top: 20px;
+}
+
+.reserve-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.seat-detail {
+  margin-bottom: 10px;
+}
+
+.reserve-btn:hover {
+  background-color: #0056b3;
 }

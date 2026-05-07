@@ -14,7 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 export class LoginComponent {
 
   loginData = {
-    correo: '',
+    username: '',
     password: ''
   };
 
@@ -25,12 +25,12 @@ export class LoginComponent {
 
   login() {
 
-    if (!this.loginData.correo || !this.loginData.password) {
+    if (!this.loginData.username || !this.loginData.password) {
       alert('Completa todos los campos');
       return;
     }
 
-    this.http.post('http://localhost:8083/auth/login', this.loginData)
+    this.http.post('http://localhost:8080/auth/login', this.loginData)
       .subscribe({
         next: (response: any) => {
 
@@ -44,7 +44,7 @@ export class LoginComponent {
         },
         error: (err) => {
           console.error(err);
-          alert('Correo o contraseña incorrectos');
+          alert('Usuario o contraseña incorrectos');
         }
       });
   }
