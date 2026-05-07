@@ -1,0 +1,22 @@
+.confirmation {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.confirmation h1 {
+  color: green;
+}
+
+.confirmation button {
+  margin-top: 20px;
+  background: #0b1f3a;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}

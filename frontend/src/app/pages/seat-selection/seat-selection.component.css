@@ -1,0 +1,92 @@
+.container {
+  text-align: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.row {
+  margin-bottom: 10px;
+}
+
+.row-label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.row-seats {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.seat:hover {
+  transform: scale(1.1);
+}
+
+/* 🟢 seleccionado */
+.seat.selected {
+  background-color: green;
+  color: white;
+}
+
+/* 🔴 ocupado */
+.seat.occupied {
+  background-color: red;
+  color: white;
+  cursor: not-allowed;
+}
+
+/* ⚪ disponible */
+.seat.available {
+  background-color: white;
+}
+
+/* INFO */
+.seat-info {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+/* BOTÓN */
+.actions {
+  margin-top: 20px;
+}
+
+.reserve-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.seat-detail {
+  margin-bottom: 10px;
+}
+
+.reserve-btn:hover {
+  background-color: #0056b3;
+}

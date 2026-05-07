@@ -1,0 +1,29 @@
+.container {
+  padding: 40px;
+  text-align: center;
+}
+
+.planes {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.plane-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  width: 250px;
+}
+
+.plane-card button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #0b1f3a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
