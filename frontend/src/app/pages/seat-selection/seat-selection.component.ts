@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 
 interface Seat {
   label: string;
@@ -30,7 +31,7 @@ export class SeatSelectionComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.loadSeats(1);
+    this.loadSeats(1, 1);
   }
 
   generateSeats() {
@@ -92,48 +93,86 @@ export class SeatSelectionComponent implements OnInit {
   }
 
   confirmSelection() {
-    const selectedSeats = this.seats
-      .flat()
-      .filter(seat => seat.selected)
-      .map(seat => seat.label);
+    const selectedSeatsObjects = this.selectedSeatInfo;
 
-    if (selectedSeats.length === 0) {
+    if (selectedSeatsObjects.length === 0) {
       alert('Debes seleccionar al menos un asiento');
       return;
     }
+    
 
-    console.log("Asientos seleccionados:", selectedSeats);
+    // para pruebas, cambiar luego
+    const idUsuario = 1;
+    const idVueloActual = 1;
 
-    alert(`Asientos reservados: ${selectedSeats.join(', ')}`);
+
+
+
+
+    selectedSeatsObjects.forEach(seat => {
+      
+      const payload = {
+        vueloId: idVueloActual,
+        usuarioId: idUsuario,
+        asientoId: seat.idAsiento, // Enviamos el ID numérico
+        codigoAsiento: seat.label,
+        cantMaletas: 1, // Puedes quemar valores para la prueba
+        costoBoleto: 150.00
+      };
+
+      this.http.post('http://localhost:8084/api/reservas/crear', payload)
+        .subscribe({
+          next: (res) => {
+            console.log(`Asiento ${seat.label} reservado con éxito en la BD.`);
+            // Si funciona, recargamos el mapa para que se pinte de rojo inmediatamente
+            this.loadSeats(1, 1);
+            this.selectedSeatInfo = []; // Limpiamos la selección
+          },
+          error: (err) => {
+            console.error(`Error reservando el asiento ${seat.label}`, err);
+            alert(`Ocurrió un error al reservar el asiento ${seat.label}`);
+          }
+        });
+    });
   }
 
-  loadSeats(avionId: number) {
-    this.http.get<any>(`http://localhost:8083/aviones/${avionId}/asientos`)
-      .subscribe({
-        next: (data) => {
+  loadSeats(avionId: number, vueloId: number) {
+    const reqOperaciones = this.http.get<any>(`http://localhost:8083/aviones/${avionId}/asientos`);
+    
+    const reqReservas = this.http.get<number[]>(`http://localhost:8084/api/reservas/vuelo/${vueloId}/ocupados`);
 
-          console.log("DATA BACKEND:", data);
+    
+    forkJoin({
+      mapa:reqOperaciones,
+      ocupados: reqReservas
+    }).subscribe({
+      next: (data) => {
 
-          this.seats = data.matrizAsientos.map((row: any[]) =>
-            row.map(seat => ({
+          console.log("DATA BACKEND:", data.mapa);
+          console.log("DATA BACKEND:", data.ocupados);
+
+          this.seats = data.mapa.matrizAsientos.map((row: any[]) =>
+            row.map(seat => {
+
+            const estaOcupado = data.ocupados.includes(seat.idAsiento);
+            return {
               label: `${seat.fila}${seat.columna}`,
               selected: false,
-              occupied: seat.estado !== 'LIBRE',
+              occupied: estaOcupado,
 
               categoria: seat.categoria,
               tipo: seat.tipo,
-              estado: seat.estado,
+              estado: estaOcupado ? 'OCUPADO': 'LIBRE',
               fila: seat.fila,
               columna: seat.columna,
               idAsiento: seat.idAsiento
-            }))
-          );
-
-          console.log("MATRIZ FINAL:", this.seats);
-        },
-        error: (err) => {
-          console.error('Error cargando asientos', err);
-        }
-      });
+            };
+          })
+        );
+      },
+      error: (err) => {
+        console.error('Error cargando asientos', err);
+      }
+    });
   }
 }
