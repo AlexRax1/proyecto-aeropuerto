@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
+import { forkJoin, Observable, interval, Subscription} from 'rxjs';
 
 interface Seat {
   label: string;
@@ -23,15 +24,27 @@ interface Seat {
   templateUrl: './seat-selection.component.html',
   styleUrls: ['./seat-selection.component.css']
 })
-export class SeatSelectionComponent implements OnInit {
+export class SeatSelectionComponent implements OnInit, OnDestroy {
 
   seats: Seat[][] = [];
   maxSelection = 5;
 
-  constructor(private http: HttpClient) {}
+  pollingSub!: Subscription;
+
+  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.loadSeats(1, 1);
+    
+    // Iniciar el polling silencioso cada 3 segundos usando el endpoint original
+    this.pollingSub = interval(3000).subscribe(() => {
+      this.actualizarEstados(1); 
+    });
+  }
+
+  ngOnDestroy() {
+    // Apagar el polling al salir de la pantalla
+    if (this.pollingSub) this.pollingSub.unsubscribe();
   }
 
   generateSeats() {
@@ -105,9 +118,7 @@ export class SeatSelectionComponent implements OnInit {
     const idUsuario = 1;
     const idVueloActual = 1;
 
-
-
-
+    const peticionesBloqueo: Observable<any>[] = [];
 
     selectedSeatsObjects.forEach(seat => {
       
@@ -116,53 +127,65 @@ export class SeatSelectionComponent implements OnInit {
         usuarioId: idUsuario,
         asientoId: seat.idAsiento, // Enviamos el ID numérico
         codigoAsiento: seat.label,
-        cantMaletas: 1, // Puedes quemar valores para la prueba
+        cantMaletas: 1, //valores para la prueba
         costoBoleto: 150.00
       };
 
-      this.http.post('http://localhost:8084/api/reservas/crear', payload)
-        .subscribe({
-          next: (res) => {
-            console.log(`Asiento ${seat.label} reservado con éxito en la BD.`);
-            // Si funciona, recargamos el mapa para que se pinte de rojo inmediatamente
-            this.loadSeats(1, 1);
-            this.selectedSeatInfo = []; // Limpiamos la selección
-          },
-          error: (err) => {
-            console.error(`Error reservando el asiento ${seat.label}`, err);
-            alert(`Ocurrió un error al reservar el asiento ${seat.label}`);
+      
+      
+      peticionesBloqueo.push(
+        this.http.post('http://localhost:8084/api/reservas/iniciar-pago', payload, { responseType: 'text' })
+      );
+    });
+
+    // Ejecutamos todos los bloqueos al mismo tiempo
+    forkJoin(peticionesBloqueo).subscribe({
+      next: (res) => {
+        console.log("Asientos bloqueados en Redis con éxito.");
+        
+        // NAVEGAMOS A LA PANTALLA DE PAGO ENVIANDO LOS DATOS
+        this.router.navigate(['/pago'], {
+          state: { 
+            asientosReservados: selectedSeatsObjects, 
+            vueloId: idVueloActual, 
+            usuarioId: idUsuario 
           }
         });
+      },
+      error: (err) => {
+        console.error("Error al bloquear", err);
+        alert("Alguien más está intentando reservar o ya reservó estos asientos. Por favor, elige otros.");
+        
+        // Recargamos el mapa para mostrar los asientos que nos ganaron
+        this.loadSeats(1, 1);
+        this.selectedSeatInfo = []; 
+      }
     });
   }
 
   loadSeats(avionId: number, vueloId: number) {
     const reqOperaciones = this.http.get<any>(`http://localhost:8083/aviones/${avionId}/asientos`);
-    
-    const reqReservas = this.http.get<number[]>(`http://localhost:8084/api/reservas/vuelo/${vueloId}/ocupados`);
-
+    const reqReservas = this.http.get<any>(`http://localhost:8084/api/reservas/vuelo/${vueloId}/ocupados`);
     
     forkJoin({
-      mapa:reqOperaciones,
-      ocupados: reqReservas
+      mapa: reqOperaciones,
+      estado: reqReservas
     }).subscribe({
       next: (data) => {
-
-          console.log("DATA BACKEND:", data.mapa);
-          console.log("DATA BACKEND:", data.ocupados);
-
           this.seats = data.mapa.matrizAsientos.map((row: any[]) =>
             row.map(seat => {
 
-            const estaOcupado = data.ocupados.includes(seat.idAsiento);
+            // Leemos del nuevo formato JSON
+            const estaOcupado = data.estado.ocupados.includes(seat.idAsiento);
+            const estaBloqueado = data.estado.bloqueados.includes(seat.idAsiento);
+
             return {
               label: `${seat.fila}${seat.columna}`,
               selected: false,
-              occupied: estaOcupado,
-
+              occupied: estaOcupado || estaBloqueado, // Se deshabilita si está en cualquiera de las dos listas
               categoria: seat.categoria,
               tipo: seat.tipo,
-              estado: estaOcupado ? 'OCUPADO': 'LIBRE',
+              estado: estaOcupado ? 'OCUPADO' : (estaBloqueado ? 'BLOQUEADO' : 'LIBRE'),
               fila: seat.fila,
               columna: seat.columna,
               idAsiento: seat.idAsiento
@@ -170,9 +193,42 @@ export class SeatSelectionComponent implements OnInit {
           })
         );
       },
-      error: (err) => {
-        console.error('Error cargando asientos', err);
-      }
+      error: (err) => console.error('Error cargando asientos', err)
     });
   }
+
+  actualizarEstados(vueloId: number) {
+    this.http.get<any>(`http://localhost:8084/api/reservas/vuelo/${vueloId}/ocupados`) // Tu URL original
+      .subscribe({
+        next: (estado) => {
+          this.seats.forEach(row => {
+            row.forEach(seat => {
+              if (estado.ocupados.includes(seat.idAsiento)) {
+                seat.occupied = true;
+                seat.estado = 'OCUPADO';
+                seat.selected = false;
+              } else if (estado.bloqueados.includes(seat.idAsiento)) {
+                seat.occupied = true;
+                seat.estado = 'BLOQUEADO';
+                
+                // Si el usuario tenía este asiento en verde, se le quita
+                if (seat.selected) {
+                  seat.selected = false;
+                  this.selectedSeatInfo = this.selectedSeatInfo.filter(s => s.idAsiento !== seat.idAsiento);
+                }
+              } else {
+                seat.occupied = false;
+                seat.estado = 'LIBRE';
+              }
+            });
+          });
+
+          // MAGIA: Obliga a Angular a redibujar los colores al instante
+          this.cdr.detectChanges(); 
+        },
+        error: (err) => console.error("Error en polling", err)
+      });
+  }
+
+  
 }

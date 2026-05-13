@@ -202,7 +202,6 @@ CREATE TABLE boleto(
 	escala int references boleto(boleto_id),
 	costo_boleto numeric(10,2),
 	codigo_asiento varchar(10),
-
 	fecha_creacion timestamp,
 	usuario_creacion varchar(150),
 	fecha_modificacion timestamp,
