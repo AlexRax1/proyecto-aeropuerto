@@ -2,34 +2,25 @@ package com.aeropuerto.usuarios.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import java.util.Collection;
-import java.util.List;
-import com.aeropuerto.usuarios.model.RolUser;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "usuarios")
 @Data
-public class Usuario implements UserDetails {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usuario_id")
-    private Long id;
+    private Integer id;
 
-    @Column(unique = true)
-    private String username;
+    @Column(name = "user_id")
+    private Integer userId;
 
-    private String password;
-
-    @ManyToOne
-    @JoinColumn(name = "rol_user_id")
-    private RolUser rol;
-
-    private String fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     private String nacionalidad;
 
@@ -52,50 +43,26 @@ public class Usuario implements UserDetails {
     @Column(name = "num_emergencias")
     private String numeroEmergencia;
 
+
+
+    //auditoria para despues
     @Column(name = "extension_num_emergencias")
     private String extensionNumeroEmergencia;
 
-    // USERDETAILS
+    @Column(name = "estado", length = 30)
+    private String estado;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    @Column(name = "fecha_creacion")
+    private LocalDateTime fechaCreacion;
 
-        return List.of(
-                new SimpleGrantedAuthority(
-                        rol.getNombreRol()
-                )
-        );
-    }
+    @Column(name = "usuario_creacion", length = 150)
+    private String usuarioCreacion;
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
+    @Column(name = "fecha_modificacion")
+    private LocalDateTime fechaModificacion;
 
-    @Override
-    public String getUsername() {
-        return username;
-    }
+    @Column(name = "usuario_modificacion", length = 150)
+    private String usuarioModificacion;
 
-    // MÉTODOS OBLIGATORIOS
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

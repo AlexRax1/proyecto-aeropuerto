@@ -4,15 +4,16 @@ import com.aeropuerto.auth.dto.AuthResponse;
 import com.aeropuerto.auth.dto.LoginRequest;
 import com.aeropuerto.auth.model.Credencial;
 import com.aeropuerto.auth.repository.CredencialRepository;
+import com.aeropuerto.auth.dto.RegisterRequest;
+import com.aeropuerto.auth.dto.RegisterResponse;
+import com.aeropuerto.auth.model.RolUser;
+import com.aeropuerto.auth.repository.RolUserRepository;
 import com.aeropuerto.auth.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,6 +21,9 @@ public class AuthController {
 
     @Autowired
     private CredencialRepository credencialRepository;
+
+    @Autowired
+    private RolUserRepository rolUserRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -44,5 +48,40 @@ public class AuthController {
         // gurdados en bitacora
 
         return ResponseEntity.ok(new AuthResponse(token));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        
+        if (credencialRepository.findByUsername(request.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body("El username ya existe");
+        }
+
+        Credencial credencial = new Credencial();
+        credencial.setUsername(request.getUsername());
+        credencial.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        RolUser rolUsuario = rolUserRepository.findById(2).orElse(null);
+
+        if (rolUsuario == null) {
+            return ResponseEntity.badRequest().body("Rol USER no encontrado");
+        }
+        credencial.setRolUser(rolUsuario);
+
+        //HACER EL LLENADO DE CREDENCIALES
+        //credencial.setFechaCreacion(java.time.LocalDateTime.now());
+        //credencial.setUsuarioCreacion("MS_USUARIOS");
+
+
+        Credencial saved = credencialRepository.save(credencial);
+
+        return ResponseEntity.ok(new RegisterResponse(saved.getUserId()));
+    }
+
+
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<?> rollbackCredencial(@PathVariable Integer userId) {
+        credencialRepository.deleteById(userId);
+        return ResponseEntity.ok().build();
     }
 }
