@@ -53,7 +53,7 @@ export class PaymentComponent implements OnInit {
 
       // Apuntamos al endpoint que guarda en BD y limpia el candado de Redis
       peticionesPago.push(
-        this.http.post('http://localhost:8084/api/reservas/crear', payload)
+        this.http.post('http://localhost:8080/api/reservas/crear', payload)
       );
     });
 

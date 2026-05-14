@@ -1,6 +1,4 @@
-package com.aeropuerto.reservas.controller;
-
-
+package com.aeropuerto.reservas.service;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

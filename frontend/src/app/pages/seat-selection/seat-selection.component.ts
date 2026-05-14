@@ -134,7 +134,7 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
       
       
       peticionesBloqueo.push(
-        this.http.post('http://localhost:8084/api/reservas/iniciar-pago', payload, { responseType: 'text' })
+        this.http.post('http://localhost:8080/api/reservas/iniciar-pago', payload, { responseType: 'text' })
       );
     });
 
@@ -164,8 +164,8 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   }
 
   loadSeats(avionId: number, vueloId: number) {
-    const reqOperaciones = this.http.get<any>(`http://localhost:8083/aviones/${avionId}/asientos`);
-    const reqReservas = this.http.get<any>(`http://localhost:8084/api/reservas/vuelo/${vueloId}/ocupados`);
+    const reqOperaciones = this.http.get<any>(`http://localhost:8080/aviones/${avionId}/asientos`);
+    const reqReservas = this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`);
     
     forkJoin({
       mapa: reqOperaciones,
@@ -198,7 +198,7 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   }
 
   actualizarEstados(vueloId: number) {
-    this.http.get<any>(`http://localhost:8084/api/reservas/vuelo/${vueloId}/ocupados`) // Tu URL original
+    this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`) // Tu URL original
       .subscribe({
         next: (estado) => {
           this.seats.forEach(row => {
