@@ -23,11 +23,10 @@
         class="seat"
         [ngClass]="{
           'selected': seat.selected,
-          'occupied': seat.occupied
+          'occupied': seat.estado === 'OCUPADO',
+          'bloqueado': seat.estado === 'BLOQUEADO' 
         }">
-
         {{ seat.label }}
-
       </button>
     </div>
   </div>
