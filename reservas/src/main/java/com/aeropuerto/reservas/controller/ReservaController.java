@@ -2,6 +2,7 @@ package com.aeropuerto.reservas.controller;
 
 import com.aeropuerto.reservas.model.Boleto;
 import com.aeropuerto.reservas.service.BoletoService;
+import com.aeropuerto.reservas.service.ReservaRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reservas")
-@CrossOrigin(origins = "http://localhost:4200")
 public class ReservaController {
 
     private final BoletoService boletoService;

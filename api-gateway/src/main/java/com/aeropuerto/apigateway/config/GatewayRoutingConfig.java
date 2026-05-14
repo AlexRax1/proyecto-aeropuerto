@@ -29,7 +29,7 @@ public class GatewayRoutingConfig {
 
                 // agregar mas rutas
                 .route("reservas-service", r -> r
-                        .path("/aviones/**")
+                        .path("/api/reservas/**")
                         .uri("http://localhost:8084"))
 
 

@@ -29,6 +29,10 @@ public class SecurityConfig {
                         // Permite el tráfico a tu servicio de autenticación para que puedas hacer login/registro
                         .pathMatchers("/auth/**").permitAll()
 
+                        //pruebas
+                        .pathMatchers("/aviones/**").permitAll()
+                        .pathMatchers("/api/reservas/**").permitAll()
+
                         /*
                         // 2. Rutas públicas de Operaciones (Ejemplo: listar vuelos)
                         .pathMatchers(HttpMethod.GET, "/operaciones/vuelos/listar").permitAll()*/
