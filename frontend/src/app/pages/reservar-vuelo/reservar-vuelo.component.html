@@ -1,0 +1,215 @@
+<div class="contenedor">
+
+  <div class="card">
+
+    <h2>Reservar Vuelo</h2>
+
+    <div class="filtros">
+
+      <div class="campo">
+
+        <label>Aeropuerto de Salida</label>
+
+        <select [(ngModel)]="filtros.origen">
+
+          <option value="">Seleccione</option>
+
+          <option
+            *ngFor="let aeropuerto of aeropuertos"
+            [value]="aeropuerto">
+
+            {{ aeropuerto }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="campo">
+
+        <label>Aeropuerto de Llegada</label>
+
+        <select [(ngModel)]="filtros.destino">
+
+          <option value="">Seleccione</option>
+
+          <option
+            *ngFor="let aeropuerto of aeropuertos"
+            [value]="aeropuerto">
+
+            {{ aeropuerto }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="campo">
+
+        <label>Fecha de Salida</label>
+
+        <input
+          type="date"
+          [(ngModel)]="filtros.fechaSalida"
+        />
+
+      </div>
+
+    </div>
+
+    <div class="botones">
+
+      <button
+        class="btn buscar"
+        (click)="buscarVuelos()">
+
+        Buscar
+
+      </button>
+
+      <button
+        class="btn limpiar"
+        (click)="nuevaBusqueda()">
+
+        Limpiar
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    class="card"
+    *ngIf="consultaRealizada && vuelosDisponibles.length > 0">
+
+    <h3>Vuelos Disponibles</h3>
+
+    <table>
+
+      <thead>
+
+      <tr>
+        <th>Salida</th>
+        <th>Llegada</th>
+        <th>Tiempo</th>
+        <th>Clase Económica</th>
+        <th>Clase Ejecutiva</th>
+        <th>Acciones</th>
+      </tr>
+
+      </thead>
+
+      <tbody>
+
+      <tr *ngFor="let vuelo of vuelosDisponibles">
+
+        <td>{{ vuelo.salida }}</td>
+        <td>{{ vuelo.llegada }}</td>
+        <td>{{ vuelo.tiempo }}</td>
+        <td>{{ vuelo.economica }}</td>
+        <td>{{ vuelo.ejecutiva }}</td>
+
+        <td>
+
+          <button
+            class="btn seleccionar"
+            (click)="seleccionarVuelo(vuelo)">
+
+            Seleccionar
+
+          </button>
+
+          <button
+            class="btn detalle"
+            (click)="verDetalle(vuelo)">
+
+            Ver
+
+          </button>
+
+        </td>
+
+      </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <div
+    class="card"
+    *ngIf="vueloSeleccionado">
+
+    <h3>
+      Vuelo Seleccionado:
+      {{ vueloSeleccionado.numeroVuelo }}
+    </h3>
+
+    <div class="filtros">
+
+      <div class="campo">
+
+        <label>Clase</label>
+
+        <select [(ngModel)]="claseSeleccionada">
+
+          <option value="">Seleccione</option>
+          <option value="Economica">Clase Económica</option>
+          <option value="Ejecutiva">Clase Ejecutiva</option>
+
+        </select>
+
+      </div>
+
+      <div class="campo">
+
+        <label>Asiento</label>
+
+        <input
+          type="text"
+          placeholder="Ejemplo A1"
+          [(ngModel)]="asientoSeleccionado"
+        />
+
+      </div>
+
+      <div class="campo">
+
+        <label>Cantidad de Maletas</label>
+
+        <input
+          type="number"
+          [(ngModel)]="cantidadMaletas"
+        />
+
+      </div>
+
+    </div>
+
+    <div class="botones">
+
+      <button
+        class="btn generar"
+        (click)="generarPase()">
+
+        Generar Pase de Abordar
+
+      </button>
+
+      <button
+        class="btn nueva"
+        (click)="nuevaBusqueda()">
+
+        Nueva Consulta
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

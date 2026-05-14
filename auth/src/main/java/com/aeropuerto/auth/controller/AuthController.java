@@ -1,6 +1,5 @@
 package com.aeropuerto.auth.controller;
 
-
 import com.aeropuerto.auth.dto.AuthResponse;
 import com.aeropuerto.auth.dto.LoginRequest;
 import com.aeropuerto.auth.model.Credencial;

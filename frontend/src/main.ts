@@ -11,6 +11,16 @@ import { PaymentComponent } from './app/pages/payment/payment.component';
 import { ConfirmationComponent } from './app/pages/confirmation/confirmation.component';
 import { LoginComponent } from './app/pages/login/login.component';
 import { RegisterComponent } from './app/pages/register/register.component';
+import { ConsultaVuelosComponent } from './app/pages/consulta_listVuelos/consulta-vuelos.component';
+import { ConsultaAerolineasComponent } from './app/pages/consulta-aerolineas/consulta-aerolineas.component';
+import { ConsultaAvionesComponent } from './app/pages/consulta-aviones/consulta-aviones.component';
+import { ConsultaPasajerosVueloComponent } from './app/pages/consulta-pasajeros-vuelo/consulta-pasajeros-vuelo.component';
+import {ConsultaDestinosComponent} from './app/pages/consulta-destinos/consulta-destinos.component';
+import {ConsultaEquipajeComponent} from './app/pages/consulta-equipaje/consulta-equipaje.component';
+import {AbordajeComponent} from './app/pages/abordaje/abordaje.component';
+import {ReservarVueloComponent} from './app/pages/reservar-vuelo/reservar-vuelo.component';
+import {ConsultaAgregarVueloComponent} from './app/pages/consulta-agregar-vuelo/consulta-agregar-vuelo.component';
+import {CrearTripulacionComponent} from './app/pages/crear-tripulacion/crear-tripulacion.component';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -29,6 +39,26 @@ bootstrapApplication(AppComponent, {
       { path: 'login', component: LoginComponent },
 
       { path: 'registro', component: RegisterComponent },
+
+      { path: 'consulta-vuelos', component: ConsultaVuelosComponent },
+
+      { path: 'consulta-aerolineas', component: ConsultaAerolineasComponent },
+
+      { path: 'consulta-aviones',  component: ConsultaAvionesComponent },
+
+      { path: 'consulta-pasajeros-vuelo',  component: ConsultaPasajerosVueloComponent },
+
+      { path: 'consulta-destinos',  component: ConsultaDestinosComponent },
+
+      { path: 'consulta-equipaje',  component: ConsultaEquipajeComponent },
+
+      { path: 'abordaje',  component: AbordajeComponent },
+
+      { path: 'reservar-vuelo', component: ReservarVueloComponent },
+
+      { path: 'consulta-agregar-vuelo',  component: ConsultaAgregarVueloComponent },
+
+      { path: 'crear-tripulacion',  component: CrearTripulacionComponent },
 
       { path: '**', redirectTo: '' }
     ])

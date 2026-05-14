@@ -1,0 +1,115 @@
+<div class="consulta-container">
+
+  <div class="consulta-card">
+
+    <h2>Consulta de Aviones ✈️</h2>
+
+    <!-- FILTRO -->
+    <div class="filtros">
+
+      <div class="campo">
+
+        <label>Aerolínea</label>
+
+        <select [(ngModel)]="aerolineaSeleccionada">
+
+          <option value="">
+            Seleccione una aerolínea
+          </option>
+
+          <option
+            *ngFor="let aerolinea of aerolineas"
+            [value]="aerolinea">
+
+            {{ aerolinea }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="acciones">
+
+      <button
+        class="btn buscar"
+        (click)="buscarAviones()">
+
+        BUSCAR
+      </button>
+
+      <button
+        class="btn limpiar"
+        (click)="limpiarFiltros()">
+
+        LIMPIAR
+      </button>
+
+      <button
+        class="btn nueva"
+        (click)="nuevaConsulta()">
+
+        NUEVA CONSULTA
+      </button>
+
+      <button
+        class="btn pdf"
+        [disabled]="!consultaRealizada"
+        (click)="imprimirPDF()">
+
+        IMPRIMIR PDF
+      </button>
+
+      <button
+        class="btn excel"
+        [disabled]="!consultaRealizada"
+        (click)="exportarExcel()">
+
+        EXCEL
+      </button>
+
+    </div>
+
+    <!-- TABLA -->
+    <div
+      class="tabla-container"
+      *ngIf="aviones.length > 0">
+
+      <table>
+
+        <thead>
+
+        <tr>
+          <th>Modelo Avión</th>
+          <th>Marca</th>
+          <th>Año</th>
+          <th>Cantidad Pasajeros</th>
+          <th>Cantidad Vuelos</th>
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        <tr *ngFor="let avion of aviones">
+
+          <td>{{ avion.modeloAvion }}</td>
+          <td>{{ avion.marca }}</td>
+          <td>{{ avion.anio }}</td>
+          <td>{{ avion.cantidadPasajeros }}</td>
+          <td>{{ avion.cantidadVuelos }}</td>
+
+        </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

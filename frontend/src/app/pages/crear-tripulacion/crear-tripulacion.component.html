@@ -1,0 +1,138 @@
+<div class="contenedor">
+
+  <div class="card">
+
+    <h1>Crear Tripulación</h1>
+
+    <div class="grid">
+
+      <!-- PILOTO -->
+      <div class="campo">
+
+        <label>Piloto</label>
+
+        <select
+          [(ngModel)]="tripulacion.piloto">
+
+          <option value="">
+            Seleccione un piloto
+          </option>
+
+          <option
+            *ngFor="let piloto of pilotos"
+            [value]="piloto">
+
+            {{ piloto }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- COPILOTO -->
+      <div class="campo">
+
+        <label>Co-Piloto</label>
+
+        <select
+          [(ngModel)]="tripulacion.copiloto">
+
+          <option value="">
+            Seleccione un copiloto
+          </option>
+
+          <option
+            *ngFor="let copiloto of copilotos"
+            [value]="copiloto">
+
+            {{ copiloto }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- INGENIERO -->
+      <div class="campo">
+
+        <label>Ingeniero de Vuelo</label>
+
+        <select
+          [(ngModel)]="tripulacion.ingeniero">
+
+          <option value="">
+            Seleccione un ingeniero
+          </option>
+
+          <option
+            *ngFor="let ingeniero of ingenieros"
+            [value]="ingeniero">
+
+            {{ ingeniero }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <!-- CABINA -->
+    <div class="cabina-container">
+
+      <h2>Tripulantes de Cabina</h2>
+
+      <p>
+        Seleccione 3 tripulantes
+      </p>
+
+      <div class="cabina-grid">
+
+        <div
+          *ngFor="let tripulante of tripulantesCabina"
+          class="cabina-item">
+
+          <input
+            type="checkbox"
+            [checked]="tripulacion.cabina.includes(tripulante)"
+            (change)="toggleCabina(tripulante)">
+
+          <span>
+
+            {{ tripulante }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="acciones">
+
+      <button
+        class="btn limpiar"
+        (click)="limpiarFormulario()">
+
+        Limpiar
+
+      </button>
+
+      <button
+        class="btn guardar"
+        (click)="guardarTripulacion()">
+
+        Guardar
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

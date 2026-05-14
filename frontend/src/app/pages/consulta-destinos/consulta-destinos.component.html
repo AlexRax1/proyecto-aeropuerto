@@ -1,0 +1,106 @@
+<div class="contenedor">
+
+  <div class="card">
+
+    <h2>Consulta de Destinos Autorizados</h2>
+
+    <div class="filtros">
+
+      <div class="campo">
+        <label>Aerolínea</label>
+
+        <select [(ngModel)]="aerolineaSeleccionada">
+
+          <option value="">Seleccione una aerolínea</option>
+
+          <option *ngFor="let aerolinea of aerolineas"
+                  [value]="aerolinea">
+
+            {{ aerolinea }}
+
+          </option>
+
+        </select>
+      </div>
+
+    </div>
+
+    <div class="botones">
+
+      <button class="btn buscar"
+              (click)="buscarDestinos()">
+
+        Buscar
+
+      </button>
+
+      <button class="btn limpiar"
+              (click)="limpiarFiltros()">
+
+        Limpiar
+
+      </button>
+
+      <button class="btn nueva"
+              (click)="nuevaConsulta()">
+
+        Nueva Consulta
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="tabla-card"
+       *ngIf="consultaRealizada && destinos.length > 0">
+
+    <h3>Resultados de la Consulta</h3>
+
+    <table>
+
+      <thead>
+
+      <tr>
+        <th>Nombre Aeropuerto</th>
+        <th>País</th>
+        <th>Ciudad</th>
+      </tr>
+
+      </thead>
+
+      <tbody>
+
+      <tr *ngFor="let destino of destinos">
+
+        <td>{{ destino.aeropuerto }}</td>
+        <td>{{ destino.pais }}</td>
+        <td>{{ destino.ciudad }}</td>
+
+      </tr>
+
+      </tbody>
+
+    </table>
+
+    <div class="acciones-tabla">
+
+      <button class="btn pdf"
+              (click)="imprimirPDF()">
+
+        IMPRIMIR PDF
+
+      </button>
+
+      <button class="btn excel"
+              (click)="exportarExcel()">
+
+        EXPORTAR EXCEL
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
