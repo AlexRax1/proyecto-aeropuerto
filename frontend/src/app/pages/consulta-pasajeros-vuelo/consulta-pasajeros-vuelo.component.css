@@ -1,0 +1,116 @@
+.consulta-container {
+  min-height: 100vh;
+  background: #f4f7fb;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px;
+}
+
+.consulta-card {
+  width: 100%;
+  max-width: 1300px;
+  background: white;
+  border-radius: 14px;
+  padding: 30px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #1e3a5f;
+}
+
+.filtros {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 300px;
+}
+
+.campo label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.campo input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cfd8e3;
+  font-size: 14px;
+}
+
+.acciones {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.btn {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.buscar {
+  background: #2563eb;
+}
+
+.limpiar {
+  background: #dc2626;
+}
+
+.nueva {
+  background: #7c3aed;
+}
+
+.pdf {
+  background: #ea580c;
+}
+
+.excel {
+  background: #16a34a;
+}
+
+.tabla-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #1e3a5f;
+  color: white;
+}
+
+th,
+td {
+  padding: 14px;
+  border: 1px solid #dbe2ea;
+  text-align: center;
+}
+
+tbody tr:nth-child(even) {
+  background: #f8fafc;
+}

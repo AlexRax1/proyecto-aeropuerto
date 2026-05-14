@@ -1,7 +1,5 @@
 package com.aeropuerto.auth.service;
 
-
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
