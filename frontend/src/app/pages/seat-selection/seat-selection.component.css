@@ -90,3 +90,12 @@
 .reserve-btn:hover {
   background-color: #0056b3;
 }
+
+
+/* Asiento en proceso de pago por otra persona */
+.bloqueado {
+  background-color: #ffc107 !important; /* Amarillo */
+  color: black;
+  cursor: not-allowed;
+  opacity: 0.8;
+}

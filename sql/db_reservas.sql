@@ -9,6 +9,8 @@ CREATE TABLE boleto(
 	cant_maletas int,
 	escala int references boleto(boleto_id),
 	costo_boleto numeric(10,2), 
+	codigo_asiento varchar(10),
+
 	fecha_creacion timestamp, 
 	usuario_creacion varchar(150),
 	fecha_modificacion timestamp,
@@ -25,3 +27,8 @@ CREATE TABLE equipaje(
 	fecha_modificacion timestamp,
 	usuario_modificacion varchar(150)
 );
+
+
+CREATE UNIQUE INDEX uk_vuelo_asiento_activo
+ON boleto (vuelo_id, asiento_id)
+WHERE estado IN ('RESERVADO', 'PAGADO');
