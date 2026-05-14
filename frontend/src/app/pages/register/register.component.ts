@@ -14,7 +14,6 @@ import { Router, RouterLink } from '@angular/router';
 export class RegisterComponent {
 
   registerData = {
-    username: '',
     pasaporte: '',
     nombreCompleto: '',
     fechaNacimiento: '',
@@ -79,39 +78,55 @@ export class RegisterComponent {
     }
 
     // Validar pasaporte existente
-    const confirmar = confirm('¿Está seguro de continuar?');
-
-    if (!confirmar) {
-      alert('Se ha cancelado el registro satisfactoriamente');
-      return;
-    }
-
-// Registrar usuario
-
-    this.http.post(
-      'http://localhost:8082/auth/register',
-      this.registerData
+    this.http.get<any>(
+      `http://localhost:8083/usuarios/pasaporte/${data.pasaporte}`
     )
       .subscribe({
 
         next: (response) => {
 
-          console.log('Usuario registrado', response);
+          // Si ya existe usuario
+          if (response.existe) {
+            alert('El número de pasaporte ingresado ya cuenta con usuario.');
+            return;
+          }
 
-          alert('Se ha creado con éxito el usuario.');
+          // Confirmación
+          const confirmar = confirm('¿Está seguro de continuar?');
 
-          this.router.navigate(['/login']);
+          if (!confirmar) {
+            alert('Se ha cancelado el registro satisfactoriamente');
+            return;
+          }
+
+          // Registrar usuario
+          this.http.post(
+            'http://localhost:8083/auth/register',
+            this.registerData
+          )
+            .subscribe({
+
+              next: (response) => {
+
+                console.log('Usuario registrado', response);
+
+                alert('Se ha creado con éxito el usuario.');
+
+                this.router.navigate(['/login']);
+              },
+
+              error: (err) => {
+                console.error(err);
+                alert('Error al registrar usuario');
+              }
+
+            });
+
         },
 
         error: (err) => {
-
           console.error(err);
-
-          if (err.error) {
-            alert(err.error);
-          } else {
-            alert('Error al registrar usuario');
-          }
+          alert('Error validando pasaporte');
         }
 
       });
