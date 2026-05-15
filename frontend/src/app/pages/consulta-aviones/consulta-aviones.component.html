@@ -1,0 +1,136 @@
+<div class="consulta-container">
+
+  <div class="consulta-card">
+
+    <h2>Consulta de Aviones ✈️</h2>
+
+    <!-- FILTRO -->
+    <div class="filtros">
+
+      <div class="campo">
+
+        <label>Aerolínea</label>
+
+        <select [(ngModel)]="aerolineaSeleccionada">
+
+          <option value="">
+            Seleccione una aerolínea
+          </option>
+
+          <option
+            *ngFor="let aerolinea of aerolineas"
+            [value]="aerolinea.aerolineaId">
+
+            {{ aerolinea.nombreAerolinea }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="acciones">
+
+      <button
+        class="btn buscar"
+        (click)="buscarAviones()">
+
+        BUSCAR
+      </button>
+
+      <button
+        class="btn limpiar"
+        (click)="limpiarFiltros()">
+
+        LIMPIAR
+      </button>
+
+      <button
+        class="btn nueva"
+        (click)="nuevaConsulta()">
+
+        NUEVA CONSULTA
+      </button>
+
+      <button
+        class="btn pdf"
+        [disabled]="aviones.length === 0"
+        (click)="imprimirPDF()">
+
+        IMPRIMIR PDF
+      </button>
+
+      <button
+        class="btn excel"
+        [disabled]="aviones.length === 0"
+        (click)="exportarExcel()">
+
+        EXPORTAR EXCEL
+      </button>
+
+    </div>
+
+    <!-- TABLA -->
+    <div
+      class="tabla-container"
+      *ngIf="aviones.length > 0">
+
+      <table>
+
+        <thead>
+
+        <tr>
+
+          <th>ID</th>
+          <th>Marca</th>
+          <th>Año</th>
+          <th>Asientos Económica</th>
+          <th>Asientos Ejecutiva</th>
+          <th>Cantidad Vuelos</th>
+          <th>Estado</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        <tr *ngFor="let avion of aviones">
+
+          <td>{{ avion.avionId }}</td>
+
+          <td>{{ avion.marca }}</td>
+
+          <td>{{ avion.ano }}</td>
+
+          <td>{{ avion.cantAsientosEconomica }}</td>
+
+          <td>{{ avion.cantAsientosEjecutiva }}</td>
+
+          <td>{{ avion.cantVuelos }}</td>
+
+          <td>{{ avion.estado }}</td>
+
+        </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <!-- MENSAJE SI NO HAY RESULTADOS -->
+    <div
+      class="sin-resultados"
+      *ngIf="consultaRealizada && aviones.length === 0">
+
+      No se encontraron aviones para la aerolínea seleccionada.
+
+    </div>
+
+  </div>
+
+</div>
