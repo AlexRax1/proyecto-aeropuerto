@@ -1,11 +1,14 @@
 package com.aeropuerto.operaciones.service;
 
 
+import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
 import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
 import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.repository.VueloRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class VueloService {
 
     private final VueloRepository vueloRepository;
+    private final AvionService avionService;
 
     public List<VueloDisponibleDTO> buscarVuelos(Long origenId, Long destinoId, LocalDate fechaSalida) {
         List<Vuelo> vuelos = vueloRepository.buscarVuelosDisponibles(origenId, destinoId, fechaSalida);
@@ -45,5 +49,17 @@ public class VueloService {
                     .ejecutiva("$" + vuelo.getPrecioClaseEjecutiva())
                     .build();
         }).collect(Collectors.toList());
+    }
+
+
+    public EstructuraAvionDTO obtenerMatrizPorVuelo(Long vueloId) {
+        Vuelo vuelo = vueloRepository.findById(vueloId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Vuelo no encontrado con ID: " + vueloId
+                ));
+
+        Long avionId = vuelo.getAvion().getId();
+        return avionService.obtenerEstructuraAsientos(avionId);
     }
 }

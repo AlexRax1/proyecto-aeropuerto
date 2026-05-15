@@ -1,6 +1,7 @@
 package com.aeropuerto.operaciones.controller;
 
 
+import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
 import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
 import com.aeropuerto.operaciones.service.VueloService;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +28,12 @@ public class VueloController {
 
         List<VueloDisponibleDTO> vuelos = vueloService.buscarVuelos(origenId, destinoId, fechaSalida);
         return ResponseEntity.ok(vuelos);
+    }
+
+    // Endpoint para obtener la matriz de los asientos
+    @GetMapping("/{id}/asientos")
+    public ResponseEntity<EstructuraAvionDTO> obtenerAsientosDeVuelo(@PathVariable Long id) {
+        EstructuraAvionDTO estructura = vueloService.obtenerMatrizPorVuelo(id);
+        return ResponseEntity.ok(estructura);
     }
 }
