@@ -1,0 +1,151 @@
+<div class="contenedor">
+
+  <div class="card">
+    <h2>Reservar Vuelo</h2>
+    <div class="filtros">
+      <div class="campo">
+        <label>Aeropuerto de Salida</label>
+        <select [(ngModel)]="filtros.origen">
+          <option value="">Seleccione</option>
+          <option *ngFor="let aeropuerto of aeropuertos" [value]="aeropuerto.id">
+            {{ aeropuerto.labelCompleto }}
+          </option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label>Aeropuerto de Llegada</label>
+        <select [(ngModel)]="filtros.destino">
+          <option value="">Seleccione</option>
+          <option *ngFor="let aeropuerto of aeropuertos" [value]="aeropuerto.id">
+            {{ aeropuerto.labelCompleto }}
+          </option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label>Fecha de Salida</label>
+        <input type="date" [(ngModel)]="filtros.fechaSalida" />
+      </div>
+    </div>
+
+    <div class="botones">
+      <button class="btn buscar" (click)="buscarVuelos()">Buscar</button>
+      <button class="btn limpiar" (click)="nuevaBusqueda()">Limpiar</button>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="consultaRealizada && vuelosDisponibles.length > 0">
+    <h3>Vuelos Disponibles</h3>
+    <table>
+      <thead>
+      <tr>
+        <th>Salida</th>
+        <th>Llegada</th>
+        <th>Tiempo</th>
+        <th>Clase Económica</th>
+        <th>Clase Ejecutiva</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let vuelo of vuelosDisponibles">
+        <td>{{ vuelo.salida }}</td>
+        <td>{{ vuelo.llegada }}</td>
+        <td>{{ vuelo.tiempo }}</td>
+        <td>{{ vuelo.economica }}</td>
+        <td>{{ vuelo.ejecutiva }}</td>
+        <td>
+          <button class="btn seleccionar" (click)="seleccionarVuelo(vuelo)">Seleccionar</button>
+          <button class="btn detalle" (click)="verDetalle(vuelo)">Ver</button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" *ngIf="vueloSeleccionado">
+    <h3>Vuelo Seleccionado: {{ vueloSeleccionado.numeroVuelo }}</h3>
+    
+    <div class="filtros">
+      <div class="campo">
+        <label>Clase</label>
+        <select [(ngModel)]="claseSeleccionada" [disabled]="asientosSeleccionados.length > 0">
+          <option value="">Seleccione</option>
+          <option value="Economica">Clase Económica</option>
+          <option value="Ejecutiva">Clase Ejecutiva</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label>Cantidad de Maletas</label>
+        <input type="number" [(ngModel)]="cantidadMaletas" [disabled]="asientosSeleccionados.length > 0" />
+      </div>
+
+      <!-- Input de solo lectura: Solo aparece si hay asientos elegidos -->
+      <div class="campo" *ngIf="asientosSeleccionados.length > 0">
+        <label>Asientos Seleccionados</label>
+        <input type="text" [value]="obtenerNombresAsientos()" readonly style="background-color: #f1f5f9; font-weight: bold; color: #0f766e;" />
+      </div>
+    </div>
+
+    <!-- Botón visible solo si no han seleccionado asientos aún -->
+    <div class="botones" *ngIf="asientosSeleccionados.length === 0">
+      <button class="btn generar" (click)="abrirModalAsientos()">
+        Seleccionar Asientos
+      </button>
+      <button class="btn nueva" (click)="nuevaBusqueda()">
+        Nueva Consulta
+      </button>
+    </div>
+
+    <!-- SECCIÓN DE PAGOS: Solo visible cuando ya eligieron los asientos -->
+    <div *ngIf="asientosSeleccionados.length > 0" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+      <h3>Resumen y Pago</h3>
+      <p style="margin-bottom: 15px;"><strong>Total a cobrar:</strong> Q{{ asientosSeleccionados.length * 150 }}</p>
+      
+      <div class="filtros" style="margin-bottom: 20px;">
+        <div class="campo">
+          <label>Nombre en tarjeta</label>
+          <input type="text" placeholder="Ej. Juan Pérez" [(ngModel)]="datosPago.nombre">
+        </div>
+        <div class="campo">
+          <label>Número de tarjeta</label>
+          <input type="text" placeholder="XXXX XXXX XXXX XXXX" [(ngModel)]="datosPago.tarjeta">
+        </div>
+        <div class="campo">
+          <label>MM/YY</label>
+          <input type="text" placeholder="12/28" [(ngModel)]="datosPago.vencimiento">
+        </div>
+        <div class="campo">
+          <label>CVV</label>
+          <input type="text" placeholder="123" [(ngModel)]="datosPago.cvv">
+        </div>
+      </div>
+
+      <div class="botones">
+        <button class="btn generar" (click)="procesarPago()">
+          Confirmar y Pagar
+        </button>
+        <button class="btn nueva" (click)="nuevaBusqueda()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL DE SELECCIÓN DE ASIENTOS -->
+<div class="modal-overlay" *ngIf="mostrarModalAsientos">
+  <div class="modal-content">
+    <button class="btn-close" (click)="cerrarModal()">✕ Cerrar Mapa</button>
+    
+    <!-- Escuchamos el nuevo evento asientosConfirmados -->
+    <app-seat-selection 
+      [vueloId]="vueloSeleccionado.numeroVuelo" 
+      (asientosConfirmados)="onAsientosConfirmados($event)"
+      (cerrar)="cerrarModal()">
+    </app-seat-selection>
+  </div>
+</div>

@@ -2,17 +2,18 @@ package com.aeropuerto.operaciones.controller;
 
 
 import com.aeropuerto.operaciones.dto.AvionRequestDTO;
-import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
 import com.aeropuerto.operaciones.model.Avion;
 import com.aeropuerto.operaciones.service.AvionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/aviones")
-@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class AvionController {
 
@@ -29,10 +30,5 @@ public class AvionController {
 
 
 
-    // Endpoint para obtener la matriz de los asientos
-    @GetMapping("/{id}/asientos")
-    public ResponseEntity<EstructuraAvionDTO> obtenerEstructuraAsientos(@PathVariable Long id) {
-        EstructuraAvionDTO estructura = avionService.obtenerEstructuraAsientos(id);
-        return ResponseEntity.ok(estructura);
-    }
+
 }

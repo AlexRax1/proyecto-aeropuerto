@@ -1,9 +1,7 @@
 package com.aeropuerto.operaciones.model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,4 +31,10 @@ public abstract class Auditoria {
     @LastModifiedBy
     @Column(name = "usuario_modificacion", length = 150)
     private String usuarioModificacion;
+
+    @PrePersist
+    protected void onCreate() { fechaHoraCreacion = LocalDateTime.now(); }
+
+    @PreUpdate
+    protected void onUpdate() { fechaHoraModificacion = LocalDateTime.now(); }
 }

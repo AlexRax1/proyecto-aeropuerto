@@ -12,7 +12,7 @@ public class DestinoAeropuerto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "destino_id")
-    private Long id;
+    private Long destinoId;
 
     @Column(name = "ciudad_destino", length = 100)
     private String ciudadDestino;

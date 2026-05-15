@@ -27,6 +27,11 @@ public class GatewayRoutingConfig {
                         .path("/aviones/**")
                         .uri("http://localhost:8083"))
 
+                // agregar mas rutas
+                .route("reservas-service", r -> r
+                        .path("/api/reservas/**")
+                        .uri("http://localhost:8084"))
+
 
                 .build();
     }

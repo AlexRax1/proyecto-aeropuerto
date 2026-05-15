@@ -1,0 +1,26 @@
+.payment-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 40px;
+}
+
+.payment-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.payment-container input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.payment-container button {
+  background: green;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
