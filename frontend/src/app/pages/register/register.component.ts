@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-register',
@@ -14,15 +14,21 @@ import { Router, RouterLink } from '@angular/router';
 export class RegisterComponent {
 
   registerData = {
+
     username: '',
+
     pasaporte: '',
     nombreCompleto: '',
     fechaNacimiento: '',
     nacionalidad: '',
     correo: '',
+
     codigoArea: '',
     telefono: '',
+
+    extensionNumeroEmergencia: '',
     numeroEmergencia: '',
+
     direccion: '',
     password: ''
   };
@@ -36,8 +42,10 @@ export class RegisterComponent {
 
     const data = this.registerData;
 
-    // Validar campos obligatorios
+    // VALIDAR CAMPOS OBLIGATORIOS
+
     if (
+      !data.username ||
       !data.pasaporte ||
       !data.nombreCompleto ||
       !data.fechaNacimiento ||
@@ -45,48 +53,67 @@ export class RegisterComponent {
       !data.correo ||
       !data.codigoArea ||
       !data.telefono ||
+      !data.extensionNumeroEmergencia ||
       !data.numeroEmergencia ||
       !data.direccion ||
       !data.password
     ) {
+
       alert('Debe ingresar los campos obligatorios');
       return;
     }
 
-    // Validar pasaporte
+    // VALIDAR PASAPORTE
+
     if (data.pasaporte.length > 15) {
+
       alert('El pasaporte no puede exceder 15 caracteres');
       return;
     }
 
-    // Validar teléfono
+    // VALIDAR TELÉFONO
+
     const telefonoRegex = /^\d{8}$/;
 
     if (!telefonoRegex.test(data.telefono)) {
+
       alert('El teléfono debe contener exactamente 8 dígitos');
       return;
     }
 
-    // Validar contraseña
+    // VALIDAR NÚMERO DE EMERGENCIA
+
+    if (!telefonoRegex.test(data.numeroEmergencia)) {
+
+      alert('El número de emergencia debe contener exactamente 8 dígitos');
+      return;
+    }
+
+    // VALIDAR PASSWORD
+
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#])[A-Za-z\d@$!%*?&.#]{6,}$/;
 
     if (!passwordRegex.test(data.password)) {
+
       alert(
-        'El formato de la contraseña debe incluir al menos una letra mayúscula, un carácter especial y un número'
+        'La contraseña debe incluir al menos una mayúscula, un número y un carácter especial'
       );
+
       return;
     }
 
-    // Validar pasaporte existente
+    // CONFIRMAR
+
     const confirmar = confirm('¿Está seguro de continuar?');
 
     if (!confirmar) {
+
       alert('Se ha cancelado el registro satisfactoriamente');
       return;
     }
 
-// Registrar usuario
+    // REGISTRAR USUARIO
 
     this.http.post(
       'http://localhost:8082/auth/register',
@@ -108,13 +135,14 @@ export class RegisterComponent {
           console.error(err);
 
           if (err.error) {
+
             alert(err.error);
+
           } else {
+
             alert('Error al registrar usuario');
           }
         }
-
       });
-
   }
 }

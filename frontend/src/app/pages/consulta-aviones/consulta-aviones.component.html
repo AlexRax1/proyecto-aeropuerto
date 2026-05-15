@@ -19,9 +19,9 @@
 
           <option
             *ngFor="let aerolinea of aerolineas"
-            [value]="aerolinea">
+            [value]="aerolinea.aerolineaId">
 
-            {{ aerolinea }}
+            {{ aerolinea.nombreAerolinea }}
 
           </option>
 
@@ -57,7 +57,7 @@
 
       <button
         class="btn pdf"
-        [disabled]="!consultaRealizada"
+        [disabled]="aviones.length === 0"
         (click)="imprimirPDF()">
 
         IMPRIMIR PDF
@@ -65,10 +65,10 @@
 
       <button
         class="btn excel"
-        [disabled]="!consultaRealizada"
+        [disabled]="aviones.length === 0"
         (click)="exportarExcel()">
 
-        EXCEL
+        EXPORTAR EXCEL
       </button>
 
     </div>
@@ -83,11 +83,15 @@
         <thead>
 
         <tr>
-          <th>Modelo Avión</th>
+
+          <th>ID</th>
           <th>Marca</th>
           <th>Año</th>
-          <th>Cantidad Pasajeros</th>
+          <th>Asientos Económica</th>
+          <th>Asientos Ejecutiva</th>
           <th>Cantidad Vuelos</th>
+          <th>Estado</th>
+
         </tr>
 
         </thead>
@@ -96,17 +100,34 @@
 
         <tr *ngFor="let avion of aviones">
 
-          <td>{{ avion.modeloAvion }}</td>
+          <td>{{ avion.avionId }}</td>
+
           <td>{{ avion.marca }}</td>
-          <td>{{ avion.anio }}</td>
-          <td>{{ avion.cantidadPasajeros }}</td>
-          <td>{{ avion.cantidadVuelos }}</td>
+
+          <td>{{ avion.ano }}</td>
+
+          <td>{{ avion.cantAsientosEconomica }}</td>
+
+          <td>{{ avion.cantAsientosEjecutiva }}</td>
+
+          <td>{{ avion.cantVuelos }}</td>
+
+          <td>{{ avion.estado }}</td>
 
         </tr>
 
         </tbody>
 
       </table>
+
+    </div>
+
+    <!-- MENSAJE SI NO HAY RESULTADOS -->
+    <div
+      class="sin-resultados"
+      *ngIf="consultaRealizada && aviones.length === 0">
+
+      No se encontraron aviones para la aerolínea seleccionada.
 
     </div>
 

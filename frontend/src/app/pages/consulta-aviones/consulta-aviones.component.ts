@@ -1,6 +1,11 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-consulta-aviones',
@@ -9,6 +14,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './consulta-aviones.component.html',
   styleUrls: ['./consulta-aviones.component.css']
 })
+
 export class ConsultaAvionesComponent {
 
   aerolineaSeleccionada: string = '';
@@ -17,60 +23,69 @@ export class ConsultaAvionesComponent {
 
   aviones: any[] = [];
 
-  aerolineas: string[] = [
-    'Avianca',
-    'Copa Airlines',
-    'American Airlines',
-    'Delta Airlines',
-    'United Airlines'
-  ];
+  aerolineas: any[] = [];
+
+  constructor(private http: HttpClient) {
+
+    this.cargarAerolineas();
+  }
 
   buscarAviones() {
 
     if (!this.aerolineaSeleccionada) {
+
       alert('Debe seleccionar una aerolínea');
       return;
     }
 
-    this.consultaRealizada = true;
+    this.http.get<any[]>(
+      `http://localhost:8084/aviones/aerolinea/${this.aerolineaSeleccionada}`
+    )
+      .subscribe({
 
-    // Simulación FRONTEND
-    if (this.aerolineaSeleccionada === 'United Airlines') {
+        next: (response) => {
 
-      this.aviones = [];
+          this.consultaRealizada = true;
 
-      alert('La aerolínea consultada no tiene aviones');
+          this.aviones = response;
 
-      return;
-    }
+          if (this.aviones.length === 0) {
 
-    this.aviones = [
+            alert('La aerolínea consultada no tiene aviones');
+          }
+        },
 
-      {
-        modeloAvion: 'A320',
-        marca: 'Airbus',
-        anio: 2020,
-        cantidadPasajeros: 180,
-        cantidadVuelos: 340
-      },
+        error: (err) => {
 
-      {
-        modeloAvion: 'B737',
-        marca: 'Boeing',
-        anio: 2018,
-        cantidadPasajeros: 160,
-        cantidadVuelos: 280
-      },
+          console.error(err);
 
-      {
-        modeloAvion: 'A350',
-        marca: 'Airbus',
-        anio: 2023,
-        cantidadPasajeros: 300,
-        cantidadVuelos: 120
-      }
+          alert('Error al consultar aviones');
+        }
 
-    ];
+      });
+
+  }
+
+  cargarAerolineas() {
+
+    this.http.get<any[]>(
+      'http://localhost:8084/aerolineas'
+    )
+      .subscribe({
+
+        next: (response) => {
+
+          this.aerolineas = response;
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert('Error al cargar aerolíneas');
+        }
+
+      });
 
   }
 
@@ -88,14 +103,105 @@ export class ConsultaAvionesComponent {
     this.limpiarFiltros();
   }
 
+  // ==========================
+  // GENERAR PDF
+  // ==========================
+
   imprimirPDF() {
 
-    alert('Generando PDF...');
+    if (this.aviones.length === 0) {
+
+      alert('No existen datos para exportar');
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+
+    doc.text('Reporte de Aviones', 14, 20);
+
+    const filas = this.aviones.map(avion => [
+
+      avion.avionId,
+      avion.marca,
+      avion.ano,
+      avion.cantAsientosEconomica,
+      avion.cantAsientosEjecutiva,
+      avion.cantVuelos,
+      avion.estado
+
+    ]);
+
+    autoTable(doc, {
+
+      startY: 30,
+
+      head: [[
+        'ID',
+        'Marca',
+        'Año',
+        'Asientos Económica',
+        'Asientos Ejecutiva',
+        'Cantidad Vuelos',
+        'Estado'
+      ]],
+
+      body: filas
+
+    });
+
+    doc.save('reporte-aviones.pdf');
+
   }
+
+  // ==========================
+  // EXPORTAR EXCEL
+  // ==========================
 
   exportarExcel() {
 
-    alert('Generando Excel...');
+    if (this.aviones.length === 0) {
+
+      alert('No existen datos para exportar');
+      return;
+    }
+
+    const datosExcel = this.aviones.map(avion => ({
+
+      ID: avion.avionId,
+
+      Marca: avion.marca,
+
+      Año: avion.ano,
+
+      'Asientos Económica': avion.cantAsientosEconomica,
+
+      'Asientos Ejecutiva': avion.cantAsientosEjecutiva,
+
+      'Cantidad de Vuelos': avion.cantVuelos,
+
+      Estado: avion.estado
+
+    }));
+
+    const worksheet: XLSX.WorkSheet =
+      XLSX.utils.json_to_sheet(datosExcel);
+
+    const workbook: XLSX.WorkBook = {
+
+      Sheets: {
+        'Aviones': worksheet
+      },
+
+      SheetNames: ['Aviones']
+    };
+
+    XLSX.writeFile(
+      workbook,
+      'reporte-aviones.xlsx'
+    );
+
   }
 
 }
