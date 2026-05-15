@@ -1,8 +1,7 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { forkJoin, Observable, interval, Subscription} from 'rxjs';
+import { forkJoin, Observable, interval, Subscription } from 'rxjs';
 
 interface Seat {
   label: string;
@@ -26,65 +25,39 @@ interface Seat {
 })
 export class SeatSelectionComponent implements OnInit, OnDestroy {
 
+  // 1. Recibimos el ID del vuelo dinámicamente desde el componente padre
+  @Input() vueloId!: number;
+  
+  // para cerrar el modal y/o devolver los asientos seleccionados hacia el front
+  @Output() cerrar = new EventEmitter<void>();
+  @Output() asientosConfirmados = new EventEmitter<any[]>();
+
   seats: Seat[][] = [];
   maxSelection = 5;
-
   pollingSub!: Subscription;
+  selectedSeatInfo: Seat[] = [];
 
-  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.loadSeats(1, 1);
-    
-    // Iniciar el polling silencioso cada 3 segundos usando el endpoint original
-    this.pollingSub = interval(3000).subscribe(() => {
-      this.actualizarEstados(1); 
-    });
-  }
-
-  ngOnDestroy() {
-    // Apagar el polling al salir de la pantalla
-    if (this.pollingSub) this.pollingSub.unsubscribe();
-  }
-
-  generateSeats() {
-    this.seats = [];
-
-    const rows = 30;
-    const cols = ['A','B','C','D','E','F'];
-
-    for (let i = 1; i <= rows; i++) {
-      const row: Seat[] = [];
-
-      for (let col of cols) {
-        row.push({
-          label: `${i}${col}`,
-          selected: false,
-          occupied: false
-        });
-      }
-
-      this.seats.push(row);
+    // Solo cargamos si realmente nos pasaron un vueloId
+    if (this.vueloId) {
+      this.loadSeats(this.vueloId);
+      
+      // Iniciar el polling silencioso cada 3 segundos
+      this.pollingSub = interval(3000).subscribe(() => {
+        this.actualizarEstados(this.vueloId); 
+      });
     }
   }
 
-  mockOccupiedSeats() {
-    const data = ["1A", "2B", "3C", "5D"];
-
-    this.seats.forEach(row => {
-      row.forEach(seat => {
-        if (data.includes(seat.label)) {
-          seat.occupied = true;
-        }
-      });
-    });
+  ngOnDestroy() {
+    if (this.pollingSub) this.pollingSub.unsubscribe();
   }
 
   getSelectedCount(): number {
     return this.seats.flat().filter(s => s.selected).length;
   }
-
-  selectedSeatInfo: Seat[] = [];
 
   selectSeat(seat: Seat) {
     if (seat.occupied) return;
@@ -112,59 +85,51 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
       alert('Debes seleccionar al menos un asiento');
       return;
     }
-    
 
-    // para pruebas, cambiar luego
-    const idUsuario = 1;
-    const idVueloActual = 1;
+    // Aún en pruebas, luego lo cambiaremos por el ID del usuario logueado
+    const idUsuario = 1; 
 
     const peticionesBloqueo: Observable<any>[] = [];
 
     selectedSeatsObjects.forEach(seat => {
-      
       const payload = {
-        vueloId: idVueloActual,
+        vueloId: this.vueloId, // Usamos la variable de entrada
         usuarioId: idUsuario,
-        asientoId: seat.idAsiento, // Enviamos el ID numérico
+        asientoId: seat.idAsiento, 
         codigoAsiento: seat.label,
-        cantMaletas: 1, //valores para la prueba
+        cantMaletas: 1, //cambiar para luego 
         costoBoleto: 150.00
       };
 
-      
-      
       peticionesBloqueo.push(
         this.http.post('http://localhost:8080/api/reservas/iniciar-pago', payload, { responseType: 'text' })
       );
     });
 
-    // Ejecutamos todos los bloqueos al mismo tiempo
     forkJoin(peticionesBloqueo).subscribe({
       next: (res) => {
         console.log("Asientos bloqueados en Redis con éxito.");
         
-        // NAVEGAMOS A LA PANTALLA DE PAGO ENVIANDO LOS DATOS
-        this.router.navigate(['/pago'], {
-          state: { 
-            asientosReservados: selectedSeatsObjects, 
-            vueloId: idVueloActual, 
-            usuarioId: idUsuario 
-          }
-        });
+        this.asientosConfirmados.emit(selectedSeatsObjects);
+        this.cerrar.emit(); 
       },
       error: (err) => {
         console.error("Error al bloquear", err);
         alert("Alguien más está intentando reservar o ya reservó estos asientos. Por favor, elige otros.");
         
-        // Recargamos el mapa para mostrar los asientos que nos ganaron
-        this.loadSeats(1, 1);
+        // Recargamos el mapa para mostrar los asientos que nos ganaron usando el vueloId
+        this.loadSeats(this.vueloId);
         this.selectedSeatInfo = []; 
       }
     });
   }
 
-  loadSeats(avionId: number, vueloId: number) {
-    const reqOperaciones = this.http.get<any>(`http://localhost:8080/aviones/${avionId}/asientos`);
+  // 3. Ya no pedimos avionId, solo vueloId
+  loadSeats(vueloId: number) {
+    // 4. Apuntamos al nuevo endpoint de Operaciones (Puerto 8083)
+    const reqOperaciones = this.http.get<any>(`http://localhost:8083/api/operaciones/vuelos/${vueloId}/asientos`);
+    
+    // Asumo que tu microservicio de reservas sigue corriendo en el 8080
     const reqReservas = this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`);
     
     forkJoin({
@@ -175,14 +140,13 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
           this.seats = data.mapa.matrizAsientos.map((row: any[]) =>
             row.map(seat => {
 
-            // Leemos del nuevo formato JSON
             const estaOcupado = data.estado.ocupados.includes(seat.idAsiento);
             const estaBloqueado = data.estado.bloqueados.includes(seat.idAsiento);
 
             return {
               label: `${seat.fila}${seat.columna}`,
               selected: false,
-              occupied: estaOcupado || estaBloqueado, // Se deshabilita si está en cualquiera de las dos listas
+              occupied: estaOcupado || estaBloqueado,
               categoria: seat.categoria,
               tipo: seat.tipo,
               estado: estaOcupado ? 'OCUPADO' : (estaBloqueado ? 'BLOQUEADO' : 'LIBRE'),
@@ -198,7 +162,7 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   }
 
   actualizarEstados(vueloId: number) {
-    this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`) // Tu URL original
+    this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`) 
       .subscribe({
         next: (estado) => {
           this.seats.forEach(row => {
@@ -211,7 +175,6 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
                 seat.occupied = true;
                 seat.estado = 'BLOQUEADO';
                 
-                // Si el usuario tenía este asiento en verde, se le quita
                 if (seat.selected) {
                   seat.selected = false;
                   this.selectedSeatInfo = this.selectedSeatInfo.filter(s => s.idAsiento !== seat.idAsiento);
@@ -223,12 +186,14 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
             });
           });
 
-          // MAGIA: Obliga a Angular a redibujar los colores al instante
           this.cdr.detectChanges(); 
         },
         error: (err) => console.error("Error en polling", err)
       });
   }
-
   
+  // 5. Botón opcional por si quieres cerrar el modal sin reservar
+  cancelar() {
+    this.cerrar.emit();
+  }
 }

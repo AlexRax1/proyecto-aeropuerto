@@ -1,169 +1,185 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { forkJoin, Observable } from 'rxjs';
+import { SeatSelectionComponent } from '../seat-selection/seat-selection.component'; // Ajusta esta ruta según tu estructura de carpetas
+
+export interface Destino {
+  id: number;
+  labelCompleto: string;
+}
+
+export interface Vuelo {
+  numeroVuelo: number;
+  modelo: string;
+  origen: string;
+  destino: string;
+  salida: string;
+  llegada: string;
+  tiempo: string;
+  economica: string;
+  ejecutiva: string;
+}
 
 @Component({
   selector: 'app-reservar-vuelo',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, SeatSelectionComponent], 
   templateUrl: './reservar-vuelo.component.html',
   styleUrls: ['./reservar-vuelo.component.css']
 })
-export class ReservarVueloComponent {
+export class ReservarVueloComponent implements OnInit {
 
-  aeropuertos: string[] = [
-    'Guatemala',
-    'Panamá',
-    'México',
-    'Costa Rica',
-    'Estados Unidos'
-  ];
-
+  aeropuertos: Destino[] = [];
+  vuelosDisponibles: Vuelo[] = [];
+  
   filtros = {
-    origen: '',
+    origen: '', 
     destino: '',
     fechaSalida: ''
   };
 
-  vuelosDisponibles: any[] = [];
-
   vueloSeleccionado: any = null;
-
   claseSeleccionada: string = '';
-
-  asientoSeleccionado: string = '';
-
   cantidadMaletas: number | null = null;
 
   consultaRealizada = false;
+  mostrarModalAsientos = false; // Controla la visibilidad del modal
+
+  asientosSeleccionados: any[] = [];
+  datosPago = {
+    nombre: '',
+    tarjeta: '',
+    vencimiento: '',
+    cvv: ''
+  };
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.http.get<Destino[]>('http://localhost:8083/api/operaciones/destinos/select')
+      .subscribe({
+        next: (data) => {
+          this.aeropuertos = data;
+        },
+        error: (err) => {
+          console.error('Error al cargar destinos:', err);
+          alert('Error de conexión con el servidor al cargar aeropuertos.');
+        }
+      });
+  }
 
   buscarVuelos() {
-
-    // FA02
-    if (
-      !this.filtros.origen ||
-      !this.filtros.destino ||
-      !this.filtros.fechaSalida
-    ) {
-
+    if (!this.filtros.origen || !this.filtros.destino || !this.filtros.fechaSalida) {
       alert('Debe ingresar los campos obligatorios');
-
       return;
     }
 
-    // FA03
     if (this.filtros.origen === this.filtros.destino) {
-
-      alert(
-        'No se puede seleccionar el mismo aeropuerto de salida y llegada.'
-      );
-
+      alert('No se puede seleccionar el mismo aeropuerto de salida y llegada.');
       return;
     }
 
     this.consultaRealizada = true;
 
-    // FA04
-    if (this.filtros.destino === 'Estados Unidos') {
+    const url = `http://localhost:8083/api/operaciones/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
 
-      this.vuelosDisponibles = [];
-
-      alert(
-        'No se encontraron vuelos según los parámetros ingresados'
-      );
-
-      return;
-    }
-
-    // Datos simulados
-    this.vuelosDisponibles = [
-      {
-        numeroVuelo: 'AV101',
-        modelo: 'Airbus A320',
-        origen: this.filtros.origen,
-        destino: this.filtros.destino,
-        salida: '2026-07-10 08:00',
-        llegada: '2026-07-10 10:30',
-        tiempo: '2h 30m',
-        economica: '$250',
-        ejecutiva: '$600'
+    this.http.get<Vuelo[]>(url).subscribe({
+      next: (data) => {
+        this.vuelosDisponibles = data;
+        
+        if (this.vuelosDisponibles.length === 0) {
+          alert('No se encontraron vuelos según los parámetros ingresados');
+        }
       },
-      {
-        numeroVuelo: 'CP205',
-        modelo: 'Boeing 737',
-        origen: this.filtros.origen,
-        destino: this.filtros.destino,
-        salida: '2026-07-10 14:00',
-        llegada: '2026-07-10 17:00',
-        tiempo: '3h',
-        economica: '$300',
-        ejecutiva: '$700'
+      error: (err) => {
+        console.error('Error al buscar vuelos:', err);
+        alert('Ocurrió un error al consultar los vuelos disponibles.');
       }
-    ];
+    });
   }
 
-  seleccionarVuelo(vuelo: any) {
-
+  seleccionarVuelo(vuelo: Vuelo) {
     this.vueloSeleccionado = vuelo;
   }
 
-  verDetalle(vuelo: any) {
-
+  verDetalle(vuelo: Vuelo) {
     alert(
-      `Modelo: ${vuelo.modelo}
-Número de vuelo: ${vuelo.numeroVuelo}
-Origen: ${vuelo.origen}
-Destino: ${vuelo.destino}
-Salida: ${vuelo.salida}
-Llegada: ${vuelo.llegada}`
+      `Modelo: ${vuelo.modelo}\nNúmero de vuelo: ${vuelo.numeroVuelo}\nOrigen: ${vuelo.origen}\nDestino: ${vuelo.destino}\nSalida: ${vuelo.salida}\nLlegada: ${vuelo.llegada}`
     );
   }
 
-  generarPase() {
+  abrirModalAsientos() {
+    if (!this.claseSeleccionada || this.cantidadMaletas === null) {
+      alert('Debe ingresar los campos obligatorios (Clase y Cantidad de Maletas)');
+      return;
+    }
+    this.mostrarModalAsientos = true;
+  }
 
-    // Validaciones
-    if (
-      !this.claseSeleccionada ||
-      !this.asientoSeleccionado ||
-      this.cantidadMaletas === null
-    ) {
+  cerrarModal() {
+    this.mostrarModalAsientos = false;
+  }
 
-      alert('Debe ingresar los campos obligatorios');
+  // NUEVO: Recibe los asientos desde el modal
+  onAsientosConfirmados(asientos: any[]) {
+    this.asientosSeleccionados = asientos;
+  }
 
+  // NUEVO: Formatea los asientos para el input de solo lectura
+  obtenerNombresAsientos(): string {
+    return this.asientosSeleccionados.map(s => s.label).join(', ');
+  }
+
+  // NUEVO: Ejecuta la transacción final
+  procesarPago() {
+    if (!this.datosPago.nombre || !this.datosPago.tarjeta || !this.datosPago.vencimiento || !this.datosPago.cvv) {
+      alert("Por favor, ingrese todos los datos de la tarjeta.");
       return;
     }
 
-    // FA06
-    if (this.asientoSeleccionado === 'A1') {
+    const idUsuario = 1; // Quemado temporal
+    const peticionesPago: Observable<any>[] = [];
 
-      alert(
-        'No se puede seleccionar el vuelo porque ya tiene vuelos asignados'
+    this.asientosSeleccionados.forEach(seat => {
+      const payload = {
+        vueloId: this.vueloSeleccionado.numeroVuelo,
+        usuarioId: idUsuario,
+        asientoId: seat.idAsiento,
+        codigoAsiento: seat.label,
+        cantMaletas: this.cantidadMaletas,
+        costoBoleto: 150.00 
+      };
+
+      peticionesPago.push(
+        this.http.post('http://localhost:8080/api/reservas/crear', payload)
       );
+    });
 
-      return;
-    }
-
-    alert('Pase de abordar generado correctamente');
+    forkJoin(peticionesPago).subscribe({
+      next: (res) => {
+        alert("¡Pago exitoso! El pase de abordar se ha generado y tus asientos están confirmados.");
+        this.nuevaBusqueda(); // Limpiamos todo
+      },
+      error: (err) => {
+        console.error("Error al procesar el pago", err);
+        alert("Hubo un error al procesar tu pago. Intenta nuevamente.");
+      }
+    });
   }
 
   nuevaBusqueda() {
-
-    this.filtros = {
-      origen: '',
-      destino: '',
-      fechaSalida: ''
-    };
-
+    this.filtros = { origen: '', destino: '', fechaSalida: '' };
     this.vuelosDisponibles = [];
-
     this.vueloSeleccionado = null;
-
     this.claseSeleccionada = '';
-
-    this.asientoSeleccionado = '';
-
     this.cantidadMaletas = null;
-
     this.consultaRealizada = false;
+    this.mostrarModalAsientos = false;
+    
+    // Limpiamos también variables de pago
+    this.asientosSeleccionados = [];
+    this.datosPago = { nombre: '', tarjeta: '', vencimiento: '', cvv: '' };
   }
 }
