@@ -19,7 +19,7 @@ public class Vuelo extends Auditoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vuelo_id")
-    private Long id;
+    private Long vueloId;
 
     @ManyToOne
     @JoinColumn(name = "avion_id")

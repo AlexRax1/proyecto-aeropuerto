@@ -7,43 +7,29 @@
     <div class="filtros">
 
       <div class="campo">
-
         <label>Aeropuerto de Salida</label>
-
         <select [(ngModel)]="filtros.origen">
-
           <option value="">Seleccione</option>
-
+          <!-- Cargar el id como valor y el labelCompleto como texto -->
           <option
             *ngFor="let aeropuerto of aeropuertos"
-            [value]="aeropuerto">
-
-            {{ aeropuerto }}
-
+            [value]="aeropuerto.id">
+            {{ aeropuerto.labelCompleto }}
           </option>
-
         </select>
-
       </div>
 
       <div class="campo">
-
         <label>Aeropuerto de Llegada</label>
-
         <select [(ngModel)]="filtros.destino">
-
           <option value="">Seleccione</option>
-
+          <!-- Cargar el id como valor y el labelCompleto como texto -->
           <option
             *ngFor="let aeropuerto of aeropuertos"
-            [value]="aeropuerto">
-
-            {{ aeropuerto }}
-
+            [value]="aeropuerto.id">
+            {{ aeropuerto.labelCompleto }}
           </option>
-
         </select>
-
       </div>
 
       <div class="campo">
