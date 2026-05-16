@@ -82,13 +82,11 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const idUsuario = 1; 
     const peticionesBloqueo: Observable<any>[] = [];
 
     selectedSeatsObjects.forEach(seat => {
       const payload = {
         vueloId: this.vueloId,
-        usuarioId: idUsuario,
         asientoId: seat.idAsiento, 
         codigoAsiento: seat.label,
         cantMaletas: 1, 

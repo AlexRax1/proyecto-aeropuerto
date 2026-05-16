@@ -34,6 +34,10 @@ public class JwtAuthenticationFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
+        if (exchange.getRequest().getMethod() == org.springframework.http.HttpMethod.OPTIONS) {
+            return chain.filter(exchange);
+        }
+
         // 1. Si la ruta es pública (como login), dejamos que pase sin revisar token
         if (path.startsWith("/auth/")) {
             return chain.filter(exchange);
@@ -50,6 +54,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             if (jwtUtils.isTokenValid(token)) {
 
                 // Extraemos los datos
+                Integer userId = jwtUtils.getUserIdFromToken(token);
                 String username = jwtUtils.getUsernameFromToken(token);
                 List<String> roles = jwtUtils.getRolesFromToken(token);
 
@@ -63,8 +68,15 @@ public class JwtAuthenticationFilter implements WebFilter {
                         username, null, authorities
                 );
 
-                // 6. Dejamos que la petición siga su curso, pero ahora le pegamos la credencial al contexto
-                return chain.filter(exchange)
+                ServerWebExchange mutatedExchange = exchange.mutate()
+                        .request(exchange.getRequest().mutate()
+                                .header("X-User-Id", String.valueOf(userId))
+                                .header("X-Username", username)
+                                .build())
+                        .build();
+
+                // 6. Pasamos el mutatedExchange para que viajen los nuevos Headers
+                return chain.filter(mutatedExchange)
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
             }
         }

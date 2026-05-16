@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 import { forkJoin, Observable } from 'rxjs';
 import { SeatSelectionComponent } from '../seat-selection/seat-selection.component'; // Ajusta esta ruta según tu estructura de carpetas
+import { AuthService } from '../../core/services/auth.service';
 
 export interface Destino {
   id: number;
@@ -25,7 +26,7 @@ export interface Vuelo {
 @Component({
   selector: 'app-reservar-vuelo',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, SeatSelectionComponent], 
+  imports: [CommonModule, FormsModule, SeatSelectionComponent], 
   templateUrl: './reservar-vuelo.component.html',
   styleUrls: ['./reservar-vuelo.component.css']
 })
@@ -54,7 +55,7 @@ export class ReservarVueloComponent implements OnInit {
     cvv: ''
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.http.get<Destino[]>('http://localhost:8083/api/operaciones/destinos/select')
@@ -140,28 +141,6 @@ export class ReservarVueloComponent implements OnInit {
   }
 
 
-  obtenerUsuarioLogueado(): number {
-    // Suponiendo que guardas un objeto de sesión o el ID directo al hacer login
-    const usuarioIdStr = localStorage.getItem('usuarioId'); 
-    
-    // Si usas un Token JWT real, aquí usarías jwt_decode(token) para extraer el ID
-    /*
-      const token = localStorage.getItem('token');
-      if (token) {
-        const decoded = jwt_decode(token);
-        return decoded.id;
-      }
-    */
-
-    if (usuarioIdStr) {
-      return parseInt(usuarioIdStr, 10);
-    }
-    
-    return 1; // Fallback temporal para pruebas
-  }
-
-
-
 
   // NUEVO: Ejecuta la transacción final
   procesarPago() {
@@ -170,14 +149,13 @@ export class ReservarVueloComponent implements OnInit {
       return;
     }
 
-    const idUsuario = this.obtenerUsuarioLogueado();
+
     const peticionesPago: Observable<any>[] = [];
 
     this.asientosSeleccionados.forEach(seat => {
       const costoAsiento = seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
       const payload = {
         vueloId: this.vueloSeleccionado.numeroVuelo,
-        usuarioId: idUsuario,
         asientoId: seat.idAsiento,
         codigoAsiento: seat.label,
         cantMaletas: this.cantidadMaletas,

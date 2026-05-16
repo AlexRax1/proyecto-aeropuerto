@@ -41,7 +41,9 @@ public class ReservaController {
     }
 
     @PostMapping("/iniciar-pago")
-    public ResponseEntity<?> iniciarPago(@RequestBody Boleto boleto) {
+    public ResponseEntity<?> iniciarPago( @RequestHeader("X-User-Id") Long usuarioIdAutenticado, @RequestBody Boleto boleto) {
+
+        boleto.setUsuarioId(usuarioIdAutenticado);
 
         boolean bloqueado = redisService.bloquearAsiento(
                 boleto.getVueloId(),
@@ -60,8 +62,10 @@ public class ReservaController {
 
     //para confirmar la reserva DESPUES del pago
     @PostMapping("/crear")
-    public ResponseEntity<Boleto> registrarBoleto(@RequestBody Boleto boleto) {
+    public ResponseEntity<Boleto> registrarBoleto(@RequestHeader("X-User-Id") Long usuarioIdAutenticado, @RequestBody Boleto boleto) {
         // hacer validaciones
+        boleto.setUsuarioId(usuarioIdAutenticado);
+        
         Boleto nuevaReserva = boletoService.crearReserva(boleto);
         //quitar el bloqueo de redis
         redisService.liberarAsiento(boleto.getVueloId(), boleto.getAsientoId());
