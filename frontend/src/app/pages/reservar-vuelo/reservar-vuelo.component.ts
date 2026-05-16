@@ -41,7 +41,6 @@ export class ReservarVueloComponent implements OnInit {
   };
 
   vueloSeleccionado: any = null;
-  claseSeleccionada: string = '';
   cantidadMaletas: number | null = null;
 
   consultaRealizada = false;
@@ -111,8 +110,8 @@ export class ReservarVueloComponent implements OnInit {
   }
 
   abrirModalAsientos() {
-    if (!this.claseSeleccionada || this.cantidadMaletas === null) {
-      alert('Debe ingresar los campos obligatorios (Clase y Cantidad de Maletas)');
+    if (this.cantidadMaletas === null || this.cantidadMaletas < 0) {
+      alert('Debe ingresar la Cantidad de Maletas para continuar.');
       return;
     }
     this.mostrarModalAsientos = true;
@@ -126,11 +125,43 @@ export class ReservarVueloComponent implements OnInit {
   onAsientosConfirmados(asientos: any[]) {
     this.asientosSeleccionados = asientos;
   }
-
-  // NUEVO: Formatea los asientos para el input de solo lectura
   obtenerNombresAsientos(): string {
-    return this.asientosSeleccionados.map(s => s.label).join(', ');
+    return this.asientosSeleccionados.map(s => `${s.label} (${s.categoria})`).join(', ');
   }
+
+
+  calcularTotal(): number {
+    let total = 0;
+    this.asientosSeleccionados.forEach(seat => {
+      // Estos valores los puedes ajustar según tu lógica de negocio
+      total += seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
+    });
+    return total;
+  }
+
+
+  obtenerUsuarioLogueado(): number {
+    // Suponiendo que guardas un objeto de sesión o el ID directo al hacer login
+    const usuarioIdStr = localStorage.getItem('usuarioId'); 
+    
+    // Si usas un Token JWT real, aquí usarías jwt_decode(token) para extraer el ID
+    /*
+      const token = localStorage.getItem('token');
+      if (token) {
+        const decoded = jwt_decode(token);
+        return decoded.id;
+      }
+    */
+
+    if (usuarioIdStr) {
+      return parseInt(usuarioIdStr, 10);
+    }
+    
+    return 1; // Fallback temporal para pruebas
+  }
+
+
+
 
   // NUEVO: Ejecuta la transacción final
   procesarPago() {
@@ -139,17 +170,18 @@ export class ReservarVueloComponent implements OnInit {
       return;
     }
 
-    const idUsuario = 1; // Quemado temporal
+    const idUsuario = this.obtenerUsuarioLogueado();
     const peticionesPago: Observable<any>[] = [];
 
     this.asientosSeleccionados.forEach(seat => {
+      const costoAsiento = seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
       const payload = {
         vueloId: this.vueloSeleccionado.numeroVuelo,
         usuarioId: idUsuario,
         asientoId: seat.idAsiento,
         codigoAsiento: seat.label,
         cantMaletas: this.cantidadMaletas,
-        costoBoleto: 150.00 
+        costoBoleto: costoAsiento
       };
 
       peticionesPago.push(
@@ -173,7 +205,6 @@ export class ReservarVueloComponent implements OnInit {
     this.filtros = { origen: '', destino: '', fechaSalida: '' };
     this.vuelosDisponibles = [];
     this.vueloSeleccionado = null;
-    this.claseSeleccionada = '';
     this.cantidadMaletas = null;
     this.consultaRealizada = false;
     this.mostrarModalAsientos = false;

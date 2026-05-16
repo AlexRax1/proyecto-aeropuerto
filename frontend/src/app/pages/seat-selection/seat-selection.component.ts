@@ -7,7 +7,6 @@ interface Seat {
   label: string;
   selected: boolean;
   occupied: boolean;
-
   categoria?: string;
   tipo?: string;
   estado?: string;
@@ -25,10 +24,7 @@ interface Seat {
 })
 export class SeatSelectionComponent implements OnInit, OnDestroy {
 
-  // 1. Recibimos el ID del vuelo dinámicamente desde el componente padre
   @Input() vueloId!: number;
-  
-  // para cerrar el modal y/o devolver los asientos seleccionados hacia el front
   @Output() cerrar = new EventEmitter<void>();
   @Output() asientosConfirmados = new EventEmitter<any[]>();
 
@@ -36,15 +32,15 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   maxSelection = 5;
   pollingSub!: Subscription;
   selectedSeatInfo: Seat[] = [];
+  
+  // Novedad: Guardamos qué letras preceden a un pasillo
+  letrasConPasilloADerecha: string[] = [];
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    // Solo cargamos si realmente nos pasaron un vueloId
     if (this.vueloId) {
       this.loadSeats(this.vueloId);
-      
-      // Iniciar el polling silencioso cada 3 segundos
       this.pollingSub = interval(3000).subscribe(() => {
         this.actualizarEstados(this.vueloId); 
       });
@@ -86,19 +82,17 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Aún en pruebas, luego lo cambiaremos por el ID del usuario logueado
     const idUsuario = 1; 
-
     const peticionesBloqueo: Observable<any>[] = [];
 
     selectedSeatsObjects.forEach(seat => {
       const payload = {
-        vueloId: this.vueloId, // Usamos la variable de entrada
+        vueloId: this.vueloId,
         usuarioId: idUsuario,
         asientoId: seat.idAsiento, 
         codigoAsiento: seat.label,
-        cantMaletas: 1, //cambiar para luego 
-        costoBoleto: 150.00
+        cantMaletas: 1, 
+        costoBoleto: seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00 // Ejemplo básico
       };
 
       peticionesBloqueo.push(
@@ -108,38 +102,30 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
 
     forkJoin(peticionesBloqueo).subscribe({
       next: (res) => {
-        console.log("Asientos bloqueados en Redis con éxito.");
-        
+        console.log("Asientos bloqueados con éxito.");
         this.asientosConfirmados.emit(selectedSeatsObjects);
         this.cerrar.emit(); 
       },
       error: (err) => {
         console.error("Error al bloquear", err);
-        alert("Alguien más está intentando reservar o ya reservó estos asientos. Por favor, elige otros.");
-        
-        // Recargamos el mapa para mostrar los asientos que nos ganaron usando el vueloId
+        alert("Alguien más está intentando reservar. Por favor, elige otros.");
         this.loadSeats(this.vueloId);
         this.selectedSeatInfo = []; 
       }
     });
   }
 
-  // 3. Ya no pedimos avionId, solo vueloId
   loadSeats(vueloId: number) {
-    // 4. Apuntamos al nuevo endpoint de Operaciones (Puerto 8083)
     const reqOperaciones = this.http.get<any>(`http://localhost:8083/api/operaciones/vuelos/${vueloId}/asientos`);
-    
-    // Asumo que tu microservicio de reservas sigue corriendo en el 8080
     const reqReservas = this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`);
     
-    forkJoin({
-      mapa: reqOperaciones,
-      estado: reqReservas
-    }).subscribe({
+    forkJoin({ mapa: reqOperaciones, estado: reqReservas }).subscribe({
       next: (data) => {
+          // Lógica para detectar el pasillo basada en "ABC-DEF"
+          this.letrasConPasilloADerecha = this.calcularPasillos(data.mapa.mapaColumnas);
+
           this.seats = data.mapa.matrizAsientos.map((row: any[]) =>
             row.map(seat => {
-
             const estaOcupado = data.estado.ocupados.includes(seat.idAsiento);
             const estaBloqueado = data.estado.bloqueados.includes(seat.idAsiento);
 
@@ -161,9 +147,21 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Novedad: Extrae la letra anterior a un guion
+  // Si el mapa es "ABC-DEF", devolverá ["C"]
+  // Si el mapa es "AB-CD-EF", devolverá ["B", "D"]
+  calcularPasillos(mapaOriginal: string): string[] {
+    const letrasPasillo = [];
+    for (let i = 0; i < mapaOriginal.length; i++) {
+      if (mapaOriginal[i] === '-' && i > 0) {
+        letrasPasillo.push(mapaOriginal[i - 1]);
+      }
+    }
+    return letrasPasillo;
+  }
+
   actualizarEstados(vueloId: number) {
-    this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`) 
-      .subscribe({
+    this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`).subscribe({
         next: (estado) => {
           this.seats.forEach(row => {
             row.forEach(seat => {
@@ -174,7 +172,6 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
               } else if (estado.bloqueados.includes(seat.idAsiento)) {
                 seat.occupied = true;
                 seat.estado = 'BLOQUEADO';
-                
                 if (seat.selected) {
                   seat.selected = false;
                   this.selectedSeatInfo = this.selectedSeatInfo.filter(s => s.idAsiento !== seat.idAsiento);
@@ -185,14 +182,15 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
               }
             });
           });
-
           this.cdr.detectChanges(); 
         },
         error: (err) => console.error("Error en polling", err)
       });
   }
-  
-  // 5. Botón opcional por si quieres cerrar el modal sin reservar
+  tienePasilloADerecha(columna?: string): boolean {
+    if (!columna) return false;
+    return this.letrasConPasilloADerecha.includes(columna);
+  }
   cancelar() {
     this.cerrar.emit();
   }

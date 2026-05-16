@@ -15,7 +15,13 @@ public class AvionRequestDTO {
 
     private String marca;
     private String ano;
-    //despues
-    // private Integer cantAsientosEconomica;
-    // private Integer cantAsientosEjecutiva;
+
+    private Integer cantAsientosEconomica;
+    private Integer cantAsientosEjecutiva;
+
+    // Datos del Modelo a crear
+    private String nombreModelo;
+    private Integer cantFilas;
+    private Integer cantColumnas;
+    private String mapaColumnas;
 }
