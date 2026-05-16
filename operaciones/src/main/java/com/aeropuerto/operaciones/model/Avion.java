@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -14,7 +13,11 @@ public class Avion extends Auditoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "avion_id")
-    private Long id;
+    private Integer avionId;
+
+    // =========================
+    // RELACIONES
+    // =========================
 
     @ManyToOne
     @JoinColumn(name = "aerolinea_id")
@@ -23,6 +26,10 @@ public class Avion extends Auditoria {
     @ManyToOne
     @JoinColumn(name = "modelo_avion_id")
     private ModeloAvion modeloAvion;
+
+    // =========================
+    // CAMPOS
+    // =========================
 
     @Column(length = 100)
     private String marca;
@@ -41,8 +48,6 @@ public class Avion extends Auditoria {
 
     @Column(length = 30)
     private String estado;
-
-
 }
 
 

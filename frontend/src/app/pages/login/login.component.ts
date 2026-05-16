@@ -30,7 +30,7 @@ export class LoginComponent {
       return;
     }
 
-    this.http.post('http://localhost:8082/auth/login', this.loginData)
+    this.http.post('http://localhost:8081/auth/login', this.loginData)
       .subscribe({
         next: (response: any) => {
 

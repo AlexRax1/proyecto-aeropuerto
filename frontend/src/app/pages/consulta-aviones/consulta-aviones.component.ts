@@ -39,7 +39,7 @@ export class ConsultaAvionesComponent {
     }
 
     this.http.get<any[]>(
-      `http://localhost:8084/aviones/aerolinea/${this.aerolineaSeleccionada}`
+      `http://localhost:8083/aviones/aerolinea/${this.aerolineaSeleccionada}`
     )
       .subscribe({
 
@@ -69,7 +69,7 @@ export class ConsultaAvionesComponent {
   cargarAerolineas() {
 
     this.http.get<any[]>(
-      'http://localhost:8084/aerolineas'
+      'http://localhost:8083/aerolineas'
     )
       .subscribe({
 

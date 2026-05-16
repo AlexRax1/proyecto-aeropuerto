@@ -31,7 +31,7 @@
 
 
         //obtener la matriz de asientos para consultar su estado y el como esta distribuido
-        public EstructuraAvionDTO obtenerEstructuraAsientos(Long avionId) {
+        public EstructuraAvionDTO obtenerEstructuraAsientos(Integer avionId) {
 
             Avion avion = avionRepository.findById(avionId)
                     .orElseThrow(() -> new RuntimeException("Avión no encontrado"));
@@ -39,12 +39,12 @@
 
 
             //listado de todos los aseintos de ese avion
-            List<Asiento> asientosPlanos = asientoRepository.findByAvionId(avionId);
+            List<Asiento> asientosPlanos = asientoRepository.findByAvion_AvionId(avionId);
 
             // preparacion el dto de respuesta
             EstructuraAvionDTO respuesta = new EstructuraAvionDTO();
-            respuesta.setIdAvion(avion.getId());
-            respuesta.setIdAerolinea(avion.getAerolinea().getId());
+            respuesta.setIdAvion(avion.getAvionId().longValue());
+            respuesta.setIdAerolinea(avion.getAerolinea().getAerolineaId().longValue());
             respuesta.setCantFilas(avion.getModeloAvion().getCantFilas());
             respuesta.setCantColumnas(avion.getModeloAvion().getCantColumnas());
             respuesta.setMapaColumnas(avion.getModeloAvion().getMapaColumnas());
@@ -135,7 +135,7 @@
 
                     // simplificado
                     asiento.setCategoria("ECONOMICA");
-                    asiento.setTipo("ESTANDAR");
+                    asiento.setTipo("EJECUTIVA");
 
                     asientosAGuardar.add(asiento);
                 }
