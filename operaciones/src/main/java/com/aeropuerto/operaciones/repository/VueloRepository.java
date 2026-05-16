@@ -20,4 +20,9 @@ public interface VueloRepository  extends JpaRepository<Vuelo, Long> {
             @Param("destinoId") Long destinoId,
             @Param("fechaSalida") LocalDate fechaSalida
     );
+
+    List<Vuelo> findByFechaSalidaBetween(
+            LocalDate fechaDesde,
+            LocalDate fechaHasta
+    );
 }

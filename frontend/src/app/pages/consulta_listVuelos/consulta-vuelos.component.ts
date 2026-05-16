@@ -1,15 +1,28 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule, HttpParams } from '@angular/common/http';
+
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-consulta-vuelos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HttpClientModule
+  ],
   templateUrl: './consulta-vuelos.component.html',
   styleUrls: ['./consulta-vuelos.component.css']
 })
 export class ConsultaVuelosComponent {
+
+  constructor(private http: HttpClient) {}
 
   filtros = {
     fechaDesde: '',
@@ -22,6 +35,9 @@ export class ConsultaVuelosComponent {
 
   consultaRealizada = false;
 
+  // SOLO URL BASE
+  apiUrl = 'http://localhost:8083/vuelos/consulta';
+
   buscarVuelos() {
 
     if (
@@ -32,43 +48,42 @@ export class ConsultaVuelosComponent {
     ) {
 
       alert('Debe ingresar todos los filtros');
-
       return;
     }
 
-    this.consultaRealizada = true;
+    const params = new HttpParams()
+      .set('fechaDesde', this.filtros.fechaDesde)
+      .set('fechaHasta', this.filtros.fechaHasta);
 
-    // DATOS TEMPORALES
+    this.http.get<any[]>(this.apiUrl, { params })
+      .subscribe({
 
-    this.vuelos = [
+        next: (response) => {
 
-      {
-        numeroVuelo: 'AV245',
-        modeloAvion: 'Airbus A320',
-        aerolinea: 'Avianca',
-        origen: 'Guatemala',
-        destino: 'México',
-        fechaSalida: '2026-05-10',
-        horaSalida: '08:30',
-        fechaLlegada: '2026-05-10',
-        horaLlegada: '10:45'
-      },
+          console.log(response);
 
-      {
-        numeroVuelo: 'CM541',
-        modeloAvion: 'Boeing 737',
-        aerolinea: 'Copa Airlines',
-        origen: 'Panamá',
-        destino: 'Guatemala',
-        fechaSalida: '2026-05-10',
-        horaSalida: '12:15',
-        fechaLlegada: '2026-05-10',
-        horaLlegada: '14:20'
-      }
+          this.vuelos = response;
 
-    ];
+          this.consultaRealizada = true;
 
-    alert('Consulta realizada correctamente');
+          if (this.vuelos.length === 0) {
+
+            alert('No se encontraron vuelos');
+
+          } else {
+
+            alert('Consulta realizada correctamente');
+          }
+        },
+
+        error: (error) => {
+
+          console.error(error);
+
+          alert('Error al consultar vuelos');
+        }
+
+      });
   }
 
   limpiarFiltros() {
@@ -96,12 +111,88 @@ export class ConsultaVuelosComponent {
 
   imprimirPDF() {
 
-    window.print();
+    if (this.vuelos.length === 0) {
+
+      alert('No hay datos para imprimir');
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.text('Consulta de Vuelos', 14, 15);
+
+    autoTable(doc, {
+
+      startY: 25,
+
+      head: [[
+        'Vuelo',
+        'Modelo',
+        'Aerolínea',
+        'Origen',
+        'Destino',
+        'Fecha Salida',
+        'Hora Salida',
+        'Fecha Llegada',
+        'Hora Llegada'
+      ]],
+
+      body: this.vuelos.map(vuelo => [
+
+        vuelo.numeroVuelo,
+        vuelo.modeloAvion,
+        vuelo.aerolinea,
+        vuelo.origen,
+        vuelo.destino,
+        vuelo.fechaSalida,
+        vuelo.horaSalida,
+        vuelo.fechaLlegada,
+        vuelo.horaLlegada
+
+      ])
+
+    });
+
+    doc.save('consulta-vuelos.pdf');
   }
 
   exportarExcel() {
 
-    alert('Aquí generarás el Excel posteriormente');
+    if (this.vuelos.length === 0) {
+
+      alert('No hay datos para exportar');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(this.vuelos);
+
+    const workbook = {
+      Sheets: {
+        'Vuelos': worksheet
+      },
+      SheetNames: ['Vuelos']
+    };
+
+    const excelBuffer =
+      XLSX.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array'
+      });
+
+    const data = new Blob(
+      [excelBuffer],
+      {
+        type:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+      }
+    );
+
+    FileSaver.saveAs(
+      data,
+      'consulta-vuelos.xlsx'
+    );
+
+    alert('Excel generado correctamente');
   }
 
 }

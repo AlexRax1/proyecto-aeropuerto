@@ -96,13 +96,24 @@
 
           <td>{{ aerolinea.nombreAerolinea }}</td>
           <td>{{ aerolinea.cantidadAviones }}</td>
-          <td>{{ aerolinea.destinosAutorizados }}</td>
+          <td>
+            {{ aerolinea.ciudadDestino }},
+            {{ aerolinea.paisDestino }}
+          </td>
 
         </tr>
 
         </tbody>
 
       </table>
+
+    </div>
+
+    <div
+      class="sin-resultados"
+      *ngIf="consultaRealizada && aerolineas.length === 0">
+
+      No existen aerolíneas para el aeropuerto seleccionado.
 
     </div>
 

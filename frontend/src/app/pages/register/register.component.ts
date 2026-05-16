@@ -117,7 +117,6 @@ export class RegisterComponent {
 
     this.http.post(
       'http://localhost:8082/usuarios/register',
-      
       this.registerData
     )
       .subscribe({

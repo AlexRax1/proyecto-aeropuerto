@@ -1,6 +1,11 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-consulta-destinos',
@@ -15,54 +20,92 @@ export class ConsultaDestinosComponent {
 
   consultaRealizada = false;
 
-  aerolineas: string[] = [
-    'Avianca',
-    'Copa Airlines',
-    'American Airlines',
-    'Delta Airlines',
-    'United Airlines'
-  ];
-
   destinos: any[] = [];
+
+  aerolineas: any[] = [];
+
+  constructor(private http: HttpClient) {
+
+    this.cargarAerolineas();
+  }
+
+  // ==========================
+  // CARGAR AEROLÍNEAS
+  // ==========================
+
+  cargarAerolineas() {
+
+    this.http.get<any[]>(
+      'http://localhost:8083/consulta-destinos/aerolineas'
+    )
+      .subscribe({
+
+        next: (response) => {
+
+          console.log('Aerolíneas cargadas', response);
+
+          this.aerolineas = response;
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert('Error al cargar aerolíneas');
+        }
+
+      });
+
+  }
+
+  // ==========================
+  // BUSCAR DESTINOS
+  // ==========================
 
   buscarDestinos() {
 
     if (!this.aerolineaSeleccionada) {
+
       alert('Debe seleccionar una aerolínea');
       return;
     }
 
-    this.consultaRealizada = true;
+    this.http.get<any[]>(
 
-    // Simulación FA02
-    if (this.aerolineaSeleccionada === 'Delta Airlines') {
+      `http://localhost:8083/consulta-destinos/${this.aerolineaSeleccionada}`
 
-      this.destinos = [];
+    ).subscribe({
 
-      alert('La aerolínea consultada no tiene destinos autorizados');
+        next: (response) => {
 
-      return;
-    }
+          console.log('Destinos encontrados', response);
 
-    // Datos simulados
-    this.destinos = [
-      {
-        aeropuerto: 'Aeropuerto Internacional La Aurora',
-        pais: 'Guatemala',
-        ciudad: 'Ciudad de Guatemala'
-      },
-      {
-        aeropuerto: 'Aeropuerto Internacional Juan Santamaría',
-        pais: 'Costa Rica',
-        ciudad: 'San José'
-      },
-      {
-        aeropuerto: 'Aeropuerto Internacional Tocumen',
-        pais: 'Panamá',
-        ciudad: 'Ciudad de Panamá'
-      }
-    ];
+          this.consultaRealizada = true;
+
+          this.destinos = response;
+
+          if (this.destinos.length === 0) {
+
+            alert(
+              'La aerolínea consultada no tiene destinos autorizados'
+            );
+          }
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert('Error al consultar destinos');
+        }
+
+      });
+
   }
+
+  // ==========================
+  // LIMPIAR
+  // ==========================
 
   limpiarFiltros() {
 
@@ -73,18 +116,98 @@ export class ConsultaDestinosComponent {
     this.consultaRealizada = false;
   }
 
+  // ==========================
+  // NUEVA CONSULTA
+  // ==========================
+
   nuevaConsulta() {
 
     this.limpiarFiltros();
   }
 
+  // ==========================
+  // GENERAR PDF
+  // ==========================
+
   imprimirPDF() {
 
-    alert('Generando archivo PDF...');
+    if (this.destinos.length === 0) {
+
+      alert('No existen datos para exportar');
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+
+    doc.text('Reporte de Destinos Autorizados', 14, 20);
+
+    const filas = this.destinos.map(destino => [
+
+      destino.nombreAeropuerto,
+      destino.paisDestino,
+      destino.ciudadDestino
+
+    ]);
+
+    autoTable(doc, {
+
+      startY: 30,
+
+      head: [[
+        'Nombre Aeropuerto',
+        'País',
+        'Ciudad'
+      ]],
+
+      body: filas
+
+    });
+
+    doc.save('reporte-destinos.pdf');
+
   }
+
+  // ==========================
+  // EXPORTAR EXCEL
+  // ==========================
 
   exportarExcel() {
 
-    alert('Generando archivo Excel...');
+    if (this.destinos.length === 0) {
+
+      alert('No existen datos para exportar');
+      return;
+    }
+
+    const datosExcel = this.destinos.map(destino => ({
+
+      'Nombre Aeropuerto': destino.nombreAeropuerto,
+
+      'País': destino.paisDestino,
+
+      'Ciudad': destino.ciudadDestino
+
+    }));
+
+    const worksheet: XLSX.WorkSheet =
+      XLSX.utils.json_to_sheet(datosExcel);
+
+    const workbook: XLSX.WorkBook = {
+
+      Sheets: {
+        'Destinos': worksheet
+      },
+
+      SheetNames: ['Destinos']
+    };
+
+    XLSX.writeFile(
+      workbook,
+      'reporte-destinos.xlsx'
+    );
+
   }
+
 }

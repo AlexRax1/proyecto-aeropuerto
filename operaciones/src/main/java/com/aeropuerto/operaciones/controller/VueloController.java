@@ -1,6 +1,7 @@
 package com.aeropuerto.operaciones.controller;
 
 
+import com.aeropuerto.operaciones.dto.ConsultaVueloDTO;
 import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
 import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
 import com.aeropuerto.operaciones.service.VueloService;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/operaciones/vuelos")
+@RequestMapping("/vuelos")
 @CrossOrigin("*")
 @RequiredArgsConstructor
 public class VueloController {
@@ -35,5 +36,18 @@ public class VueloController {
     public ResponseEntity<EstructuraAvionDTO> obtenerAsientosDeVuelo(@PathVariable Long id) {
         EstructuraAvionDTO estructura = vueloService.obtenerMatrizPorVuelo(id);
         return ResponseEntity.ok(estructura);
+    }
+
+    @GetMapping("/consulta")
+    public List<ConsultaVueloDTO> consultarVuelos(
+
+            @RequestParam LocalDate fechaDesde,
+            @RequestParam LocalDate fechaHasta
+    ) {
+
+        return vueloService.consultarVuelos(
+                fechaDesde,
+                fechaHasta
+        );
     }
 }
