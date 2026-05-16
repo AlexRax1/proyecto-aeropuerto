@@ -114,7 +114,7 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   }
 
   loadSeats(vueloId: number) {
-    const reqOperaciones = this.http.get<any>(`http://localhost:8083/api/operaciones/vuelos/${vueloId}/asientos`);
+    const reqOperaciones = this.http.get<any>(`http://localhost:8083/vuelos/${vueloId}/asientos`);
     const reqReservas = this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`);
     
     forkJoin({ mapa: reqOperaciones, estado: reqReservas }).subscribe({

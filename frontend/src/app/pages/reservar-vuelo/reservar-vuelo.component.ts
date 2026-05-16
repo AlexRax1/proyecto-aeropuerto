@@ -83,7 +83,7 @@ export class ReservarVueloComponent implements OnInit {
 
     this.consultaRealizada = true;
 
-    const url = `http://localhost:8083/api/operaciones/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
+    const url = `http://localhost:8083/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
 
     this.http.get<Vuelo[]>(url).subscribe({
       next: (data) => {
