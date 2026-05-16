@@ -1,0 +1,79 @@
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.buscar {
+  background: #2563eb;
+}
+
+.limpiar {
+  background: #dc2626;
+}
+
+.nueva {
+  background: #7c3aed;
+}
+
+.pdf {
+  background: #059669;
+}
+
+.excel {
+  background: #15803d;
+}
+
+.btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.tabla-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #0f172a;
+  color: white;
+}
+
+th,
+td {
+  padding: 14px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+tbody tr:hover {
+  background: #f1f5f9;
+}
+
+.sin-resultados {
+  text-align: center;
+  margin-top: 20px;
+  color: #dc2626;
+  font-weight: bold;
+}
+
+.acciones {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}

@@ -11,5 +11,5 @@ import java.util.List;
 public interface AsientoRepository  extends JpaRepository<Asiento, Long> {
 
     // asientos de un avion especificado por su id
-    List<Asiento> findByAvionId(Long avionId);
+    List<Asiento> findByAvion_AvionId(Integer avionId);
 }

@@ -39,7 +39,7 @@ Desktop.ini
 # 5. Seguridad (Por si acaso en el futuro)
 # ==========================================
 *.env
-
+.env
 
 *.bak
 
@@ -55,3 +55,6 @@ yarn-error.log*
 
 application-local.properties
 application-local.yml
+
+# Ignorar conflictos de Syncthing
+*.sync-conflict-*

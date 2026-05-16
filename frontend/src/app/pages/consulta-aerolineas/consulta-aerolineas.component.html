@@ -1,0 +1,122 @@
+<div class="consulta-container">
+
+  <div class="consulta-card">
+
+    <h2>Consulta de Aerolíneas ✈️</h2>
+
+    <!-- FILTRO -->
+    <div class="filtros">
+
+      <div class="campo">
+
+        <label>Aeropuerto</label>
+
+        <select [(ngModel)]="aeropuertoSeleccionado">
+
+          <option value="">
+            Seleccione un aeropuerto
+          </option>
+
+          <option
+            *ngFor="let aeropuerto of aeropuertos"
+            [value]="aeropuerto">
+
+            {{ aeropuerto }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="acciones">
+
+      <button
+        class="btn buscar"
+        (click)="buscarAerolineas()">
+
+        BUSCAR
+      </button>
+
+      <button
+        class="btn limpiar"
+        (click)="limpiarFiltros()">
+
+        LIMPIAR
+      </button>
+
+      <button
+        class="btn nueva"
+        (click)="nuevaConsulta()">
+
+        NUEVA CONSULTA
+      </button>
+
+      <button
+        class="btn pdf"
+        [disabled]="!consultaRealizada"
+        (click)="imprimirPDF()">
+
+        IMPRIMIR PDF
+      </button>
+
+      <button
+        class="btn excel"
+        [disabled]="!consultaRealizada"
+        (click)="exportarExcel()">
+
+        EXCEL
+      </button>
+
+    </div>
+
+    <!-- TABLA -->
+    <div
+      class="tabla-container"
+      *ngIf="aerolineas.length > 0">
+
+      <table>
+
+        <thead>
+
+        <tr>
+          <th>Nombre Aerolínea</th>
+          <th>Cantidad Aviones</th>
+          <th>Destinos Autorizados</th>
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        <tr *ngFor="let aerolinea of aerolineas">
+
+          <td>{{ aerolinea.nombreAerolinea }}</td>
+          <td>{{ aerolinea.cantidadAviones }}</td>
+          <td>
+            {{ aerolinea.ciudadDestino }},
+            {{ aerolinea.paisDestino }}
+          </td>
+
+        </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <div
+      class="sin-resultados"
+      *ngIf="consultaRealizada && aerolineas.length === 0">
+
+      No existen aerolíneas para el aeropuerto seleccionado.
+
+    </div>
+
+  </div>
+
+</div>

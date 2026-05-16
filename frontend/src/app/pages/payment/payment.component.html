@@ -1,0 +1,28 @@
+<div class="payment-container">
+  <h2>Pago de Reserva</h2>
+
+  <!-- Mostramos un resumen dinámico -->
+  <div class="resumen-compra">
+    <p>Estás a punto de pagar <strong>{{ asientosSeleccionados.length }}</strong> asiento(s):</p>
+    <ul>
+      <li *ngFor="let seat of asientosSeleccionados">{{ seat.label }}</li>
+    </ul>
+    <p><strong>Total a cobrar:</strong> Q{{ asientosSeleccionados.length * 150 }}</p>
+  </div>
+
+  <form>
+    <input type="text" placeholder="Nombre en tarjeta">
+    <input type="text" placeholder="Número de tarjeta">
+
+    <div class="row">
+      <input type="text" placeholder="MM/YY">
+      <input type="text" placeholder="CVV">
+    </div>
+
+    <!-- CAMBIAMOS ESTE BOTÓN -->
+    <button type="button" (click)="procesarPago()">
+      Pagar
+    </button>
+
+  </form>
+</div>

@@ -1,0 +1,81 @@
+<div class="container">
+  <h2>Selecciona tus asientos</h2>
+  <p>Total filas: {{ seats.length }}</p>
+
+  <!-- LEYENDA -->
+  <div class="legend">
+    <div class="legend-item">
+      <span class="seat ejecutiva available mini"></span> Ejecutiva Libre
+    </div>
+    <div class="legend-item">
+      <span class="seat economica available mini"></span> Económica Libre
+    </div>
+    <div class="legend-item">
+      <span class="seat selected mini"></span> Seleccionado
+    </div>
+    <div class="legend-item">
+      <span class="seat bloqueado mini"></span> Pendiente
+    </div>
+    <div class="legend-item">
+      <span class="seat occupied mini"></span> Ocupado
+    </div>
+  </div>
+
+  <!-- DIBUJO DEL AVIÓN -->
+  <div class="plane-container">
+    <!-- Cabina / Nariz -->
+    <div class="plane-nose"></div>
+    
+    <!-- Fuselaje con los asientos -->
+    <div class="plane-body">
+      
+      <div *ngFor="let row of seats; let i = index" class="row">
+        <!-- Número de Fila al costado izquierdo -->
+        <div class="row-label">{{ i + 1 }}</div>
+
+        <div class="row-seats">
+          <!-- Dibujando asientos dinámicamente -->
+          <button 
+            *ngFor="let seat of row"
+            (click)="selectSeat(seat)"
+            [disabled]="seat.occupied"
+            class="seat"
+            title="{{ seat.tipo }} - {{ seat.categoria }}"
+            [ngClass]="{
+              'ejecutiva': seat.categoria === 'EJECUTIVA',
+              'economica': seat.categoria === 'ECONOMICA',
+              'selected': seat.selected,
+              'occupied': seat.estado === 'OCUPADO',
+              'bloqueado': seat.estado === 'BLOQUEADO' 
+            }"
+              [style.marginRight.px]="tienePasilloADerecha(seat.columna) ? 45 : 0">
+            {{ seat.columna }}
+          </button>
+        </div>
+        
+        <!-- Número de Fila al costado derecho (opcional, típico en mapas de aviones) -->
+        <div class="row-label right">{{ i + 1 }}</div>
+      </div>
+
+    </div>
+    <div class="plane-tail"></div>
+  </div>
+
+  <!-- INFO SELECCIONADA -->
+  <div *ngIf="selectedSeatInfo.length > 0" class="seat-info">
+    <h3>Asientos Seleccionados</h3>
+    <div class="info-grid">
+      <div *ngFor="let seat of selectedSeatInfo" class="seat-detail">
+        <p><strong>Asiento:</strong> {{seat.label}}</p>
+        <p><strong>Categoría:</strong> {{seat.categoria}}</p>
+        <p><strong>Ubicación:</strong> {{seat.tipo}}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTONES -->
+  <div class="actions">
+    <button class="reserve-btn" (click)="confirmSelection()">Reservar Asientos</button>
+    <button class="cancel-btn" (click)="cancelar()">Cancelar</button>
+  </div>
+</div>

@@ -1,0 +1,104 @@
+<div class="auth-container">
+
+  <div class="auth-card register-card">
+
+    <h2>Registro de Usuarios ✈️</h2>
+
+    <!-- Pasaporte -->
+    <input
+      type="text"
+      maxlength="15"
+      placeholder="Número de Pasaporte"
+      [(ngModel)]="registerData.pasaporte">
+
+    <!-- Nombre Completo -->
+    <input
+      type="text"
+      placeholder="Nombre Completo"
+      [(ngModel)]="registerData.nombreCompleto">
+
+    <!-- Fecha de nacimiento -->
+    <input
+      type="date"
+      [(ngModel)]="registerData.fechaNacimiento">
+
+    <!-- Nacionalidad -->
+    <input
+      type="text"
+      placeholder="Nacionalidad"
+      [(ngModel)]="registerData.nacionalidad">
+
+    <!-- Correo -->
+    <input
+      type="email"
+      placeholder="Correo Electrónico"
+      [(ngModel)]="registerData.correo">
+
+    <!-- Código área -->
+    <input
+      type="text"
+      placeholder="Código de Área Telefónico"
+      [(ngModel)]="registerData.codigoArea">
+
+    <!-- Teléfono -->
+    <input
+      type="text"
+      maxlength="8"
+      placeholder="Número de Teléfono"
+      [(ngModel)]="registerData.telefono">
+
+    <input
+      type="text"
+      placeholder="Extensión numero emergencia"
+      [(ngModel)]="registerData.extensionNumeroEmergencia">
+
+    <!-- Número emergencia -->
+    <input
+      type="text"
+      placeholder="Número para Emergencias"
+      [(ngModel)]="registerData.numeroEmergencia">
+
+    <!-- Dirección -->
+    <textarea
+      placeholder="Dirección"
+      [(ngModel)]="registerData.direccion">
+    </textarea>
+
+    <input
+      type="text"
+      placeholder="Usuario"
+      [(ngModel)]="registerData.username">
+
+    <!-- Contraseña -->
+    <input
+      type="password"
+      placeholder="Contraseña"
+      [(ngModel)]="registerData.password">
+
+    <!-- Información contraseña -->
+    <small class="password-info">
+      La contraseña debe contener:
+      <br>
+      • Mínimo 6 caracteres
+      <br>
+      • Una letra mayúscula
+      <br>
+      • Un número
+      <br>
+      • Un carácter especial
+    </small>
+
+    <!-- Botón -->
+    <button (click)="register()">
+      VALIDAR
+    </button>
+
+    <!-- Login -->
+    <p>
+      ¿Ya tienes cuenta?
+      <a routerLink="/login">Iniciar sesión</a>
+    </p>
+
+  </div>
+
+</div>

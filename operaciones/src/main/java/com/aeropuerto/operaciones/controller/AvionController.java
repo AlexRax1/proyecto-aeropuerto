@@ -1,38 +1,54 @@
 package com.aeropuerto.operaciones.controller;
 
-
 import com.aeropuerto.operaciones.dto.AvionRequestDTO;
-import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
 import com.aeropuerto.operaciones.model.Avion;
+import com.aeropuerto.operaciones.repository.AvionRepository;
 import com.aeropuerto.operaciones.service.AvionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/aviones")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class AvionController {
 
     private final AvionService avionService;
 
+    @Autowired
+    private AvionRepository avionRepository;
 
+    // ==========================
+    // CONSULTAR AVIONES
+    // ==========================
 
-    //crear aviones y sus asientos automaticamnte
-    @PostMapping
-    public ResponseEntity<Avion> crearAvion(@RequestBody AvionRequestDTO requestDTO) {
-        Avion nuevoAvion = avionService.crearAvionConAsientos(requestDTO);
-        return new ResponseEntity<>(nuevoAvion, HttpStatus.CREATED);
+    @GetMapping("/aerolinea/{id}")
+    public List<Avion> obtenerPorAerolinea(
+            @PathVariable Integer id
+    ) {
+
+        return avionRepository.findByAerolinea_AerolineaId(id);
     }
 
+    // ==========================
+    // CREAR AVIÓN
+    // ==========================
 
+    @PostMapping
+    public ResponseEntity<Avion> crearAvion(
+            @RequestBody AvionRequestDTO requestDTO
+    ) {
 
-    // Endpoint para obtener la matriz de los asientos
-    @GetMapping("/{id}/asientos")
-    public ResponseEntity<EstructuraAvionDTO> obtenerEstructuraAsientos(@PathVariable Long id) {
-        EstructuraAvionDTO estructura = avionService.obtenerEstructuraAsientos(id);
-        return ResponseEntity.ok(estructura);
+        Avion nuevoAvion =
+                avionService.crearAvionConAsientos(requestDTO);
+
+        return new ResponseEntity<>(
+                nuevoAvion,
+                HttpStatus.CREATED
+        );
     }
 }

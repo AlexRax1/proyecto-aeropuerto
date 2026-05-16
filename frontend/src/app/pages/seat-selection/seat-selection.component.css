@@ -1,0 +1,220 @@
+.container {
+  text-align: center;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* LEYENDA */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.seat.mini {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  cursor: default;
+}
+
+/* ESTRUCTURA DEL AVIÓN */
+.plane-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.plane-nose {
+  width: 140px;
+  height: 100px;
+  background-color: #eaf1f8;
+  border: 3px solid #b0c4de;
+  border-bottom: none;
+  border-radius: 50% 50% 0 0;
+}
+
+.plane-body {
+  background-color: #f8fbff;
+  border: 3px solid #b0c4de;
+  padding: 30px 20px;
+  border-radius: 0 0 40px 40px;
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+}
+
+/* FILAS Y ASIENTOS */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.row-label {
+  width: 30px;
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
+}
+
+.row-label.right {
+  text-align: left;
+}
+
+.row-seats {
+  display: flex;
+  justify-content: center;
+  gap: 8px; /* Espacio normal entre asientos adjuntos */
+}
+
+.seat {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Simula la forma del reposacabezas */
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* 🟡 EJECUTIVA (Colores más Premium/Dorado) */
+.seat.ejecutiva {
+  background-color: #fff8e1;
+  border: 2px solid #ffc107;
+  color: #b08d00;
+}
+
+/* 🔵 ECONÓMICA (Azul estándar) */
+.seat.economica {
+  background-color: #ffffff;
+  border: 2px solid #6c757d;
+  color: #333;
+}
+
+/* ESTADOS COMPARTIDOS */
+.seat:hover:not(.occupied):not(.bloqueado) {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.seat.selected {
+  background-color: #28a745 !important;
+  border-color: #1e7e34 !important;
+  color: white !important;
+}
+
+.seat.occupied {
+  background-color: #dc3545 !important;
+  border-color: #b02a37 !important;
+  color: white !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.seat.bloqueado {
+  background-color: #fd7e14 !important; 
+  border-color: #e8590c !important;
+  color: white !important;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* INFORMACIÓN INFERIOR */
+.seat-info {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f1f8ff;
+  border: 1px solid #cce5ff;
+  border-radius: 10px;
+}
+
+.info-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.seat-detail {
+  background: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  text-align: left;
+  min-width: 150px;
+}
+
+.seat-detail p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* BOTONES */
+.actions {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.reserve-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.reserve-btn:hover {
+  background-color: #0056b3;
+}
+
+.cancel-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+/* 🟠 PENDIENTE / BLOQUEADO (Naranja con rayas sutiles para indicar proceso) */
+.seat.bloqueado {
+  background-image: repeating-linear-gradient(
+    45deg,
+    #ff9800,
+    #ff9800 10px,
+    #f57c00 10px,
+    #f57c00 20px
+  ) !important;
+  border-color: #e65100 !important;
+  color: white !important;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
