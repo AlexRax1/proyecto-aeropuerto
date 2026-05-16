@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.config.Customizer;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -22,18 +23,21 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
-                .cors(cors -> {})
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeExchange(exchanges -> exchanges
 
+                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Permite el tráfico a tu servicio de autenticación para que puedas hacer login/registro
                         .pathMatchers("/auth/**").permitAll()
 
                         //pruebas
                         .pathMatchers("/aviones/**").permitAll()
-                        .pathMatchers("/api/reservas/**").permitAll()
 
+                        //ya no permitira todo, solo lo hara antes de pagar ahi si te pedira login si o si
+                        //.pathMatchers("/api/reservas/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/reservas/vuelo/*/ocupados").permitAll()
                         /*
                         // 2. Rutas públicas de Operaciones (Ejemplo: listar vuelos)
                         .pathMatchers(HttpMethod.GET, "/operaciones/vuelos/listar").permitAll()*/

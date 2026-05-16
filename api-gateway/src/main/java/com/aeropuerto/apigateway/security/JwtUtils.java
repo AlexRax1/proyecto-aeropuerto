@@ -43,8 +43,13 @@ public class JwtUtils {
             return false;
         }
     }
-
+    //modificar
+    public Integer getUserIdFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("userId", Integer.class);
+    }
     // Extrae el nombre de usuario (el "Subject" del token)
+
     public String getUsernameFromToken(String token) {
         return getAllClaimsFromToken(token).getSubject();
     }

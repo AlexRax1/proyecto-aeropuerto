@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
+import com.aeropuerto.auth.model.Credencial;
 
 @Service
 public class JwtService {
@@ -32,6 +32,10 @@ public class JwtService {
                 .collect(Collectors.joining(","));
         claims.put("roles", roles);
 
+        if (userDetails instanceof Credencial) {
+            Credencial credencial = (Credencial) userDetails;
+            claims.put("userId", credencial.getUserId());
+        }
         return crearToken(claims, userDetails.getUsername());
     }
 

@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 import { forkJoin, Observable } from 'rxjs';
 import { SeatSelectionComponent } from '../seat-selection/seat-selection.component'; // Ajusta esta ruta según tu estructura de carpetas
+import { AuthService } from '../../core/services/auth.service';
 
 export interface Destino {
   id: number;
@@ -25,7 +26,7 @@ export interface Vuelo {
 @Component({
   selector: 'app-reservar-vuelo',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, SeatSelectionComponent], 
+  imports: [CommonModule, FormsModule, SeatSelectionComponent], 
   templateUrl: './reservar-vuelo.component.html',
   styleUrls: ['./reservar-vuelo.component.css']
 })
@@ -41,7 +42,6 @@ export class ReservarVueloComponent implements OnInit {
   };
 
   vueloSeleccionado: any = null;
-  claseSeleccionada: string = '';
   cantidadMaletas: number | null = null;
 
   consultaRealizada = false;
@@ -55,7 +55,7 @@ export class ReservarVueloComponent implements OnInit {
     cvv: ''
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.http.get<Destino[]>('http://localhost:8083/api/operaciones/destinos/select')
@@ -111,8 +111,8 @@ export class ReservarVueloComponent implements OnInit {
   }
 
   abrirModalAsientos() {
-    if (!this.claseSeleccionada || this.cantidadMaletas === null) {
-      alert('Debe ingresar los campos obligatorios (Clase y Cantidad de Maletas)');
+    if (this.cantidadMaletas === null || this.cantidadMaletas < 0) {
+      alert('Debe ingresar la Cantidad de Maletas para continuar.');
       return;
     }
     this.mostrarModalAsientos = true;
@@ -126,11 +126,21 @@ export class ReservarVueloComponent implements OnInit {
   onAsientosConfirmados(asientos: any[]) {
     this.asientosSeleccionados = asientos;
   }
-
-  // NUEVO: Formatea los asientos para el input de solo lectura
   obtenerNombresAsientos(): string {
-    return this.asientosSeleccionados.map(s => s.label).join(', ');
+    return this.asientosSeleccionados.map(s => `${s.label} (${s.categoria})`).join(', ');
   }
+
+
+  calcularTotal(): number {
+    let total = 0;
+    this.asientosSeleccionados.forEach(seat => {
+      // Estos valores los puedes ajustar según tu lógica de negocio
+      total += seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
+    });
+    return total;
+  }
+
+
 
   // NUEVO: Ejecuta la transacción final
   procesarPago() {
@@ -139,17 +149,17 @@ export class ReservarVueloComponent implements OnInit {
       return;
     }
 
-    const idUsuario = 1; // Quemado temporal
+
     const peticionesPago: Observable<any>[] = [];
 
     this.asientosSeleccionados.forEach(seat => {
+      const costoAsiento = seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
       const payload = {
         vueloId: this.vueloSeleccionado.numeroVuelo,
-        usuarioId: idUsuario,
         asientoId: seat.idAsiento,
         codigoAsiento: seat.label,
         cantMaletas: this.cantidadMaletas,
-        costoBoleto: 150.00 
+        costoBoleto: costoAsiento
       };
 
       peticionesPago.push(
@@ -173,7 +183,6 @@ export class ReservarVueloComponent implements OnInit {
     this.filtros = { origen: '', destino: '', fechaSalida: '' };
     this.vuelosDisponibles = [];
     this.vueloSeleccionado = null;
-    this.claseSeleccionada = '';
     this.cantidadMaletas = null;
     this.consultaRealizada = false;
     this.mostrarModalAsientos = false;
