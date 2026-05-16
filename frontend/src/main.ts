@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient , withInterceptors } from '@angular/common/http';
 
 import { AppComponent } from './app/app';
 
@@ -22,44 +22,38 @@ import {ReservarVueloComponent} from './app/pages/reservar-vuelo/reservar-vuelo.
 import {ConsultaAgregarVueloComponent} from './app/pages/consulta-agregar-vuelo/consulta-agregar-vuelo.component';
 import {CrearTripulacionComponent} from './app/pages/crear-tripulacion/crear-tripulacion.component';
 
+
+import { authInterceptor } from './app/core/interceptors/auth.interceptor'; 
+
+// 1. AGREGA 'withIntercept
+
 bootstrapApplication(AppComponent, {
   providers: [
-    provideHttpClient(),
+    
+    // 3. MODIFICA ESTA LÍNEA PARA ENLAZAR EL INTERCEPTOR
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    ),
+
+    // TUS RUTAS SE QUEDAN EXACTAMENTE IGUAL
     provideRouter([
       { path: '', component: HomeComponent },
-
       { path: 'aviones', component: AvionSelectionComponent },
-
       { path: 'asientos', component: SeatSelectionComponent },
-
       { path: 'pago', component: PaymentComponent },
-
       { path: 'confirmacion', component: ConfirmationComponent },
-
       { path: 'login', component: LoginComponent },
-
       { path: 'registro', component: RegisterComponent },
-
       { path: 'consulta-vuelos', component: ConsultaVuelosComponent },
-
       { path: 'consulta-aerolineas', component: ConsultaAerolineasComponent },
-
       { path: 'consulta-aviones',  component: ConsultaAvionesComponent },
-
       { path: 'consulta-pasajeros-vuelo',  component: ConsultaPasajerosVueloComponent },
-
       { path: 'consulta-destinos',  component: ConsultaDestinosComponent },
-
       { path: 'consulta-equipaje',  component: ConsultaEquipajeComponent },
-
       { path: 'abordaje',  component: AbordajeComponent },
-
       { path: 'reservar-vuelo', component: ReservarVueloComponent },
-
       { path: 'consulta-agregar-vuelo',  component: ConsultaAgregarVueloComponent },
-
       { path: 'crear-tripulacion',  component: CrearTripulacionComponent },
-
       { path: '**', redirectTo: '' }
     ])
   ]

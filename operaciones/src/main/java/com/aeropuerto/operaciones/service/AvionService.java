@@ -97,45 +97,69 @@
 
             //busqueda de modelo de avión y su aerolínea para manejo de errores
 
-            ModeloAvion modelo = modeloAvionRepository.findById(dto.getModeloAvionId())
-                    .orElseThrow(() -> new RuntimeException("Modelo no encontrado"));
+            //"""ModeloAvion modelo = modeloAvionRepository.findById(dto.getModeloAvionId()).orElseThrow(() -> new RuntimeException("Modelo no encontrado"));
 
             Aerolinea aerolinea = aerolineaRepository.findById(dto.getAerolineaId())
                     .orElseThrow(() -> new RuntimeException("Aerolínea no encontrada"));
 
+
+            //"""
+            int totalAsientosRequeridos = dto.getCantAsientosEjecutiva() + dto.getCantAsientosEconomica();
+            int totalAsientosCuadricula = dto.getCantFilas() * dto.getCantColumnas();
+            if (totalAsientosRequeridos != totalAsientosCuadricula) {
+                throw new RuntimeException("La suma de asientos ejecutiva y económica (" + totalAsientosRequeridos + ") no coincide con la cuadrícula de " + dto.getCantFilas() + "x" + dto.getCantColumnas() + " (" + totalAsientosCuadricula + ")");
+            }
+
+            //crear y guardar el modelo de avion """"
+            ModeloAvion nuevoModelo = new ModeloAvion();
+            nuevoModelo.setNombre(dto.getNombreModelo());
+            nuevoModelo.setCantFilas(dto.getCantFilas());
+            nuevoModelo.setCantColumnas(dto.getCantColumnas());
+            nuevoModelo.setMapaColumnas(dto.getMapaColumnas());
+            nuevoModelo = modeloAvionRepository.save(nuevoModelo);
+
             // craecion y guardado del avion
             Avion nuevoAvion = new Avion();
             nuevoAvion.setAerolinea(aerolinea);
-            nuevoAvion.setModeloAvion(modelo);
+            nuevoAvion.setModeloAvion(nuevoModelo);//""""
             nuevoAvion.setMarca(dto.getMarca());
             nuevoAvion.setAno(dto.getAno());
+            nuevoAvion.setCantAsientosEjecutiva(dto.getCantAsientosEjecutiva());//'''
+            nuevoAvion.setCantAsientosEconomica(dto.getCantAsientosEconomica());//'''
             nuevoAvion.setEstado("ACTIVO");
-            //setear los demás campos...
-
             nuevoAvion = avionRepository.save(nuevoAvion); // se guarda el avion y se obtiene su id
 
 
-            /*
-                CREACION DE ASIENTOS DEL AVION CREADO BASADO EN SU MODELO
-             */
-
             List<Asiento> asientosAGuardar = new ArrayList<>();
 
-            // Un arreglo simple para mapear números a letras (0=A, 1=B, etc.)
-            String[] letras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
 
-            for (int fila = 1; fila <= modelo.getCantFilas(); fila++) {
-                for (int col = 0; col < modelo.getCantColumnas(); col++) {
+            // Un arreglo simple para mapear números a letras (0=A, 1=B, etc.)
+            String letras = dto.getMapaColumnas().replace("-", "");//'''
+            int contadorEjecutiva = 0;
+
+            for (int fila = 1; fila <= nuevoModelo.getCantFilas(); fila++) {
+                for (int col = 0; col < nuevoModelo.getCantColumnas(); col++) {
 
                     Asiento asiento = new Asiento();
                     asiento.setAvion(nuevoAvion);
                     asiento.setFila(String.valueOf(fila));
-                    asiento.setColumna(letras[col]);
-                    asiento.setEstado("LIBRE"); // manejar luego
 
-                    // simplificado
-                    asiento.setCategoria("ECONOMICA");
-                    asiento.setTipo("ESTANDAR");
+                    char letraColumna = letras.charAt(col);
+                    asiento.setColumna(String.valueOf(letraColumna));
+
+                    asiento.setEstado("ACTIVO"); // manejar luego
+
+
+                    // categorias
+                    if (contadorEjecutiva < dto.getCantAsientosEjecutiva()) {
+                        asiento.setCategoria("EJECUTIVA");
+                        contadorEjecutiva++;
+                    } else {
+                        asiento.setCategoria("ECONOMICA");
+                    }
+                    //si es ventana/pasillo/medio
+                    String tipoAsiento = determinarTipoAsiento(letraColumna, dto.getMapaColumnas(), letras);
+                    asiento.setTipo(tipoAsiento);
 
                     asientosAGuardar.add(asiento);
                 }
@@ -145,6 +169,28 @@
             asientoRepository.saveAll(asientosAGuardar);
 
             return nuevoAvion;
+        }
+
+
+        // calcular si es asiento pasillo/ventana/medio
+        private String determinarTipoAsiento(char letra, String mapaOriginal, String letrasLimpias) {
+            //ventana si es la primera o la ultima letra
+
+            if (letra == letrasLimpias.charAt(0) || letra == letrasLimpias.charAt(letrasLimpias.length() - 1)) {
+                return "VENTANA";
+            }
+
+            // pasillo si el el mapa "ABC-DEF" la letra tiene un guion al lado
+            int indexEnMapa = mapaOriginal.indexOf(letra);
+            if (indexEnMapa > 0 && mapaOriginal.charAt(indexEnMapa - 1) == '-') {
+                return "PASILLO";
+            }
+            if (indexEnMapa < mapaOriginal.length() - 1 && mapaOriginal.charAt(indexEnMapa + 1) == '-') {
+                return "PASILLO";
+            }
+
+            // si no cumple es el de medio
+            return "MEDIO";
         }
 
 

@@ -68,14 +68,7 @@
     <h3>Vuelo Seleccionado: {{ vueloSeleccionado.numeroVuelo }}</h3>
     
     <div class="filtros">
-      <div class="campo">
-        <label>Clase</label>
-        <select [(ngModel)]="claseSeleccionada" [disabled]="asientosSeleccionados.length > 0">
-          <option value="">Seleccione</option>
-          <option value="Economica">Clase Económica</option>
-          <option value="Ejecutiva">Clase Ejecutiva</option>
-        </select>
-      </div>
+      <!-- ELIMINADO: El select de Clase -->
 
       <div class="campo">
         <label>Cantidad de Maletas</label>
@@ -102,7 +95,8 @@
     <!-- SECCIÓN DE PAGOS: Solo visible cuando ya eligieron los asientos -->
     <div *ngIf="asientosSeleccionados.length > 0" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
       <h3>Resumen y Pago</h3>
-      <p style="margin-bottom: 15px;"><strong>Total a cobrar:</strong> Q{{ asientosSeleccionados.length * 150 }}</p>
+      <!-- Actualizado para calcular el total dinámicamente según la categoría del asiento -->
+      <p style="margin-bottom: 15px;"><strong>Total a cobrar:</strong> Q{{ calcularTotal() }}</p>
       
       <div class="filtros" style="margin-bottom: 20px;">
         <div class="campo">
