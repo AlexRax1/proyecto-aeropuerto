@@ -199,13 +199,17 @@ CREATE TABLE boleto(
 	asiento_id int,
 	estado varchar(30),
 	cant_maletas int,
+	estado_abordaje varchar(30) DEFAULT 'PENDIENTE',
 	escala int references boleto(boleto_id),
 	costo_boleto numeric(10,2),
 	codigo_asiento varchar(10),
 	fecha_creacion timestamp,
 	usuario_creacion varchar(150),
 	fecha_modificacion timestamp,
-	usuario_modificacion varchar(150)
+	usuario_modificacion varchar(150),
+
+	cant_maletas_extra int DEFAULT 0,
+	monto_extra_equipaje numeric(10,2) DEFAULT 0.00
 );
 
 CREATE TABLE equipaje(

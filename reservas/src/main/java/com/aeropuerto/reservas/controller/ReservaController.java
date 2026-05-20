@@ -1,28 +1,34 @@
 package com.aeropuerto.reservas.controller;
 
+import com.aeropuerto.reservas.dto.RequestAbordajeDTO;
 import com.aeropuerto.reservas.model.Boleto;
+import com.aeropuerto.reservas.repository.BoletoRepository;
 import com.aeropuerto.reservas.service.BoletoService;
 import com.aeropuerto.reservas.service.ReservaRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reservas")
+@CrossOrigin("*")
 public class ReservaController {
 
     private final BoletoService boletoService;
 
     private final ReservaRedisService redisService;
+
+
+    @Autowired
+    private BoletoRepository boletoRepository;
 
     public ReservaController(BoletoService boletoService, ReservaRedisService redisService) {
         this.boletoService = boletoService;
@@ -70,5 +76,50 @@ public class ReservaController {
         //quitar el bloqueo de redis
         redisService.liberarAsiento(boleto.getVueloId(), boleto.getAsientoId());
         return ResponseEntity.ok(nuevaReserva);
+    }
+
+
+
+    @PutMapping("/abordar")
+    public ResponseEntity<String> registrarAbordaje(@RequestBody RequestAbordajeDTO request) {
+
+        Optional<Boleto> boletoOpt = boletoRepository.findByVueloIdAndUsuarioIdAndEstado(
+                request.getIdVuelo(),
+                request.getIdusuario(),
+                "PAGADO"
+        );
+
+        if (boletoOpt.isEmpty()) {//FA 05
+            return ResponseEntity.status(404).body("Error: Boleto no encontrado o pasajero no registrado");
+        }
+
+        Boleto boleto = boletoOpt.get();
+        boleto.setEstadoAbordaje("ABORDADO");
+
+        //calculo de maletas extras
+        int maletasExtras = request.getNumMaletas() - boleto.getCantMaletas();
+        if(maletasExtras > 0 ){
+
+            boleto.setCantMaletasExtra(maletasExtras);
+
+            BigDecimal cobroExtra = BigDecimal.valueOf(maletasExtras * 50.0);
+
+            boleto.setMontoExtra(cobroExtra);
+
+        };
+
+
+        boletoRepository.save(boleto);
+
+        return ResponseEntity.ok("Abordaje registrado con éxito");
+    }
+
+
+    @PutMapping("/vuelo/{vueloId}/finalizar")
+    public ResponseEntity<String> finalizarAbordaje(@PathVariable Integer vueloId) {
+
+        int boletosCancelados = boletoRepository.cancelarBoletosPendientes(vueloId);
+
+        return ResponseEntity.ok( boletosCancelados + " boletos que no se presentaron.");
     }
 }

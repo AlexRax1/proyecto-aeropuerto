@@ -25,4 +25,6 @@ public interface VueloRepository  extends JpaRepository<Vuelo, Long> {
             LocalDate fechaDesde,
             LocalDate fechaHasta
     );
+
+    List<Vuelo> findByEstado(String estado);
 }

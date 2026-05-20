@@ -8,6 +8,7 @@ import com.aeropuerto.operaciones.repository.VueloRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -225,4 +227,31 @@ public class VueloService {
 
         return respuesta;
     }
+
+
+    public List<Vuelo> obtenerPendientesAbordaje() {
+
+        List<Vuelo> vuelos =
+                vueloRepository.findByEstado("PENDIENTE ABORDAR");
+
+        return vuelos;
+    }
+
+
+
+    @Transactional
+    public void actualizarEstadoVuelo(Long id, String nuevoEstado) {
+        // 1. Buscar el vuelo por su ID
+        Optional<Vuelo> vueloOpt = vueloRepository.findById(id);
+
+        if (vueloOpt.isPresent()) {
+            Vuelo vuelo = vueloOpt.get();
+            vuelo.setEstado(nuevoEstado);
+            vueloRepository.save(vuelo);
+        } else {
+            // 3. Si no existe, lanzamos un error que el Controller atrapará
+            throw new RuntimeException("Vuelo no encontrado con ID: " + id);
+        }
+    }
+
 }

@@ -44,4 +44,12 @@ public class Boleto {
         // datos de auditoria para despues
     }
 
+    @Column(name = "estado_abordaje")
+    private String estadoAbordaje;
+
+    @Column(name = "monto_extra_equipaje")
+    private BigDecimal montoExtra;
+
+    @Column(name = "cant_maletas_extra")
+    private Integer cantMaletasExtra;
 }

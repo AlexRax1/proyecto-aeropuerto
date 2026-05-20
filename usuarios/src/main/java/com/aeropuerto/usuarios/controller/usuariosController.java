@@ -41,4 +41,15 @@ public class usuariosController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/pasaporte/{numPasaporte}")
+    public ResponseEntity<Usuario> obtenerPorPasaporte(@PathVariable String numPasaporte){
+        Usuario usuario = usuarioService.buscarPorPasaporte(numPasaporte);
+
+        if (usuario != null) {
+            return ResponseEntity.ok(usuario);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    };
 }

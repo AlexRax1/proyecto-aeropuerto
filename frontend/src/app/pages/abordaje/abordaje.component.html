@@ -25,10 +25,14 @@
 
       <tr *ngFor="let vuelo of vuelos">
 
-        <td>{{ vuelo.numeroVuelo }}</td>
-        <td>{{ vuelo.origen }}</td>
-        <td>{{ vuelo.destino }}</td>
-        <td>{{ vuelo.fechaHora }}</td>
+        <td>{{ vuelo.vueloId || vuelo.id }}</td>
+        
+        <!-- Accedemos a las propiedades del objeto anidado -->
+        <td>{{ vuelo.origen.ciudadDestino }}, {{ vuelo.origen.paisDestino }}</td>
+        <td>{{ vuelo.destino.ciudadDestino }}, {{ vuelo.destino.paisDestino }}</td>
+        
+        <td>{{ vuelo.fechaSalida }} {{ vuelo.horaSalida }}</td>
+        
         <td>{{ vuelo.estado }}</td>
 
         <td>
@@ -57,7 +61,7 @@
 
     <h3>
       Vuelo Seleccionado:
-      {{ vueloSeleccionado.numeroVuelo }}
+      {{ vueloSeleccionado.vueloId || vueloSeleccionado.id }}
     </h3>
 
     <div class="formulario">

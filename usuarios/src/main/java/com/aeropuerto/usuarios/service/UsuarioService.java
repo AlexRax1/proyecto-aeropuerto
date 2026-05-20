@@ -79,4 +79,9 @@ public class UsuarioService {
             throw new RuntimeException("Error en el registro del usuario. Proceso cancelado.");
         }
     }
+
+
+    public Usuario buscarPorPasaporte(String numPasaporte) {
+        return usuarioRepository.findByPasaporte(numPasaporte).orElse(null);
+    }
 }

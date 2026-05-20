@@ -4,6 +4,7 @@ package com.aeropuerto.operaciones.controller;
 import com.aeropuerto.operaciones.dto.ConsultaVueloDTO;
 import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
 import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
+import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.service.VueloService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,6 +22,7 @@ public class VueloController {
 
     private final VueloService vueloService;
 
+    // buscar basado en destinos y fecha/hora de vuelo
     @GetMapping("/buscar")
     public ResponseEntity<List<VueloDisponibleDTO>> buscarVuelos(
             @RequestParam Long origenId,
@@ -38,6 +40,7 @@ public class VueloController {
         return ResponseEntity.ok(estructura);
     }
 
+    //buscar basado en fechas
     @GetMapping("/consulta")
     public List<ConsultaVueloDTO> consultarVuelos(
 
@@ -49,5 +52,22 @@ public class VueloController {
                 fechaDesde,
                 fechaHasta
         );
+    }
+
+    //buscar vuelos "PENDIENTE DE ABORDAR"
+    @GetMapping("/pendientesAbordar")
+    public List<Vuelo> vuelosAbordaje() {
+        return vueloService.obtenerPendientesAbordaje();
+
+    };
+
+    @PutMapping("/{id}/estado-abordado")
+    public ResponseEntity<String> cambiarEstadoAAbordado(@PathVariable Long id) {
+        try {
+            vueloService.actualizarEstadoVuelo(id, "ABORDADO");
+            return ResponseEntity.ok("Estado del vuelo actualizado a ABORDADO en Operaciones");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
 }
