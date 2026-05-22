@@ -14,7 +14,7 @@ public interface VueloRepository  extends JpaRepository<Vuelo, Long> {
     @Query("SELECT v FROM Vuelo v WHERE v.origen.destinoId = :origenId " +
             "AND v.destino.destinoId = :destinoId " +
             "AND v.fechaSalida = :fechaSalida " +
-            "AND v.estado = 'PROGRAMADO'")
+            "AND v.estado = 'PENDIENTE ABORDAR'")
     List<Vuelo> buscarVuelosDisponibles(
             @Param("origenId") Long origenId,
             @Param("destinoId") Long destinoId,
@@ -25,4 +25,6 @@ public interface VueloRepository  extends JpaRepository<Vuelo, Long> {
             LocalDate fechaDesde,
             LocalDate fechaHasta
     );
+
+    List<Vuelo> findByEstado(String estado);
 }

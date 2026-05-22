@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'; // <-- Importamos ChangeDetectorRef
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-abordaje',
@@ -9,45 +11,72 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './abordaje.component.html',
   styleUrls: ['./abordaje.component.css']
 })
-export class AbordajeComponent {
+export class AbordajeComponent implements OnInit {
 
-  vuelos = [
-    {
-      numeroVuelo: 'AV101',
-      origen: 'Guatemala',
-      destino: 'Panamá',
-      fechaHora: '2026-06-15 08:30',
-      estado: 'PENDIENTE ABORDAR'
-    },
-    {
-      numeroVuelo: 'CP205',
-      origen: 'Costa Rica',
-      destino: 'México',
-      fechaHora: '2026-06-15 10:00',
-      estado: 'PENDIENTE ABORDAR'
-    }
-  ];
+  private http = inject(HttpClient);
+  private cdr = inject(ChangeDetectorRef); // <-- Lo inyectamos aquí
 
+  vuelos: any[] = [];
   vueloSeleccionado: any = null;
-
   pasaporte: string = '';
-
   cantidadMaletas: number | null = null;
+  pasajerosAbordados: any[] = [];;
 
-  pasajerosAbordados: any[] = [];
 
-  seleccionarVuelo(vuelo: any) {
-
-    this.vueloSeleccionado = vuelo;
-
-    this.pasaporte = '';
-
-    this.cantidadMaletas = null;
+ // NUEVA ESTRUCTURA DE MALETAS
+  maletasFisicas: {
+    maleta: string;
+    peso: number | null;
+  }[] = [];
+  
+  ngOnInit() {
+    this.cargarVuelos();
   }
 
-  buscarPasajero() {
+  // Convertimos a async/await e indicamos que redibuje el HTML
+  async cargarVuelos() {
+    try {
+      const data = await firstValueFrom(
+        this.http.get<any[]>('http://localhost:8083/vuelos/pendientesAbordar')
+      );
+      
+      console.log('Vuelos recibidos desde el backend:', data); // Verifícalo en F12
+      this.vuelos = data;
 
-    // FA04
+      // Magia: Forzamos a Angular a actualizar el HTML inmediatamente
+      this.cdr.detectChanges(); 
+
+    } catch (err) {
+      console.error('Error al cargar vuelos', err);
+    }
+  }
+
+  seleccionarVuelo(vuelo: any) {
+    this.vueloSeleccionado = vuelo;
+    this.pasaporte = '';
+    this.cantidadMaletas = null;
+    this.maletasFisicas = [];
+  }
+
+   generarCamposMaletas() {
+
+    this.maletasFisicas = [];
+
+    if (this.cantidadMaletas && this.cantidadMaletas > 0) {
+
+      for (let i = 0; i < this.cantidadMaletas; i++) {
+
+        this.maletasFisicas.push({
+          maleta: '',
+          peso: null
+        });
+
+      }
+    }
+  }
+
+  async buscarPasajero() {
+
     if (!this.pasaporte || this.cantidadMaletas === null) {
 
       alert('Debe ingresar los campos obligatorios');
@@ -55,60 +84,142 @@ export class AbordajeComponent {
       return;
     }
 
-    // FA05
-    if (this.pasaporte === '0000') {
+    // VALIDAR MALETAS
+    const maletasInvalidas = this.maletasFisicas.some(
+      m =>
+        !m.maleta ||
+        m.peso === null ||
+        m.peso <= 0
+    );
 
-      alert('El pasajero no se encuentra registrado en el vuelo');
+    if (maletasInvalidas) {
+
+      alert('Debe ingresar nombre y peso válido para todas las maletas.');
 
       return;
     }
 
-    let recargo = 0;
+    try {
 
-    // FA07
-    if (this.cantidadMaletas > 2) {
-
-      const extras = this.cantidadMaletas - 2;
-
-      recargo = extras * 50;
-
-      alert(
-        `Se agregó $${recargo} por recargo de equipaje`
+      const usuario: any = await firstValueFrom(
+        this.http.get(
+          `http://localhost:8082/usuarios/pasaporte/${this.pasaporte}`
+        )
       );
+
+      const idUsuario = usuario.userId;
+
+      const nombreUsuario = usuario.nombreCompleto;
+
+      const idVuelo =
+        this.vueloSeleccionado.vueloId ||
+        this.vueloSeleccionado.id;
+
+      // REQUEST FINAL
+      const requestAbordaje = {
+
+        idusuario: idUsuario,
+
+        idVuelo: idVuelo,
+
+        numMaletas: this.cantidadMaletas,
+
+        nombrePasajero: nombreUsuario,
+
+        maletas: this.maletasFisicas
+
+      };
+
+      
+      console.log('Request enviado:', requestAbordaje);
+
+      const respuestaAbordaje = await firstValueFrom(
+        this.http.put(
+          'http://localhost:8084/api/reservas/abordar',
+          requestAbordaje,
+          { responseType: 'text' }
+        )
+      );
+
+      alert(respuestaAbordaje);
+
+      this.pasajerosAbordados.push({
+
+        pasaporte: this.pasaporte,
+
+        maletas: this.cantidadMaletas,
+
+        estado: 'ABORDADO'
+
+      });
+
+      // LIMPIAR FORMULARIO
+      this.pasaporte = '';
+
+      this.cantidadMaletas = null;
+
+      this.maletasFisicas = [];
+
+      this.cdr.detectChanges();
+
+    } catch (error: any) {
+
+      if (error.status === 404) {
+
+        alert(
+          'Error: Boleto no encontrado, pasajero no registrado o pasaporte incorrecto'
+        );
+
+      } else if (error.status === 400) {
+
+        alert(
+          error.error ||
+          'Error: Validaciones de abordaje fallidas'
+        );
+
+      } else {
+
+        alert('Ocurrió un error de conexión con el servidor');
+
+        console.error(error);
+
+      }
     }
-
-    this.pasajerosAbordados.push({
-      pasaporte: this.pasaporte,
-      maletas: this.cantidadMaletas,
-      estado: 'ABORDADO'
-    });
-
-    alert('Pasajero abordado correctamente');
-
-    this.pasaporte = '';
-
-    this.cantidadMaletas = null;
   }
 
-  finalizarAbordaje() {
+  async finalizarAbordaje() {
+    if (!this.vueloSeleccionado) return;
 
-    // FA06
-    alert('Se completó el abordaje');
+    try {
+      const idVuelo = this.vueloSeleccionado.vueloId || this.vueloSeleccionado.id;
 
-    this.vueloSeleccionado = null;
+      const respuestaCancelarBoletos = await firstValueFrom(
+        this.http.put(`http://localhost:8084/api/reservas/vuelo/${idVuelo}/finalizar`, {}, { responseType: 'text' })
+      );
 
-    this.pasajerosAbordados = [];
+     
+      const respuestaActualizarVuelo = await firstValueFrom(
+        this.http.put(`http://localhost:8083/vuelos/${idVuelo}/estado-abordado`, {}, { responseType: 'text' })
+      );
+
+      // 4. Mostrar mensaje consolidado (FA06)
+      alert(`Se completó el abordaje.\nDetalle: ${respuestaCancelarBoletos}\n${respuestaActualizarVuelo}`);
+
+      // 5. Limpiar vista y refrescar los vuelos (el vuelo abordado ya no debería aparecer)
+      this.vueloSeleccionado = null;
+      this.pasajerosAbordados = [];
+      this.cargarVuelos(); 
+
+    } catch (error) {
+      alert('Error al intentar finalizar el abordaje y cambiar el estado del vuelo');
+      console.error(error);
+    }
   }
 
   nuevoVuelo() {
-
-    // FA08
     this.vueloSeleccionado = null;
-
     this.pasajerosAbordados = [];
-
     this.pasaporte = '';
-
     this.cantidadMaletas = null;
   }
 }

@@ -161,13 +161,23 @@ create table personal_tripulacion(
 	foreign key (rol_id) references roles_tripulacion(rol_id)
 );
 
+create table paq_tripulacion(
+	id serial,
+	piloto_id int references personal_tripulacion(personal_tripulacion_id),
+	copiloto_id int references personal_tripulacion(personal_tripulacion_id),
+	ingeniero_id int references personal_tripulacion(personal_tripulacion_id),
+	sobrecargo1_id int references personal_tripulacion(personal_tripulacion_id),
+	sobrecargo2_id int references personal_tripulacion(personal_tripulacion_id),
+	sobrecargo3_id int references personal_tripulacion(personal_tripulacion_id)
+);
+
 
 create table asignacion_tripulacion(
 	asignacion_id serial primary key,
 	avion_id int,
 	tripulacion_id int,
 	foreign key (avion_id) references aviones(avion_id),
-	foreign key (tripulacion_id) references personal_tripulacion(personal_tripulacion_id)
+	foreign key (tripulacion_id) references paq_tripulacion(id)
 );
 
 
@@ -199,13 +209,17 @@ CREATE TABLE boleto(
 	asiento_id int,
 	estado varchar(30),
 	cant_maletas int,
+	estado_abordaje varchar(30) DEFAULT 'PENDIENTE',
 	escala int references boleto(boleto_id),
 	costo_boleto numeric(10,2),
 	codigo_asiento varchar(10),
 	fecha_creacion timestamp,
 	usuario_creacion varchar(150),
 	fecha_modificacion timestamp,
-	usuario_modificacion varchar(150)
+	usuario_modificacion varchar(150),
+
+	cant_maletas_extra int DEFAULT 0,
+	monto_extra_equipaje numeric(10,2) DEFAULT 0.00
 );
 
 CREATE TABLE equipaje(
@@ -213,6 +227,7 @@ CREATE TABLE equipaje(
 	boleto_id int references boleto(boleto_id),
 	maleta varchar(30),
 	peso numeric(6,2),
+	nombre_usuario varchar(40),
 	fecha_creacion timestamp,
 	usuario_creacion varchar(150),
 	fecha_modificacion timestamp,
@@ -222,4 +237,10 @@ CREATE TABLE equipaje(
 
 CREATE UNIQUE INDEX uk_vuelo_asiento_activo
 ON boleto (vuelo_id, asiento_id)
+WHERE estado IN ('RESERVADO', 'PAGADO');
+
+
+
+CREATE UNIQUE INDEX uk_vuelo_usuario_activo
+ON boleto (vuelo_id, usuario_id)
 WHERE estado IN ('RESERVADO', 'PAGADO');

@@ -2,12 +2,14 @@ package com.aeropuerto.operaciones.service;
 
 import com.aeropuerto.operaciones.dto.ConsultaVueloDTO;
 import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
+import com.aeropuerto.operaciones.dto.ValidacionChoqueHorarioDTO;
 import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
 import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.repository.VueloRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -225,4 +228,62 @@ public class VueloService {
 
         return respuesta;
     }
+
+
+    public List<Vuelo> obtenerPendientesAbordaje() {
+
+        List<Vuelo> vuelos =
+                vueloRepository.findByEstado("PENDIENTE ABORDAR");
+
+        return vuelos;
+    }
+
+
+
+    @Transactional
+    public void actualizarEstadoVuelo(Long id, String nuevoEstado) {
+        // 1. Buscar el vuelo por su ID
+        Optional<Vuelo> vueloOpt = vueloRepository.findById(id);
+
+        if (vueloOpt.isPresent()) {
+            Vuelo vuelo = vueloOpt.get();
+            vuelo.setEstado(nuevoEstado);
+            vueloRepository.save(vuelo);
+        } else {
+            // 3. Si no existe, lanzamos un error que el Controller atrapará
+            throw new RuntimeException("Vuelo no encontrado con ID: " + id);
+        }
+    }
+
+
+
+
+    public boolean existeChoqueHorarios(ValidacionChoqueHorarioDTO dto) {
+        if (dto.getVuelosExistentesIds() == null || dto.getVuelosExistentesIds().isEmpty()) {
+            return false;
+        }
+
+        Vuelo vueloNuevo = vueloRepository.findById(dto.getVueloNuevoId())
+                .orElseThrow(() -> new RuntimeException("Vuelo nuevo no encontrado con ID: " + dto.getVueloNuevoId()));
+
+        LocalDateTime inicioNuevo = LocalDateTime.of(vueloNuevo.getFechaSalida(), vueloNuevo.getHoraSalida());
+        LocalDateTime finNuevo = LocalDateTime.of(vueloNuevo.getFechaLlegada(), vueloNuevo.getHoraLlegada());
+
+
+        List<Vuelo> vuelosExistentes = vueloRepository.findAllById(dto.getVuelosExistentesIds());
+
+        //comparar
+        for (Vuelo vExistente : vuelosExistentes) {
+            LocalDateTime inicioExistente = LocalDateTime.of(vExistente.getFechaSalida(), vExistente.getHoraSalida());
+            LocalDateTime finExistente = LocalDateTime.of(vExistente.getFechaLlegada(), vExistente.getHoraLlegada());
+
+            // inicio nuevo < fin Existente Y inicio existente < fin nuevo)
+            if (inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

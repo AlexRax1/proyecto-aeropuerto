@@ -29,7 +29,7 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   @Output() asientosConfirmados = new EventEmitter<any[]>();
 
   seats: Seat[][] = [];
-  maxSelection = 5;
+  maxSelection = 1;
   pollingSub!: Subscription;
   selectedSeatInfo: Seat[] = [];
   
