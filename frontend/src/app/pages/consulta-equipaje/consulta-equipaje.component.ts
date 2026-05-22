@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-consulta-equipaje',
@@ -11,13 +13,15 @@ import { FormsModule } from '@angular/forms';
 })
 export class ConsultaEquipajeComponent {
 
+  private http = inject(HttpClient);
+
   numeroVuelo: string = '';
 
   consultaRealizada = false;
 
   equipajes: any[] = [];
 
-  buscarEquipaje() {
+  async buscarEquipaje() {
 
     if (!this.numeroVuelo) {
 
@@ -26,50 +30,48 @@ export class ConsultaEquipajeComponent {
       return;
     }
 
-    // FA03
-    if (this.numeroVuelo === '0000') {
+    const vueloId = parseInt(this.numeroVuelo, 10);
 
-      alert('El número de vuelo ingresado no existe.');
+    if (isNaN(vueloId)) {
 
-      this.equipajes = [];
-
-      this.consultaRealizada = false;
+      alert('Ingrese un número de vuelo válido');
 
       return;
     }
 
-    // FA04
-    if (this.numeroVuelo === '9999') {
+    try {
 
-      alert('No puede consultar vuelos de otra aerolínea.');
+      const respuesta: any[] = await firstValueFrom(
 
-      this.equipajes = [];
+        this.http.get<any[]>(
+          `http://localhost:8084/equipajes/vuelo/${vueloId}`
+        )
 
-      this.consultaRealizada = false;
+      );
 
-      return;
-    }
+      console.log('Equipajes encontrados:', respuesta);
 
-    this.consultaRealizada = true;
+      this.equipajes = respuesta;
 
-    // Datos simulados
-    this.equipajes = [
-      {
-        pasajero: 'Juan Pérez',
-        maleta: 'Maleta Negra',
-        peso: '23 kg'
-      },
-      {
-        pasajero: 'María López',
-        maleta: 'Maleta Azul',
-        peso: '18 kg'
-      },
-      {
-        pasajero: 'Carlos Ramírez',
-        maleta: 'Maleta Roja',
-        peso: '25 kg'
+      this.consultaRealizada = true;
+
+      if (this.equipajes.length === 0) {
+
+        alert('No se encontraron equipajes para este vuelo.');
+
       }
-    ];
+
+    } catch (error) {
+
+      console.error('Error al consultar equipajes:', error);
+
+      alert('Error al comunicarse con el servidor.');
+
+      this.equipajes = [];
+
+      this.consultaRealizada = false;
+
+    }
   }
 
   limpiarFiltros() {
@@ -79,20 +81,24 @@ export class ConsultaEquipajeComponent {
     this.equipajes = [];
 
     this.consultaRealizada = false;
+
   }
 
   nuevaConsulta() {
 
     this.limpiarFiltros();
+
   }
 
   imprimirPDF() {
 
     alert('Generando archivo PDF...');
+
   }
 
   exportarExcel() {
 
     alert('Generando archivo Excel...');
+
   }
 }
