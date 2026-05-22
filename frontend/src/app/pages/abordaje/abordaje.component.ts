@@ -20,7 +20,7 @@ export class AbordajeComponent implements OnInit {
   vueloSeleccionado: any = null;
   pasaporte: string = '';
   cantidadMaletas: number | null = null;
-  pasajerosAbordados: any[] = [];;
+  pasajerosAbordados: any[] = [];
 
 
  // NUEVA ESTRUCTURA DE MALETAS
@@ -28,7 +28,7 @@ export class AbordajeComponent implements OnInit {
     maleta: string;
     peso: number | null;
   }[] = [];
-  
+
   ngOnInit() {
     this.cargarVuelos();
   }
@@ -39,12 +39,12 @@ export class AbordajeComponent implements OnInit {
       const data = await firstValueFrom(
         this.http.get<any[]>('http://localhost:8083/vuelos/pendientesAbordar')
       );
-      
+
       console.log('Vuelos recibidos desde el backend:', data); // Verifícalo en F12
       this.vuelos = data;
 
       // Magia: Forzamos a Angular a actualizar el HTML inmediatamente
-      this.cdr.detectChanges(); 
+      this.cdr.detectChanges();
 
     } catch (err) {
       console.error('Error al cargar vuelos', err);
@@ -130,7 +130,7 @@ export class AbordajeComponent implements OnInit {
 
       };
 
-      
+
       console.log('Request enviado:', requestAbordaje);
 
       const respuestaAbordaje = await firstValueFrom(
@@ -197,7 +197,7 @@ export class AbordajeComponent implements OnInit {
         this.http.put(`http://localhost:8084/api/reservas/vuelo/${idVuelo}/finalizar`, {}, { responseType: 'text' })
       );
 
-     
+
       const respuestaActualizarVuelo = await firstValueFrom(
         this.http.put(`http://localhost:8083/vuelos/${idVuelo}/estado-abordado`, {}, { responseType: 'text' })
       );
@@ -208,7 +208,7 @@ export class AbordajeComponent implements OnInit {
       // 5. Limpiar vista y refrescar los vuelos (el vuelo abordado ya no debería aparecer)
       this.vueloSeleccionado = null;
       this.pasajerosAbordados = [];
-      this.cargarVuelos(); 
+      this.cargarVuelos();
 
     } catch (error) {
       alert('Error al intentar finalizar el abordaje y cambiar el estado del vuelo');

@@ -23,13 +23,14 @@ import {ConsultaAgregarVueloComponent} from './app/pages/consulta-agregar-vuelo/
 import {CrearTripulacionComponent} from './app/pages/crear-tripulacion/crear-tripulacion.component';
 
 
-import { authInterceptor } from './app/core/interceptors/auth.interceptor'; 
+import { authInterceptor } from './app/core/interceptors/auth.interceptor';
+import {ConsultaVueloComponent} from './app/pages/consulta-vuelo/consulta-vuelo.component';
 
 // 1. AGREGA 'withIntercept
 
 bootstrapApplication(AppComponent, {
   providers: [
-    
+
     // 3. MODIFICA ESTA LÍNEA PARA ENLAZAR EL INTERCEPTOR
     provideHttpClient(
       withInterceptors([authInterceptor])
@@ -52,8 +53,9 @@ bootstrapApplication(AppComponent, {
       { path: 'consulta-equipaje',  component: ConsultaEquipajeComponent },
       { path: 'abordaje',  component: AbordajeComponent },
       { path: 'reservar-vuelo', component: ReservarVueloComponent },
-      { path: 'consulta-agregar-vuelo',  component: ConsultaAgregarVueloComponent },
+      { path: 'agregar-vuelo',  component: ConsultaAgregarVueloComponent },
       { path: 'crear-tripulacion',  component: CrearTripulacionComponent },
+      { path: 'consulta-vuelo',  component: ConsultaVueloComponent },
       { path: '**', redirectTo: '' }
     ])
   ]

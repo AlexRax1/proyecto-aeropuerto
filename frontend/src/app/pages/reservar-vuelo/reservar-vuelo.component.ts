@@ -26,7 +26,7 @@ export interface Vuelo {
 @Component({
   selector: 'app-reservar-vuelo',
   standalone: true,
-  imports: [CommonModule, FormsModule, SeatSelectionComponent], 
+  imports: [CommonModule, FormsModule, SeatSelectionComponent],
   templateUrl: './reservar-vuelo.component.html',
   styleUrls: ['./reservar-vuelo.component.css']
 })
@@ -34,9 +34,9 @@ export class ReservarVueloComponent implements OnInit {
 
   aeropuertos: Destino[] = [];
   vuelosDisponibles: Vuelo[] = [];
-  
+
   filtros = {
-    origen: '', 
+    origen: '',
     destino: '',
     fechaSalida: ''
   };
@@ -88,7 +88,7 @@ export class ReservarVueloComponent implements OnInit {
     this.http.get<Vuelo[]>(url).subscribe({
       next: (data) => {
         this.vuelosDisponibles = data;
-        
+
         if (this.vuelosDisponibles.length === 0) {
           alert('No se encontraron vuelos según los parámetros ingresados');
         }
@@ -190,7 +190,7 @@ export class ReservarVueloComponent implements OnInit {
     this.cantidadMaletas = null;
     this.consultaRealizada = false;
     this.mostrarModalAsientos = false;
-    
+
     // Limpiamos también variables de pago
     this.asientosSeleccionados = [];
     this.datosPago = { nombre: '', tarjeta: '', vencimiento: '', cvv: '' };

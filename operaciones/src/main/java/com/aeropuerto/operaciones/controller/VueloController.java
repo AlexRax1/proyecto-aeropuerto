@@ -1,10 +1,10 @@
 package com.aeropuerto.operaciones.controller;
 
 
-import com.aeropuerto.operaciones.dto.ConsultaVueloDTO;
-import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
+import com.aeropuerto.operaciones.dto.*;
+import com.aeropuerto.operaciones.model.Avion;
 import com.aeropuerto.operaciones.dto.ValidacionChoqueHorarioDTO;
-import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
+import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.service.VueloService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -53,6 +54,63 @@ public class VueloController {
                 fechaDesde,
                 fechaHasta
         );
+    }
+
+    @PostMapping
+    public ResponseEntity<Vuelo> crearVuelo(
+            @RequestBody CrearVueloDTO dto
+    ) {
+
+        return ResponseEntity.ok(
+                vueloService.crearVuelo(dto)
+        );
+    }
+
+    @GetMapping("/disponibles")
+    public List<Avion> obtenerAvionesDisponibles(
+            @RequestParam Integer aerolineaId,
+
+            @RequestParam LocalDate fechaSalida,
+
+            @RequestParam LocalTime horaSalida,
+
+            @RequestParam LocalDate fechaLlegada,
+
+            @RequestParam LocalTime horaLlegada
+    ) {
+
+        return vueloService.obtenerAvionesDisponibles(
+                aerolineaId,
+                fechaSalida,
+                horaSalida,
+                fechaLlegada,
+                horaLlegada
+        );
+    }
+
+    @GetMapping("/consulta-vuelo/{id}")
+    public ResponseEntity<ConsultaVueloDTO>
+    consultarVueloPorId(
+
+            @PathVariable Long id
+    ) {
+
+        return ResponseEntity.ok(
+                vueloService.consultarVueloPorId(id)
+        );
+    }
+
+    @GetMapping("/pasajeros/{vueloId}")
+    public List<ConsultaPasajerosVueloDTO>
+    consultarPasajerosPorVuelo(
+
+            @PathVariable Long vueloId
+    ) {
+
+        return vueloService
+                .consultarPasajerosPorVuelo(
+                        vueloId
+                );
     }
 
     //buscar vuelos "PENDIENTE DE ABORDAR"

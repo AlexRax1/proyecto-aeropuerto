@@ -20,9 +20,9 @@
 
           <option
             *ngFor="let piloto of pilotos"
-            [value]="piloto">
+            [value]="piloto.personalTripulacionId">
 
-            {{ piloto }}
+            {{ piloto.nombre }}
 
           </option>
 
@@ -44,9 +44,9 @@
 
           <option
             *ngFor="let copiloto of copilotos"
-            [value]="copiloto">
+            [value]="copiloto.personalTripulacionId">
 
-            {{ copiloto }}
+            {{ copiloto.nombre }}
 
           </option>
 
@@ -68,9 +68,9 @@
 
           <option
             *ngFor="let ingeniero of ingenieros"
-            [value]="ingeniero">
+            [value]="ingeniero.personalTripulacionId">
 
-            {{ ingeniero }}
+            {{ ingeniero.nombre }}
 
           </option>
 
@@ -83,7 +83,9 @@
     <!-- CABINA -->
     <div class="cabina-container">
 
-      <h2>Tripulantes de Cabina</h2>
+      <h2>
+        Tripulantes de Cabina
+      </h2>
 
       <p>
         Seleccione 3 tripulantes
@@ -95,16 +97,31 @@
           *ngFor="let tripulante of tripulantesCabina"
           class="cabina-item">
 
-          <input
-            type="checkbox"
-            [checked]="tripulacion.cabina.includes(tripulante)"
-            (change)="toggleCabina(tripulante)">
+          <label class="checkbox-label">
 
-          <span>
+            <input
+              type="checkbox"
 
-            {{ tripulante }}
+              [checked]="
+                tripulacion.cabina.includes(
+                  tripulante.personalTripulacionId
+                )
+              "
 
-          </span>
+              (change)="
+                toggleCabina(
+                  tripulante.personalTripulacionId
+                )
+              "
+            >
+
+            <span>
+
+              {{ tripulante.nombre }}
+
+            </span>
+
+          </label>
 
         </div>
 

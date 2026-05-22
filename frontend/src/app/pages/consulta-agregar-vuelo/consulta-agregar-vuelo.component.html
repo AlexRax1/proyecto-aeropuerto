@@ -19,14 +19,14 @@
         <select [(ngModel)]="vuelo.aeropuertoSalida">
 
           <option value="">
-            Seleccione
+            Seleccione aeropuerto
           </option>
 
           <option
             *ngFor="let aeropuerto of aeropuertos"
-            [value]="aeropuerto">
+            [value]="aeropuerto.id">
 
-            {{ aeropuerto }}
+            {{ aeropuerto.labelCompleto}}
 
           </option>
 
@@ -42,14 +42,14 @@
         <select [(ngModel)]="vuelo.aeropuertoLlegada">
 
           <option value="">
-            Seleccione
+            Seleccione aeropuerto
           </option>
 
           <option
             *ngFor="let aeropuerto of aeropuertos"
-            [value]="aeropuerto">
+            [value]="aeropuerto.id">
 
-            {{ aeropuerto }}
+            {{ aeropuerto.labelCompleto }}
 
           </option>
 
@@ -126,79 +126,75 @@
   </div>
 
   <!-- PASO 2 -->
-  <div
-    *ngIf="pasoActual === 2"
-    class="card">
+  <div *ngIf="pasoActual === 2" class="contenedor-aviones">
 
-    <h2>Seleccionar Avión</h2>
+    <h2>
+      Seleccionar Avión
+    </h2>
 
-    <table>
+    <div
+      *ngFor="let avion of avionesDisponibles"
+      class="card-avion"
+      [class.seleccionado]="
+      vuelo.avionSeleccionado === avion.avionId
+    "
+      (click)="seleccionarAvion(avion.avionId)"
+    >
 
-      <thead>
+      <h3>
+        {{ avion.modeloAvion.nombre }}
+      </h3>
 
-      <tr>
+      <p>
+        <strong>Marca:</strong>
+        {{ avion.marca }}
+      </p>
 
-        <th>ID</th>
-        <th>Modelo</th>
-        <th>Capacidad</th>
-        <th>Estado</th>
-        <th>Seleccionar</th>
+      <p>
+        <strong>Año:</strong>
+        {{ avion.ano }}
+      </p>
 
-      </tr>
+      <p>
+        <strong>Estado:</strong>
+        {{ avion.estado }}
+      </p>
 
-      </thead>
+      <p>
+        <strong>Clase Económica:</strong>
+        {{ avion.cantAsientosEconomica }}
+        asientos
+      </p>
 
-      <tbody>
+      <p>
+        <strong>Clase Ejecutiva:</strong>
+        {{ avion.cantAsientosEjecutiva }}
+        asientos
+      </p>
 
-      <tr *ngFor="let avion of avionesDisponibles">
-
-        <td>{{ avion.id }}</td>
-
-        <td>{{ avion.modelo }}</td>
-
-        <td>{{ avion.capacidad }}</td>
-
-        <td>{{ avion.estado }}</td>
-
-        <td>
-
-          <button
-            class="btn"
-            (click)="seleccionarAvion(avion.id)">
-
-            Seleccionar
-
-          </button>
-
-        </td>
-
-      </tr>
-
-      </tbody>
-
-    </table>
+    </div>
 
     <div class="precios">
 
-      <div>
+      <label>
+        Precio Clase Económica
+      </label>
 
-        <label>Precio Clase Económica</label>
+      <input
+        type="number"
+        [(ngModel)]="vuelo.precioEconomica"
+        placeholder="Ingrese precio"
+      >
 
-        <input
-          type="number"
-          [(ngModel)]="vuelo.precioEconomica">
+      <label>
+        Precio Clase Ejecutiva
+      </label>
 
-      </div>
-
-      <div>
-
-        <label>Precio Clase Ejecutiva</label>
-
-        <input
-          type="number"
-          [(ngModel)]="vuelo.precioEjecutiva">
-
-      </div>
+      <input
+        type="number"
+        [(ngModel)]="vuelo.precioEjecutiva"
+        placeholder="Ingrese precio"
+      >
 
     </div>
 
@@ -206,18 +202,16 @@
 
       <button
         class="btn cancelar"
-        (click)="nuevoVuelo()">
-
+        (click)="cancelar()"
+      >
         Cancelar
-
       </button>
 
       <button
-        class="btn"
-        (click)="irTripulacion()">
-
+        class="btn siguiente"
+        (click)="irTripulacion()"
+      >
         Siguiente
-
       </button>
 
     </div>
@@ -231,24 +225,38 @@
 
     <h2>Seleccionar Tripulación</h2>
 
-    <div class="tripulacion">
+    <div
+      class="tripulante-card"
+      *ngFor="let tripulante of tripulantesDisponibles"
+    >
 
-      <div
-        *ngFor="let tripulante of tripulantesDisponibles"
-        class="tripulante">
+      <label>
 
         <input
           type="checkbox"
-          [checked]="vuelo.tripulacion.includes(tripulante)"
-          (change)="toggleTripulante(tripulante)">
 
-        <span>
+          [checked]="
+        vuelo.tripulacion.includes(
+          tripulante.personalTripulacionId
+        )
+      "
 
-          {{ tripulante }}
+          (change)="
+        toggleTripulante(
+          tripulante.personalTripulacionId
+        )
+      "
+        />
 
-        </span>
+        <strong>
+          {{ tripulante.nombre }}
+        </strong>
 
-      </div>
+        -
+
+        {{ tripulante.rol?.nombreRol }}
+
+      </label>
 
     </div>
 

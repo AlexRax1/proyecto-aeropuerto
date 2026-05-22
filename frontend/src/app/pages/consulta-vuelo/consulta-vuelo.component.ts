@@ -18,36 +18,52 @@ import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 
 @Component({
-  selector: 'app-consulta-pasajeros-vuelo',
+  selector: 'app-consulta-vuelo',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     HttpClientModule
   ],
-  templateUrl: './consulta-pasajeros-vuelo.component.html',
-  styleUrls: ['./consulta-pasajeros-vuelo.component.css']
+  templateUrl: './consulta-vuelo.component.html',
+  styleUrls: ['./consulta-vuelo.component.css']
 })
-export class ConsultaPasajerosVueloComponent {
+export class ConsultaVueloComponent {
 
   constructor(
     private http: HttpClient
   ) {}
 
+  // =========================================
+  // NÚMERO DE VUELO
+  // =========================================
+
   numeroVuelo: string = '';
+
+  // =========================================
+  // DATOS DEL VUELO
+  // =========================================
+
+  vuelo: any = null;
+
+  // =========================================
+  // CONTROL DE CONSULTA
+  // =========================================
 
   consultaRealizada = false;
 
-  pasajeros: any[] = [];
+  // =========================================
+  // API
+  // =========================================
 
   apiUrl =
-    'http://localhost:8083/vuelos/pasajeros';
+    'http://localhost:8083/vuelos/consulta-vuelo';
 
   // =========================================
-  // BUSCAR
+  // BUSCAR VUELO
   // =========================================
 
-  buscarPasajeros() {
+  buscarVuelo() {
 
     if (!this.numeroVuelo) {
 
@@ -58,7 +74,7 @@ export class ConsultaPasajerosVueloComponent {
       return;
     }
 
-    this.http.get<any[]>(
+    this.http.get<any>(
       `${this.apiUrl}/${this.numeroVuelo}`
     ).subscribe({
 
@@ -66,34 +82,25 @@ export class ConsultaPasajerosVueloComponent {
 
         console.log(response);
 
-        this.pasajeros = response;
+        this.vuelo = response;
 
         this.consultaRealizada = true;
 
-        if (this.pasajeros.length === 0) {
-
-          alert(
-            'No existen pasajeros para este vuelo'
-          );
-
-        } else {
-
-          alert(
-            'Consulta realizada correctamente'
-          );
-        }
+        alert(
+          'Consulta realizada correctamente'
+        );
       },
 
       error: (error) => {
 
         console.error(error);
 
-        this.pasajeros = [];
+        this.vuelo = null;
 
         this.consultaRealizada = false;
 
         alert(
-          'El número de vuelo ingresado no existe.'
+          'El número de vuelo ingresado no se encontró'
         );
       }
 
@@ -104,11 +111,11 @@ export class ConsultaPasajerosVueloComponent {
   // LIMPIAR
   // =========================================
 
-  limpiarFiltros() {
+  limpiar() {
 
     this.numeroVuelo = '';
 
-    this.pasajeros = [];
+    this.vuelo = null;
 
     this.consultaRealizada = false;
 
@@ -123,7 +130,7 @@ export class ConsultaPasajerosVueloComponent {
 
   nuevaConsulta() {
 
-    this.limpiarFiltros();
+    this.limpiar();
 
     alert(
       'Nueva consulta iniciada'
@@ -136,10 +143,10 @@ export class ConsultaPasajerosVueloComponent {
 
   imprimirPDF() {
 
-    if (this.pasajeros.length === 0) {
+    if (!this.vuelo) {
 
       alert(
-        'No hay pasajeros para imprimir'
+        'No hay información para imprimir'
       );
 
       return;
@@ -148,7 +155,7 @@ export class ConsultaPasajerosVueloComponent {
     const doc = new jsPDF();
 
     doc.text(
-      'Consulta Pasajeros por Vuelo',
+      'Consulta de Vuelo',
       14,
       15
     );
@@ -158,33 +165,35 @@ export class ConsultaPasajerosVueloComponent {
       startY: 25,
 
       head: [[
-        'Nombre',
-        'Pasaporte',
-        'Nacionalidad',
-        'Edad',
-        'Teléfono',
-        'Correo'
+        'Número Vuelo',
+        'Modelo',
+        'Aerolínea',
+        'Origen',
+        'Destino',
+        'Fecha Salida',
+        'Hora Salida',
+        'Fecha Llegada',
+        'Hora Llegada'
       ]],
 
-      body: this.pasajeros.map(p => [
+      body: [[
 
-        p.nombrePasajero,
-        p.numeroPasaporte,
-        p.nacionalidad,
-        p.edad,
-        p.telefono,
-        p.correo
+        this.vuelo.numeroVuelo,
+        this.vuelo.modeloAvion,
+        this.vuelo.aerolinea,
+        this.vuelo.origen,
+        this.vuelo.destino,
+        this.vuelo.fechaSalida,
+        this.vuelo.horaSalida,
+        this.vuelo.fechaLlegada,
+        this.vuelo.horaLlegada
 
-      ])
+      ]]
 
     });
 
     doc.save(
-      'consulta-pasajeros.pdf'
-    );
-
-    alert(
-      'PDF generado correctamente'
+      'consulta-vuelo.pdf'
     );
   }
 
@@ -194,34 +203,57 @@ export class ConsultaPasajerosVueloComponent {
 
   exportarExcel() {
 
-    if (this.pasajeros.length === 0) {
+    if (!this.vuelo) {
 
       alert(
-        'No hay pasajeros para exportar'
+        'No hay información para exportar'
       );
 
       return;
     }
 
+    const datos = [{
+      numeroVuelo:
+      this.vuelo.numeroVuelo,
+
+      modeloAvion:
+      this.vuelo.modeloAvion,
+
+      aerolinea:
+      this.vuelo.aerolinea,
+
+      origen:
+      this.vuelo.origen,
+
+      destino:
+      this.vuelo.destino,
+
+      fechaSalida:
+      this.vuelo.fechaSalida,
+
+      horaSalida:
+      this.vuelo.horaSalida,
+
+      fechaLlegada:
+      this.vuelo.fechaLlegada,
+
+      horaLlegada:
+      this.vuelo.horaLlegada
+    }];
+
     const worksheet =
-      XLSX.utils.json_to_sheet(
-        this.pasajeros
-      );
+      XLSX.utils.json_to_sheet(datos);
 
     const workbook = {
-
       Sheets: {
-        'Pasajeros': worksheet
+        'Vuelo': worksheet
       },
-
-      SheetNames: ['Pasajeros']
+      SheetNames: ['Vuelo']
     };
 
     const excelBuffer =
       XLSX.write(workbook, {
-
         bookType: 'xlsx',
-
         type: 'array'
       });
 
@@ -235,7 +267,7 @@ export class ConsultaPasajerosVueloComponent {
 
     FileSaver.saveAs(
       data,
-      'consulta-pasajeros.xlsx'
+      'consulta-vuelo.xlsx'
     );
 
     alert(

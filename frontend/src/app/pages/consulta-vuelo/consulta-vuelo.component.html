@@ -1,0 +1,127 @@
+<div class="contenedor">
+
+  <div class="card">
+
+    <h1>
+      Consultar Vuelo
+    </h1>
+
+    <div class="campo">
+
+      <label>
+        Número de Vuelo
+      </label>
+
+      <input
+        type="number"
+        [(ngModel)]="numeroVuelo"
+        placeholder="Ingrese número de vuelo"
+      >
+
+    </div>
+
+    <div class="acciones">
+
+      <button
+        class="btn buscar"
+        (click)="buscarVuelo()">
+
+        Buscar
+
+      </button>
+
+      <button
+        class="btn limpiar"
+        (click)="limpiar()">
+
+        Limpiar
+
+      </button>
+
+    </div>
+
+    <div
+      *ngIf="consultaRealizada && vuelo"
+      class="resultado">
+
+      <h2>
+        Información del Vuelo
+      </h2>
+
+      <div class="grid">
+
+        <div>
+          <strong>Modelo:</strong>
+          {{ vuelo.modeloAvion }}
+        </div>
+
+        <div>
+          <strong>Aerolínea:</strong>
+          {{ vuelo.aerolinea }}
+        </div>
+
+        <div>
+          <strong>Origen:</strong>
+          {{ vuelo.origen }}
+        </div>
+
+        <div>
+          <strong>Destino:</strong>
+          {{ vuelo.destino }}
+        </div>
+
+        <div>
+          <strong>Fecha Salida:</strong>
+          {{ vuelo.fechaSalida }}
+        </div>
+
+        <div>
+          <strong>Hora Salida:</strong>
+          {{ vuelo.horaSalida }}
+        </div>
+
+        <div>
+          <strong>Fecha Llegada:</strong>
+          {{ vuelo.fechaLlegada }}
+        </div>
+
+        <div>
+          <strong>Hora Llegada:</strong>
+          {{ vuelo.horaLlegada }}
+        </div>
+
+      </div>
+
+      <div class="acciones acciones-finales">
+
+        <button
+          class="btn pdf"
+          (click)="imprimirPDF()">
+
+          PDF
+
+        </button>
+
+        <button
+          class="btn excel"
+          (click)="exportarExcel()">
+
+          Excel
+
+        </button>
+
+        <button
+          class="btn nueva"
+          (click)="nuevaConsulta()">
+
+          Nueva Consulta
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

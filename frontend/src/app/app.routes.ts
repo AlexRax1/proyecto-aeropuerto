@@ -15,6 +15,7 @@ import {AbordajeComponent} from './pages/abordaje/abordaje.component';
 import {ReservarVueloComponent} from './pages/reservar-vuelo/reservar-vuelo.component';
 import {ConsultaAgregarVueloComponent} from './pages/consulta-agregar-vuelo/consulta-agregar-vuelo.component';
 import {CrearTripulacionComponent} from './pages/crear-tripulacion/crear-tripulacion.component';
+import {ConsultaVueloComponent} from './pages/consulta-vuelo/consulta-vuelo.component';
 
 export const routes: Routes = [
   {
@@ -85,6 +86,11 @@ export const routes: Routes = [
   {
     path: 'crear-tripulacion',
     component: CrearTripulacionComponent
+  },
+
+  {
+    path: 'consulta-vuelo',
+    component: ConsultaVueloComponent
   }
 
 
