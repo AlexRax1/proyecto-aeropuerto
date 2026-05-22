@@ -142,7 +142,7 @@ export class ReservarVueloComponent implements OnInit {
 
 
 
-  // NUEVO: Ejecuta la transacción final
+  // ejecuta la transacción final
   procesarPago() {
     if (!this.datosPago.nombre || !this.datosPago.tarjeta || !this.datosPago.vencimiento || !this.datosPago.cvv) {
       alert("Por favor, ingrese todos los datos de la tarjeta.");
@@ -174,7 +174,11 @@ export class ReservarVueloComponent implements OnInit {
       },
       error: (err) => {
         console.error("Error al procesar el pago", err);
-        alert("Hubo un error al procesar tu pago. Intenta nuevamente.");
+        const mensajeError = typeof err.error === 'string' 
+             ? err.error 
+             : "Hubo un error al procesar tu pago. Intenta nuevamente.";
+        
+        alert(mensajeError);
       }
     });
   }

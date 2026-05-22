@@ -21,6 +21,9 @@ public class Boleto {
     @Column(name = "usuario_id")
     private Long usuarioId;
 
+    @Column(name ="nombre_usuario")
+    private String nombreUsuario;
+
     @Column(name = "asiento_id")
     private Long asientoId;
 
@@ -45,11 +48,11 @@ public class Boleto {
     }
 
     @Column(name = "estado_abordaje")
-    private String estadoAbordaje;
+    private String estadoAbordaje = "PENDIENTE";
 
     @Column(name = "monto_extra_equipaje")
-    private BigDecimal montoExtra;
+    private BigDecimal montoExtra = BigDecimal.ZERO;
 
     @Column(name = "cant_maletas_extra")
-    private Integer cantMaletasExtra;
+    private Integer cantMaletasExtra = 0;
 }

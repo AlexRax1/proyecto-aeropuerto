@@ -22,4 +22,10 @@ public interface BoletoRepository extends JpaRepository<Boleto, Long> {
     @Transactional
     @Query("UPDATE Boleto b SET b.estadoAbordaje = 'CANCELADO' WHERE b.vueloId = :vueloId AND b.estadoAbordaje = 'PENDIENTE'")
     int cancelarBoletosPendientes(@Param("vueloId") Integer vueloId);
+
+
+
+    // id de los vuelos del  usuario
+    @Query("SELECT b.vueloId FROM Boleto b WHERE b.usuarioId = :usuarioId AND b.estado IN ('RESERVADO', 'PAGADO')")
+    List<Long> findVuelosActivosPorUsuario(@Param("usuarioId") Long usuarioId);
 }

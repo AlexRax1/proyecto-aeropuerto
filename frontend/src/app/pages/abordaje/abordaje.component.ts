@@ -20,8 +20,15 @@ export class AbordajeComponent implements OnInit {
   vueloSeleccionado: any = null;
   pasaporte: string = '';
   cantidadMaletas: number | null = null;
-  pasajerosAbordados: any[] = [];
+  pasajerosAbordados: any[] = [];;
 
+
+ // NUEVA ESTRUCTURA DE MALETAS
+  maletasFisicas: {
+    maleta: string;
+    peso: number | null;
+  }[] = [];
+  
   ngOnInit() {
     this.cargarVuelos();
   }
@@ -48,52 +55,134 @@ export class AbordajeComponent implements OnInit {
     this.vueloSeleccionado = vuelo;
     this.pasaporte = '';
     this.cantidadMaletas = null;
+    this.maletasFisicas = [];
+  }
+
+   generarCamposMaletas() {
+
+    this.maletasFisicas = [];
+
+    if (this.cantidadMaletas && this.cantidadMaletas > 0) {
+
+      for (let i = 0; i < this.cantidadMaletas; i++) {
+
+        this.maletasFisicas.push({
+          maleta: '',
+          peso: null
+        });
+
+      }
+    }
   }
 
   async buscarPasajero() {
+
     if (!this.pasaporte || this.cantidadMaletas === null) {
+
       alert('Debe ingresar los campos obligatorios');
+
+      return;
+    }
+
+    // VALIDAR MALETAS
+    const maletasInvalidas = this.maletasFisicas.some(
+      m =>
+        !m.maleta ||
+        m.peso === null ||
+        m.peso <= 0
+    );
+
+    if (maletasInvalidas) {
+
+      alert('Debe ingresar nombre y peso válido para todas las maletas.');
+
       return;
     }
 
     try {
+
       const usuario: any = await firstValueFrom(
-        this.http.get(`http://localhost:8082/usuarios/pasaporte/${this.pasaporte}`)
+        this.http.get(
+          `http://localhost:8082/usuarios/pasaporte/${this.pasaporte}`
+        )
       );
 
-      const idUsuario = usuario.userId; 
-      const idVuelo = this.vueloSeleccionado.vueloId || this.vueloSeleccionado.id;
+      const idUsuario = usuario.userId;
 
+      const nombreUsuario = usuario.nombreCompleto;
+
+      const idVuelo =
+        this.vueloSeleccionado.vueloId ||
+        this.vueloSeleccionado.id;
+
+      // REQUEST FINAL
       const requestAbordaje = {
+
         idusuario: idUsuario,
+
         idVuelo: idVuelo,
-        numMaletas: this.cantidadMaletas
+
+        numMaletas: this.cantidadMaletas,
+
+        nombrePasajero: nombreUsuario,
+
+        maletas: this.maletasFisicas
+
       };
 
+      
+      console.log('Request enviado:', requestAbordaje);
+
       const respuestaAbordaje = await firstValueFrom(
-        this.http.put('http://localhost:8084/api/reservas/abordar', requestAbordaje, { responseType: 'text' })
+        this.http.put(
+          'http://localhost:8084/api/reservas/abordar',
+          requestAbordaje,
+          { responseType: 'text' }
+        )
       );
 
-      alert(respuestaAbordaje); 
+      alert(respuestaAbordaje);
 
       this.pasajerosAbordados.push({
+
         pasaporte: this.pasaporte,
+
         maletas: this.cantidadMaletas,
+
         estado: 'ABORDADO'
+
       });
 
+      // LIMPIAR FORMULARIO
       this.pasaporte = '';
+
       this.cantidadMaletas = null;
-      
-      // Si el array de abordados no se muestra de inmediato, también puedes usar:
+
+      this.maletasFisicas = [];
+
       this.cdr.detectChanges();
 
     } catch (error: any) {
+
       if (error.status === 404) {
-        alert('Error: Boleto no encontrado, pasajero no registrado o pasaporte incorrecto');
+
+        alert(
+          'Error: Boleto no encontrado, pasajero no registrado o pasaporte incorrecto'
+        );
+
+      } else if (error.status === 400) {
+
+        alert(
+          error.error ||
+          'Error: Validaciones de abordaje fallidas'
+        );
+
       } else {
+
         alert('Ocurrió un error de conexión con el servidor');
+
         console.error(error);
+
       }
     }
   }

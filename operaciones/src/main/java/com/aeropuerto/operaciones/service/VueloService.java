@@ -2,6 +2,7 @@ package com.aeropuerto.operaciones.service;
 
 import com.aeropuerto.operaciones.dto.ConsultaVueloDTO;
 import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
+import com.aeropuerto.operaciones.dto.ValidacionChoqueHorarioDTO;
 import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
 import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.repository.VueloRepository;
@@ -252,6 +253,37 @@ public class VueloService {
             // 3. Si no existe, lanzamos un error que el Controller atrapará
             throw new RuntimeException("Vuelo no encontrado con ID: " + id);
         }
+    }
+
+
+
+
+    public boolean existeChoqueHorarios(ValidacionChoqueHorarioDTO dto) {
+        if (dto.getVuelosExistentesIds() == null || dto.getVuelosExistentesIds().isEmpty()) {
+            return false;
+        }
+
+        Vuelo vueloNuevo = vueloRepository.findById(dto.getVueloNuevoId())
+                .orElseThrow(() -> new RuntimeException("Vuelo nuevo no encontrado con ID: " + dto.getVueloNuevoId()));
+
+        LocalDateTime inicioNuevo = LocalDateTime.of(vueloNuevo.getFechaSalida(), vueloNuevo.getHoraSalida());
+        LocalDateTime finNuevo = LocalDateTime.of(vueloNuevo.getFechaLlegada(), vueloNuevo.getHoraLlegada());
+
+
+        List<Vuelo> vuelosExistentes = vueloRepository.findAllById(dto.getVuelosExistentesIds());
+
+        //comparar
+        for (Vuelo vExistente : vuelosExistentes) {
+            LocalDateTime inicioExistente = LocalDateTime.of(vExistente.getFechaSalida(), vExistente.getHoraSalida());
+            LocalDateTime finExistente = LocalDateTime.of(vExistente.getFechaLlegada(), vExistente.getHoraLlegada());
+
+            // inicio nuevo < fin Existente Y inicio existente < fin nuevo)
+            if (inicioNuevo.isBefore(finExistente) && inicioExistente.isBefore(finNuevo)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

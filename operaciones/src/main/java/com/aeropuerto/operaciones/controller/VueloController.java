@@ -3,6 +3,7 @@ package com.aeropuerto.operaciones.controller;
 
 import com.aeropuerto.operaciones.dto.ConsultaVueloDTO;
 import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
+import com.aeropuerto.operaciones.dto.ValidacionChoqueHorarioDTO;
 import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
 import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.service.VueloService;
@@ -69,5 +70,12 @@ public class VueloController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
+    }
+
+    //validar choques en horarios, consultado desde reservas
+    @PostMapping("/validar-choque")
+    public ResponseEntity<Boolean> validarChoqueHorarios(@RequestBody ValidacionChoqueHorarioDTO peticion) {
+        boolean hayChoque = vueloService.existeChoqueHorarios(peticion);
+        return ResponseEntity.ok(hayChoque);
     }
 }

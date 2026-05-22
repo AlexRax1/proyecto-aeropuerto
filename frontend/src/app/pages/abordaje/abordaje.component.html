@@ -1,63 +1,43 @@
 <div class="contenedor">
 
   <div class="card">
-
     <h2>Abordaje de Vuelos</h2>
-
     <h3>Vuelos Pendientes de Abordar</h3>
 
     <table>
-
       <thead>
-
-      <tr>
-        <th>Número Vuelo</th>
-        <th>Origen</th>
-        <th>Destino</th>
-        <th>Fecha y Hora</th>
-        <th>Estado</th>
-        <th>Acción</th>
-      </tr>
-
+        <tr>
+          <th>Número Vuelo</th>
+          <th>Origen</th>
+          <th>Destino</th>
+          <th>Fecha y Hora</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
       </thead>
 
       <tbody>
+        <tr *ngFor="let vuelo of vuelos">
+          <td>{{ vuelo.vueloId || vuelo.id }}</td>
+          <td>{{ vuelo.origen.ciudadDestino }}, {{ vuelo.origen.paisDestino }}</td>
+          <td>{{ vuelo.destino.ciudadDestino }}, {{ vuelo.destino.paisDestino }}</td>
+          <td>{{ vuelo.fechaSalida }} {{ vuelo.horaSalida }}</td>
+          <td>{{ vuelo.estado }}</td>
 
-      <tr *ngFor="let vuelo of vuelos">
+          <td>
+            <button 
+              class="btn seleccionar"
+              (click)="seleccionarVuelo(vuelo)">
+              Seleccionar
+            </button>
+          </td>
 
-        <td>{{ vuelo.vueloId || vuelo.id }}</td>
-        
-        <!-- Accedemos a las propiedades del objeto anidado -->
-        <td>{{ vuelo.origen.ciudadDestino }}, {{ vuelo.origen.paisDestino }}</td>
-        <td>{{ vuelo.destino.ciudadDestino }}, {{ vuelo.destino.paisDestino }}</td>
-        
-        <td>{{ vuelo.fechaSalida }} {{ vuelo.horaSalida }}</td>
-        
-        <td>{{ vuelo.estado }}</td>
-
-        <td>
-
-          <button
-            class="btn seleccionar"
-            (click)="seleccionarVuelo(vuelo)">
-
-            Seleccionar
-
-          </button>
-
-        </td>
-
-      </tr>
-
+        </tr>
       </tbody>
-
     </table>
-
   </div>
 
-  <div
-    class="card"
-    *ngIf="vueloSeleccionado">
+  <div class="card" *ngIf="vueloSeleccionado">
 
     <h3>
       Vuelo Seleccionado:
@@ -67,7 +47,6 @@
     <div class="formulario">
 
       <div class="campo">
-
         <label>Número de Pasaporte</label>
 
         <input
@@ -75,17 +54,48 @@
           [(ngModel)]="pasaporte"
           placeholder="Ingrese pasaporte"
         />
-
       </div>
 
       <div class="campo">
 
-        <label>Cantidad de Maletas</label>
+        <label>Cantidad de Maletas Totales</label>
 
         <input
           type="number"
           [(ngModel)]="cantidadMaletas"
+          (ngModelChange)="generarCamposMaletas()"
           placeholder="Ingrese cantidad"
+          min="0"
+        />
+
+      </div>
+
+      <!-- MALLETAS DINÁMICAS -->
+
+      <div
+        class="campo"
+        *ngFor="let maleta of maletasFisicas; let i = index"
+      >
+
+        <h4>Maleta {{ i + 1 }}</h4>
+
+        <label>Nombre de la Maleta</label>
+
+        <input
+          type="text"
+          [(ngModel)]="maleta.maleta"
+          placeholder="Ej: Maleta Roja"
+          maxlength="30"
+        />
+
+        <label>Peso de Maleta {{ i + 1 }} (kg)</label>
+
+        <input
+          type="number"
+          [(ngModel)]="maleta.peso"
+          placeholder="Peso en kg"
+          min="0.1"
+          step="0.01"
         />
 
       </div>
@@ -97,59 +107,49 @@
       <button
         class="btn buscar"
         (click)="buscarPasajero()">
-
-        Buscar
-
+        Buscar Pasajero y Abordar
       </button>
 
       <button
         class="btn nuevo"
         (click)="nuevoVuelo()">
-
-        Nuevo Vuelo
-
+        Cambiar Vuelo
       </button>
 
       <button
         class="btn finalizar"
         (click)="finalizarAbordaje()">
-
         Finalizar Abordaje
-
       </button>
 
     </div>
-
   </div>
 
   <div
     class="card"
-    *ngIf="pasajerosAbordados.length > 0">
+    *ngIf="pasajerosAbordados.length > 0"
+  >
 
-    <h3>Pasajeros Abordados</h3>
+    <h3>Pasajeros Abordados Exitosamente</h3>
 
     <table>
 
       <thead>
-
-      <tr>
-        <th>Pasaporte</th>
-        <th>Maletas</th>
-        <th>Estado</th>
-      </tr>
-
+        <tr>
+          <th>Pasaporte</th>
+          <th>Total Maletas Físicas</th>
+          <th>Estado</th>
+        </tr>
       </thead>
 
       <tbody>
+        <tr *ngFor="let pasajero of pasajerosAbordados">
 
-      <tr *ngFor="let pasajero of pasajerosAbordados">
+          <td>{{ pasajero.pasaporte }}</td>
+          <td>{{ pasajero.maletas }}</td>
+          <td>{{ pasajero.estado }}</td>
 
-        <td>{{ pasajero.pasaporte }}</td>
-        <td>{{ pasajero.maletas }}</td>
-        <td>{{ pasajero.estado }}</td>
-
-      </tr>
-
+        </tr>
       </tbody>
 
     </table>
