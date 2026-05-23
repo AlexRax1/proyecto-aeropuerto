@@ -43,7 +43,7 @@
       <div class="hero-section">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-          <span class="hero-badge">Aerolínea Premium</span>
+          <span class="hero-badge">Los Primos</span>
           <h1 class="hero-title">El mundo está listo. ¿Y tú?</h1>
           <p class="hero-subtitle">Explora nuestros próximos vuelos y comienza tu siguiente gran aventura.</p>
         </div>
@@ -73,7 +73,7 @@
 
         <div class="grid" *ngIf="!loading && !error && vuelos.length > 0">
           <div class="flight-card" *ngFor="let vuelo of vuelos">
-            
+
             <!-- Glowing decoration -->
             <div class="card-glow"></div>
 
@@ -95,7 +95,7 @@
                   <h4 class="airport-code">{{getAirportCode(vuelo.origen)}}</h4>
                   <p class="city-name">{{getCityName(vuelo.origen)}}</p>
                 </div>
-                
+
                 <div class="flight-path">
                   <div class="path-line"></div>
                   <div class="plane-icon">✈️</div>
