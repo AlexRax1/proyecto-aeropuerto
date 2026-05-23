@@ -132,12 +132,29 @@ export class ReservarVueloComponent implements OnInit {
 
 
   calcularTotal(): number {
-    let total = 0;
-    this.asientosSeleccionados.forEach(seat => {
-      // Estos valores los puedes ajustar según tu lógica de negocio
-      total += seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
-    });
-    return total;
+  let total = 0;
+  this.asientosSeleccionados.forEach(seat => {
+    total += this.getPrecioAsiento(seat.categoria);
+  });
+  return total;
+}
+
+  private getPrecioAsiento(categoria: string): number {
+    if (!this.vueloSeleccionado || !categoria) return 0;
+
+    const catNormalizada = categoria.trim().toUpperCase();
+
+    let precioString = catNormalizada === 'EJECUTIVA' 
+      ? this.vueloSeleccionado.ejecutiva 
+      : this.vueloSeleccionado.economica;
+
+    if (!precioString) return 0;
+
+    precioString = String(precioString).replace(/[^0-9.]+/g, "");
+
+    const precio = parseFloat(precioString);
+      
+    return isNaN(precio) ? 0 : precio;
   }
 
 
@@ -149,11 +166,10 @@ export class ReservarVueloComponent implements OnInit {
       return;
     }
 
-
     const peticionesPago: Observable<any>[] = [];
 
     this.asientosSeleccionados.forEach(seat => {
-      const costoAsiento = seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
+      const costoAsiento = this.getPrecioAsiento(seat.categoria);
       const payload = {
         vueloId: this.vueloSeleccionado.numeroVuelo,
         asientoId: seat.idAsiento,
@@ -169,16 +185,22 @@ export class ReservarVueloComponent implements OnInit {
 
     forkJoin(peticionesPago).subscribe({
       next: (res) => {
-        alert("¡Pago exitoso! El pase de abordar se ha generado y tus asientos están confirmados.");
-        this.nuevaBusqueda(); // Limpiamos todo
+        // RN06: Generar el pase de abordar antes de limpiar la búsqueda
+        this.generarPaseDeAbordar();
+        this.nuevaBusqueda(); // Limpiamos todo después de mostrar el pase
       },
       error: (err) => {
         console.error("Error al procesar el pago", err);
-        const mensajeError = typeof err.error === 'string' 
-             ? err.error 
-             : "Hubo un error al procesar tu pago. Intenta nuevamente.";
+        const mensajeError = typeof err.error === 'string' ? err.error : "";
         
-        alert(mensajeError);
+        // FA06: Ya posee vuelo para la fecha y hora seleccionada
+        // Aquí asumimos que tu backend de Spring Boot devuelve este string o un código HTTP específico (ej. 409 Conflict)
+        if (mensajeError.includes("ya tiene vuelos") || err.status === 409) {
+          alert("No se puede seleccionar el vuelo porque ya tiene vuelos asignados");
+        } else {
+          // Fallback para otros errores de la API
+          alert(mensajeError || "Hubo un error al procesar tu pago. Intenta nuevamente.");
+        }
       }
     });
   }
@@ -194,5 +216,24 @@ export class ReservarVueloComponent implements OnInit {
     // Limpiamos también variables de pago
     this.asientosSeleccionados = [];
     this.datosPago = { nombre: '', tarjeta: '', vencimiento: '', cvv: '' };
+  }
+
+  generarPaseDeAbordar() {
+    const asientosStr = this.obtenerNombresAsientos();
+    
+    const pase = `=================================\n` +
+                 `        PASE DE ABORDAR        \n` +
+                 `=================================\n` +
+                 `Pasajero: ${this.datosPago.nombre}\n` +
+                 `Vuelo: ${this.vueloSeleccionado.modelo} - #${this.vueloSeleccionado.numeroVuelo}\n` +
+                 `Origen: ${this.vueloSeleccionado.origen}\n` +
+                 `Destino: ${this.vueloSeleccionado.destino}\n` +
+                 `Salida: ${this.vueloSeleccionado.salida}\n` +
+                 `Llegada: ${this.vueloSeleccionado.llegada}\n` +
+                 `Asiento(s): ${asientosStr}\n` +
+                 `Maletas registradas: ${this.cantidadMaletas}\n` +
+                 `=================================`;
+                 
+    alert(pase);
   }
 }
