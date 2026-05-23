@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-user-layout',
@@ -14,5 +15,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./user-layout.component.css']
 })
 export class UserLayoutComponent {
+  
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
 }

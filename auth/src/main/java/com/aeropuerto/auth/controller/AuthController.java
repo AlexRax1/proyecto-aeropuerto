@@ -1,11 +1,8 @@
 package com.aeropuerto.auth.controller;
 
-import com.aeropuerto.auth.dto.AuthResponse;
-import com.aeropuerto.auth.dto.LoginRequest;
+import com.aeropuerto.auth.dto.*;
 import com.aeropuerto.auth.model.Credencial;
 import com.aeropuerto.auth.repository.CredencialRepository;
-import com.aeropuerto.auth.dto.RegisterRequest;
-import com.aeropuerto.auth.dto.RegisterResponse;
 import com.aeropuerto.auth.model.RolUser;
 import com.aeropuerto.auth.repository.RolUserRepository;
 import com.aeropuerto.auth.service.JwtService;
@@ -84,5 +81,24 @@ public class AuthController {
     public ResponseEntity<?> rollbackCredencial(@PathVariable Integer userId) {
         credencialRepository.deleteById(userId);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+
+        // 1. Buscamos al usuario directamente por su ID
+        Credencial usuario = credencialRepository.findById(request.getUserId()).orElse(null);
+
+        if (usuario == null) {
+            return ResponseEntity.badRequest().body("Usuario no encontrado");
+        }
+
+        // 2. Hasheamos la nueva contraseña (¡nunca en texto plano!)
+        usuario.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        // 3. Guardamos los cambios
+        credencialRepository.save(usuario);
+
+        return ResponseEntity.ok().body("Contraseña restablecida exitosamente");
     }
 }

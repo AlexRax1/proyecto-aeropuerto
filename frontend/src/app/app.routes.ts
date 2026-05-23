@@ -21,6 +21,8 @@ import {ClienteLayoutComponent} from './shared/layout/cliente-layout.component';
 import {UserLayoutComponent} from './shared/layout/user-layout.component';
 import {RegisterComponent} from './pages/register/register.component';
 import {LoginComponent} from './pages/login/login.component';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
 
@@ -49,10 +51,16 @@ export const routes: Routes = [
 
   {
     path: 'admin',
-
     component: AdminLayoutComponent,
-
+    canActivate: [authGuard, roleGuard],
+    data: { expectedRoles: ['ROLE_ADMIN'] },
     children: [
+
+      {
+        path: '',
+        redirectTo: 'consulta-vuelo',
+        pathMatch: 'full'
+      },
 
       {
         path: 'consulta-vuelo',
@@ -98,10 +106,16 @@ export const routes: Routes = [
 
   {
     path: 'user',
-
     component: UserLayoutComponent,
-
+    canActivate: [authGuard, roleGuard],
+    data: { expectedRoles: ['ROLE_MANAGER'] }, // Manager maneja abordajes, tripulación, y agregar-vuelo
     children: [
+
+      {
+        path: '',
+        redirectTo: 'crear-vuelo',
+        pathMatch: 'full'
+      },
 
       {
         path: 'abordaje',
@@ -114,7 +128,7 @@ export const routes: Routes = [
       },
 
       {
-        path: 'agregar-vuelo',
+        path: 'crear-vuelo',
         component: ConsultaAgregarVueloComponent
       }
 
@@ -127,10 +141,16 @@ export const routes: Routes = [
 
   {
     path: 'cliente',
-
     component: ClienteLayoutComponent,
-
+    canActivate: [authGuard, roleGuard],
+    data: { expectedRoles: ['ROLE_USER'] }, // Generalmente clientes son ROLE_USER
     children: [
+
+      {
+        path: '',
+        redirectTo: 'reservar-vuelo',
+        pathMatch: 'full'
+      },
 
       {
         path: 'reservar-vuelo',
@@ -150,3 +170,4 @@ export const routes: Routes = [
   }
 
 ];
+
