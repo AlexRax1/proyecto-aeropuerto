@@ -21,6 +21,9 @@ import {ClienteLayoutComponent} from './shared/layout/cliente-layout.component';
 import {UserLayoutComponent} from './shared/layout/user-layout.component';
 import {RegisterComponent} from './pages/register/register.component';
 import {LoginComponent} from './pages/login/login.component';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { VuelosPendientesComponent } from './pages/vuelos-pendientes/vuelos-pendientes.component';
 
 export const routes: Routes = [
 
@@ -30,7 +33,8 @@ export const routes: Routes = [
 
   {
     path: '',
-    component: HomeComponent
+    redirectTo: 'cliente',
+    pathMatch: 'full'
   },
 
   {
@@ -49,10 +53,16 @@ export const routes: Routes = [
 
   {
     path: 'admin',
-
     component: AdminLayoutComponent,
-
+    canActivate: [authGuard, roleGuard],
+    data: { expectedRoles: ['ROLE_ADMIN'] },
     children: [
+
+      {
+        path: '',
+        redirectTo: 'consulta-vuelo',
+        pathMatch: 'full'
+      },
 
       {
         path: 'consulta-vuelo',
@@ -98,10 +108,16 @@ export const routes: Routes = [
 
   {
     path: 'user',
-
     component: UserLayoutComponent,
-
+    canActivate: [authGuard, roleGuard],
+    data: { expectedRoles: ['ROLE_MANAGER'] }, // Manager maneja abordajes, tripulación, y agregar-vuelo
     children: [
+
+      {
+        path: '',
+        redirectTo: 'crear-vuelo',
+        pathMatch: 'full'
+      },
 
       {
         path: 'abordaje',
@@ -114,7 +130,7 @@ export const routes: Routes = [
       },
 
       {
-        path: 'agregar-vuelo',
+        path: 'crear-vuelo',
         component: ConsultaAgregarVueloComponent
       }
 
@@ -127,14 +143,21 @@ export const routes: Routes = [
 
   {
     path: 'cliente',
-
     component: ClienteLayoutComponent,
-
     children: [
+
+      // Removed default redirect to vuelos-pendientes as requested
+
+      {
+        path: 'vuelos-pendientes',
+        component: VuelosPendientesComponent
+      },
 
       {
         path: 'reservar-vuelo',
-        component: ReservarVueloComponent
+        component: ReservarVueloComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRoles: ['ROLE_USER'] }
       }
 
     ]
@@ -146,7 +169,8 @@ export const routes: Routes = [
 
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'cliente'
   }
 
 ];
+

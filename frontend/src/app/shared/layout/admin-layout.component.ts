@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 
 import {
+  Router,
   RouterLink,
   RouterOutlet
 } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -23,4 +25,13 @@ import {
 })
 export class AdminLayoutComponent {
 
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/cliente']);
+  }
 }

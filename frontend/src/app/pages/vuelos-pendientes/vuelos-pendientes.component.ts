@@ -1,56 +1,31 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 import { firstValueFrom } from 'rxjs';
 
-import {
-  Router,
-  RouterLink,
-  RouterOutlet,
-  NavigationEnd
-} from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { filter } from 'rxjs/operators';
-
 @Component({
-  selector: 'app-cliente-layout',
+  selector: 'app-vuelos-pendientes',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    RouterOutlet
-  ],
-  templateUrl: './cliente-layout.component.html',
-  styleUrls: ['./cliente-layout.component.css']
+  imports: [CommonModule, RouterLink],
+  templateUrl: './vuelos-pendientes.component.html',
+  styleUrls: ['./vuelos-pendientes.component.css']
 })
-export class ClienteLayoutComponent implements OnInit {
-
+export class VuelosPendientesComponent implements OnInit {
   vuelos: any[] = [];
   loading = true;
   error = false;
-  isHome = true;
 
   constructor(
+    private http: HttpClient, 
+    private router: Router, 
     public authService: AuthService,
-    public router: Router,
-    private http: HttpClient,
     private cdr: ChangeDetectorRef
-  ) {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      this.isHome = event.url === '/cliente' || event.url === '/cliente/';
-    });
-  }
+  ) {}
 
   ngOnInit() {
-    this.isHome = this.router.url === '/cliente' || this.router.url === '/cliente/';
     this.cargarVuelos();
-  }
-
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/cliente']);
   }
 
   async cargarVuelos() {

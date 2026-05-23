@@ -135,7 +135,7 @@ export class AbordajeComponent implements OnInit {
 
       const respuestaAbordaje = await firstValueFrom(
         this.http.put(
-          'http://localhost:8084/api/reservas/abordar',
+          'http://localhost:8080/api/reservas/abordar',
           requestAbordaje,
           { responseType: 'text' }
         )
@@ -194,7 +194,7 @@ export class AbordajeComponent implements OnInit {
       const idVuelo = this.vueloSeleccionado.vueloId || this.vueloSeleccionado.id;
 
       const respuestaCancelarBoletos = await firstValueFrom(
-        this.http.put(`http://localhost:8084/api/reservas/vuelo/${idVuelo}/finalizar`, {}, { responseType: 'text' })
+        this.http.put(`http://localhost:8080/api/reservas/vuelo/${idVuelo}/finalizar`, {}, { responseType: 'text' })
       );
 
 

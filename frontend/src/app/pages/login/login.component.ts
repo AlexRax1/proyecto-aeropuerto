@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,8 @@ export class LoginComponent {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   login() {
@@ -36,21 +38,23 @@ export class LoginComponent {
 
           console.log('Login exitoso', response);
 
-          localStorage.setItem('token', response.token);
+          // Guardamos el token en el local storage
+          this.authService.guardarToken(response.token);
 
           alert('Bienvenido');
 
-          if (response.rol === 'ADMIN') {
-
-            this.router.navigate([
-              '/admin/consulta-vuelo'
-            ]);
-
+          // Verificamos el rol para redirigir
+          if (this.authService.hasRole('ROLE_ADMIN')) {
+            this.router.navigate(['/admin']);
+          } else if (this.authService.hasRole('ROLE_USER')) {
+            // El usuario normal entra a reservar vuelo (ClienteLayout)
+            this.router.navigate(['/cliente']); 
+          } else if (this.authService.hasRole('ROLE_MANAGER')) {
+            // El manager (rol 3) entra al layout de "user" para los abordajes y tripulación
+            this.router.navigate(['/user']);
           } else {
-
-            this.router.navigate([
-              '/usuario/reservar-vuelo'
-            ]);
+            // Ruta por defecto si tiene otro rol
+            this.router.navigate(['/']);
           }
         },
         error: (err) => {

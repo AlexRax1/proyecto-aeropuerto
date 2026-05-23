@@ -1,0 +1,98 @@
+<div class="portal-wrapper">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-badge">Aerolínea Premium</span>
+      <h1 class="hero-title">El mundo está listo. ¿Y tú?</h1>
+      <p class="hero-subtitle">Explora nuestros próximos vuelos y comienza tu siguiente gran aventura.</p>
+    </div>
+  </div>
+
+  <div class="container glass-container">
+    <div class="section-header">
+      <h2>Próximas Salidas</h2>
+      <div class="divider"></div>
+      <p class="header-desc">Vuelos listos para el proceso de abordaje</p>
+    </div>
+
+    <div *ngIf="loading" class="state-container">
+      <div class="loader"></div>
+      <p>Sincronizando radares...</p>
+    </div>
+
+    <div *ngIf="error" class="state-container error-state">
+      <div class="icon-pulse">⚠️</div>
+      <p>No pudimos establecer conexión con la torre de control.</p>
+    </div>
+
+    <div *ngIf="!loading && !error && vuelos.length === 0" class="state-container empty-state">
+      <div class="icon-pulse">✈️</div>
+      <p>El cielo está despejado. No hay vuelos pendientes de abordar.</p>
+    </div>
+
+    <div class="grid" *ngIf="!loading && !error && vuelos.length > 0">
+      <div class="flight-card" *ngFor="let vuelo of vuelos">
+        
+        <!-- Glowing decoration -->
+        <div class="card-glow"></div>
+
+        <div class="card-header">
+          <div class="flight-id">
+            <i class="fas fa-plane-departure"></i>
+            <span class="flight-number">{{vuelo.aerolinea?.nombre || 'Vuelo'}} #{{vuelo.idVuelo || vuelo.id}}</span>
+          </div>
+          <span class="badge" [ngClass]="{'badge-boarding': vuelo.estadoVuelo === 'ABORDANDO'}">
+            <span class="pulse-dot" *ngIf="vuelo.estadoVuelo === 'ABORDANDO'"></span>
+            {{vuelo.estadoVuelo}}
+          </span>
+        </div>
+
+        <div class="card-body">
+          <div class="route-info">
+            <div class="location origin">
+              <span class="label">Desde</span>
+              <h4 class="airport-code">{{getAirportCode(vuelo.origen)}}</h4>
+              <p class="city-name">{{getCityName(vuelo.origen)}}</p>
+            </div>
+            
+            <div class="flight-path">
+              <div class="path-line"></div>
+              <div class="plane-icon">✈️</div>
+            </div>
+
+            <div class="location destination">
+              <span class="label">Hacia</span>
+              <h4 class="airport-code">{{getAirportCode(vuelo.destino)}}</h4>
+              <p class="city-name">{{getCityName(vuelo.destino)}}</p>
+            </div>
+          </div>
+
+          <div class="time-info">
+            <div class="time-block">
+              <div class="icon-circle">📅</div>
+              <div class="time-text">
+                <span class="time-label">Fecha</span>
+                <span class="time-val">{{vuelo.fechaSalida}}</span>
+              </div>
+            </div>
+            <div class="time-block">
+              <div class="icon-circle">⏰</div>
+              <div class="time-text">
+                <span class="time-label">Salida</span>
+                <span class="time-val">{{vuelo.horaSalida}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer" *ngIf="authService.isLoggedIn()">
+          <button class="btn-reservar" routerLink="/cliente/reservar-vuelo">
+            <span>Reservar Asiento</span>
+            <span class="arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

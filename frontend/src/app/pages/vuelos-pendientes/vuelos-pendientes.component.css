@@ -1,68 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-.navbar {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+:host {
+  display: block;
   font-family: 'Outfit', sans-serif;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #1e3c72;
-  letter-spacing: 0.5px;
-}
-
-.logo a {
-  text-decoration: none;
-  color: inherit;
-  transition: opacity 0.2s;
-}
-
-.logo a:hover {
-  opacity: 0.8;
-}
-
-.navbar ul {
-  display: flex;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  align-items: center;
-}
-
-.navbar a {
-  color: #475569;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: color 0.2s, transform 0.2s;
-}
-
-.navbar a:hover {
-  color: #3b82f6;
-  transform: translateY(-1px);
-}
-
-.contenido {
-  min-height: calc(100vh - 70px);
+  background-color: #0f172a;
+  min-height: 100vh;
+  color: #f8fafc;
 }
 
 .portal-wrapper {
   background: #0f172a;
   min-height: 100vh;
   padding-bottom: 4rem;
-  color: #f8fafc;
 }
 
 /* Hero Section */
