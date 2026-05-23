@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import {
   Router,
@@ -13,6 +14,7 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
 
   imports: [
+    CommonModule,
     RouterLink,
     RouterOutlet
   ],
@@ -26,12 +28,12 @@ import { AuthService } from '../../core/services/auth.service';
 export class ClienteLayoutComponent {
 
   constructor(
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router
   ) {}
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/']);
+    this.router.navigate(['/cliente']);
   }
 }

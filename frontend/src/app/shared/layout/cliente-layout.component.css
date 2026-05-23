@@ -1,44 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap');
+
 .navbar {
-
-  background: #2563eb;
-
-  padding: 15px;
-
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-}
-
-.navbar ul {
-
-  display: flex;
-
-  gap: 20px;
-
-  list-style: none;
-}
-
-.navbar a {
-
-  color: white;
-
-  text-decoration: none;
-
-  font-weight: bold;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  font-family: 'Outfit', sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e3c72;
+  letter-spacing: 0.5px;
+}
 
-  color: white;
+.logo a {
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s;
+}
 
-  font-size: 20px;
+.logo a:hover {
+  opacity: 0.8;
+}
 
-  font-weight: bold;
+.navbar ul {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.navbar a {
+  color: #475569;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.navbar a:hover {
+  color: #3b82f6;
+  transform: translateY(-1px);
 }
 
 .contenido {
-
-  padding: 20px;
+  min-height: calc(100vh - 70px);
 }

@@ -23,6 +23,6 @@ export class UserLayoutComponent {
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/']);
+    this.router.navigate(['/cliente']);
   }
 }

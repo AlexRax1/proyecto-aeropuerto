@@ -1,30 +1,32 @@
 <nav class="navbar">
 
   <div class="logo">
-    ✈️ CLIENTE
+    <a routerLink="/cliente" style="text-decoration: none; color: inherit;">✈️ CLIENTE</a>
   </div>
 
   <ul>
 
-    <li>
-      <a
-        routerLink="/cliente/reservar-vuelo">
-
+    <li *ngIf="authService.isLoggedIn()">
+      <a routerLink="/cliente/reservar-vuelo">
         Reservar Vuelo
       </a>
     </li>
 
-    <li>
-      <a
-        routerLink="/cliente/mis-reservas">
-
+    <li *ngIf="authService.isLoggedIn()">
+      <a routerLink="/cliente/mis-reservas">
         Mis Reservas
       </a>
     </li>
 
-    <li>
+    <li *ngIf="authService.isLoggedIn()">
       <a (click)="logout()" style="cursor: pointer;">
         Salir
+      </a>
+    </li>
+
+    <li *ngIf="!authService.isLoggedIn()">
+      <a routerLink="/login" style="cursor: pointer; background-color: #3498db; padding: 0.4rem 1rem; border-radius: 5px; color: white; text-decoration: none;">
+        Iniciar Sesión
       </a>
     </li>
 

@@ -23,6 +23,7 @@ import {RegisterComponent} from './pages/register/register.component';
 import {LoginComponent} from './pages/login/login.component';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { VuelosPendientesComponent } from './pages/vuelos-pendientes/vuelos-pendientes.component';
 
 export const routes: Routes = [
 
@@ -32,7 +33,8 @@ export const routes: Routes = [
 
   {
     path: '',
-    component: HomeComponent
+    redirectTo: 'cliente',
+    pathMatch: 'full'
   },
 
   {
@@ -142,19 +144,20 @@ export const routes: Routes = [
   {
     path: 'cliente',
     component: ClienteLayoutComponent,
-    canActivate: [authGuard, roleGuard],
-    data: { expectedRoles: ['ROLE_USER'] }, // Generalmente clientes son ROLE_USER
     children: [
 
+      // Removed default redirect to vuelos-pendientes as requested
+
       {
-        path: '',
-        redirectTo: 'reservar-vuelo',
-        pathMatch: 'full'
+        path: 'vuelos-pendientes',
+        component: VuelosPendientesComponent
       },
 
       {
         path: 'reservar-vuelo',
-        component: ReservarVueloComponent
+        component: ReservarVueloComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRoles: ['ROLE_USER'] }
       }
 
     ]
@@ -166,7 +169,7 @@ export const routes: Routes = [
 
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'cliente'
   }
 
 ];
