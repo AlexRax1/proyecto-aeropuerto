@@ -117,15 +117,32 @@ export class RegisterComponent {
 
     this.http.post(
       'http://localhost:8082/usuarios/register',
-      this.registerData
+      this.registerData,
+      {
+        responseType: 'text'
+      }
     )
       .subscribe({
 
-        next: (response) => {
+        next: (response: any) => {
 
-          console.log('Usuario registrado', response);
+          console.log(
+            'Usuario registrado',
+            response
+          );
 
-          alert('Se ha creado con éxito el usuario.');
+          // MOSTRAR MENSAJE DEL BACKEND
+
+          if (response.message) {
+
+            alert(response.message);
+
+          } else {
+
+            alert(
+              'Se ha creado con éxito el usuario.'
+            );
+          }
 
           this.router.navigate(['/login']);
         },
@@ -134,13 +151,27 @@ export class RegisterComponent {
 
           console.error(err);
 
-          if (err.error) {
+          // SI EL BACKEND ENVÍA JSON
+
+          if (err.error?.message) {
+
+            alert(err.error.message);
+
+          }
+          // SI ENVÍA TEXTO PLANO
+
+          else if (typeof err.error === 'string') {
 
             alert(err.error);
 
-          } else {
+          }
+          // ERROR GENERAL
 
-            alert('Error al registrar usuario');
+          else {
+
+            alert(
+              'Error al registrar usuario'
+            );
           }
         }
       });

@@ -1,9 +1,12 @@
 package com.aeropuerto.operaciones.controller;
 
 
+import com.aeropuerto.operaciones.dto.CrearPaqTripulacionDTO;
+import com.aeropuerto.operaciones.model.PaqTripulacion;
 import com.aeropuerto.operaciones.model.PersonalTripulacion;
 import com.aeropuerto.operaciones.service.PersonalTripulacionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -50,6 +53,28 @@ public class PersonalTripulacionController {
 
         return personalTripulacionService
                 .obtenerPorRol(rol);
+    }
+
+    @PostMapping("/crear-paquete")
+    public ResponseEntity<PaqTripulacion>
+    crearPaquete(
+
+            @RequestBody
+            CrearPaqTripulacionDTO dto
+    ) {
+
+        return ResponseEntity.ok(
+                personalTripulacionService
+                        .crearPaquete(dto)
+        );
+    }
+
+    @GetMapping("/paquetes")
+    public List<PaqTripulacion>
+    obtenerPaquetes() {
+
+        return personalTripulacionService
+                .obtenerPaquetes();
     }
 }
 

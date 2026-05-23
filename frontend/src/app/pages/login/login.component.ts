@@ -40,7 +40,18 @@ export class LoginComponent {
 
           alert('Bienvenido');
 
-          this.router.navigate(['/']);
+          if (response.rol === 'ADMIN') {
+
+            this.router.navigate([
+              '/admin/consulta-vuelo'
+            ]);
+
+          } else {
+
+            this.router.navigate([
+              '/usuario/reservar-vuelo'
+            ]);
+          }
         },
         error: (err) => {
           console.error(err);

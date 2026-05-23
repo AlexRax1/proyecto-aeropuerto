@@ -17,11 +17,16 @@ public interface BoletoRepository
 
     SELECT
         u.nombre AS nombrePasajero,
+
         u.num_pasaporte AS numeroPasaporte,
+
         u.nacionalidad AS nacionalidad,
 
-        EXTRACT(YEAR FROM AGE(u.fecha_nacimiento::date))
-            AS edad,
+        EXTRACT(
+            YEAR FROM AGE(
+                u.fecha_nacimiento::date
+            )
+        ) AS edad,
 
         CONCAT(
             u.extension_telefonica,
@@ -34,7 +39,7 @@ public interface BoletoRepository
     FROM boleto b
 
     INNER JOIN usuarios u
-        ON b.user_id = u.user_id
+        ON b.usuario_id = u.user_id
 
     WHERE b.vuelo_id = :vueloId
 

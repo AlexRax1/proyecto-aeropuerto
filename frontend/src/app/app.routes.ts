@@ -16,82 +16,137 @@ import {ReservarVueloComponent} from './pages/reservar-vuelo/reservar-vuelo.comp
 import {ConsultaAgregarVueloComponent} from './pages/consulta-agregar-vuelo/consulta-agregar-vuelo.component';
 import {CrearTripulacionComponent} from './pages/crear-tripulacion/crear-tripulacion.component';
 import {ConsultaVueloComponent} from './pages/consulta-vuelo/consulta-vuelo.component';
+import {AdminLayoutComponent} from './shared/layout/admin-layout.component';
+import {ClienteLayoutComponent} from './shared/layout/cliente-layout.component';
+import {UserLayoutComponent} from './shared/layout/user-layout.component';
+import {RegisterComponent} from './pages/register/register.component';
+import {LoginComponent} from './pages/login/login.component';
 
 export const routes: Routes = [
+
+  // =====================================
+  // PÚBLICAS
+  // =====================================
+
   {
     path: '',
     component: HomeComponent
   },
+
   {
-    path: 'aviones',
-    component: AvionSelectionComponent
-  },
-  {
-    path: 'asientos',
-    component: SeatSelectionComponent
-  },
-  {
-    path: 'pago',
-    component: PaymentComponent
-  },
-  {
-    path: 'confirmacion',
-    component: ConfirmationComponent
-  },
-  {
-    path: 'consulta-vuelos',
-    component: ConsultaVuelosComponent
+    path: 'login',
+    component: LoginComponent
   },
 
   {
-    path: 'consulta-aerolineas',
-    component: ConsultaAerolineasComponent
+    path: 'registro',
+    component: RegisterComponent
   },
 
-  {
-    path: 'consulta-aviones',
-    component: ConsultaAvionesComponent
-  },
+  // =====================================
+  // ADMIN
+  // =====================================
 
   {
-    path: 'consulta-pasajeros-vuelo',
-    component: ConsultaPasajerosVueloComponent
+    path: 'admin',
+
+    component: AdminLayoutComponent,
+
+    children: [
+
+      {
+        path: 'consulta-vuelo',
+        component: ConsultaVueloComponent
+      },
+
+      {
+        path: 'consulta-vuelos',
+        component: ConsultaVuelosComponent
+      },
+
+      {
+        path: 'consulta-aerolineas',
+        component: ConsultaAerolineasComponent
+      },
+
+      {
+        path: 'consulta-aviones',
+        component: ConsultaAvionesComponent
+      },
+
+      {
+        path: 'consulta-pasajeros-vuelo',
+        component: ConsultaPasajerosVueloComponent
+      },
+
+      {
+        path: 'consulta-destinos',
+        component: ConsultaDestinosComponent
+      },
+
+      {
+        path: 'consulta-equipaje',
+        component: ConsultaEquipajeComponent
+      }
+
+    ]
   },
 
-  {
-    path: 'consulta-destinos',
-    component: ConsultaDestinosComponent
-  },
+  // =====================================
+  // USER
+  // =====================================
 
   {
-    path: 'abordaje',
-    component: AbordajeComponent
+    path: 'user',
+
+    component: UserLayoutComponent,
+
+    children: [
+
+      {
+        path: 'abordaje',
+        component: AbordajeComponent
+      },
+
+      {
+        path: 'crear-tripulacion',
+        component: CrearTripulacionComponent
+      },
+
+      {
+        path: 'agregar-vuelo',
+        component: ConsultaAgregarVueloComponent
+      }
+
+    ]
   },
 
-  {
-    path: 'consulta-equipaje',
-    component: ConsultaEquipajeComponent
-  },
+  // =====================================
+  // CLIENTE
+  // =====================================
 
   {
-    path: 'reservar-vuelo',
-    component: ReservarVueloComponent
+    path: 'cliente',
+
+    component: ClienteLayoutComponent,
+
+    children: [
+
+      {
+        path: 'reservar-vuelo',
+        component: ReservarVueloComponent
+      }
+
+    ]
   },
 
-  {
-    path: 'consulta-agregar-vuelo',
-    component: ConsultaAgregarVueloComponent
-  },
+  // =====================================
+  // REDIRECCIÓN
+  // =====================================
 
   {
-    path: 'crear-tripulacion',
-    component: CrearTripulacionComponent
-  },
-
-  {
-    path: 'consulta-vuelo',
-    component: ConsultaVueloComponent
+    path: '**',
+    redirectTo: ''
   }
-
 
 ];

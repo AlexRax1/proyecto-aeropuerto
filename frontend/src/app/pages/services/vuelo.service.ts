@@ -118,4 +118,23 @@ export class VueloService {
       `http://localhost:8083/tripulacion/rol?rol=${rol}`
     );
   }
+
+  crearPaqueteTripulacion(payload: any) {
+
+    return this.http.post(
+
+      'http://localhost:8083/tripulacion/paquete',
+
+      payload
+    );
+  }
+
+  obtenerPaquetesTripulacion() {
+
+    return this.http.get<any[]>(
+
+      'http://localhost:8083/tripulacion/paquetes'
+
+    );
+  }
 }

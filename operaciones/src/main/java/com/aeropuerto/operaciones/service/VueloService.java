@@ -7,11 +7,9 @@ import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
 import com.aeropuerto.operaciones.dto.*;
 import com.aeropuerto.operaciones.model.Avion;
 import com.aeropuerto.operaciones.model.DestinoAeropuerto;
+import com.aeropuerto.operaciones.model.PaqTripulacion;
 import com.aeropuerto.operaciones.model.Vuelo;
-import com.aeropuerto.operaciones.repository.AvionRepository;
-import com.aeropuerto.operaciones.repository.BoletoRepository;
-import com.aeropuerto.operaciones.repository.DestinoAeropuertoRepository;
-import com.aeropuerto.operaciones.repository.VueloRepository;
+import com.aeropuerto.operaciones.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -39,6 +37,7 @@ public class VueloService {
     private final DestinoAeropuertoRepository destinoRepository;
     private final AvionService avionService;
     private final BoletoRepository boletoRepository;
+    private final PaqTripulacionRepository tripulacionPaqueteRepository;
 
     // CREAR VUELO
     @Transactional
@@ -182,12 +181,7 @@ public class VueloService {
         }
 
         // VALIDAR TRIPULACIÓN
-        if (
-                dto.getTripulacion() == null
-                        ||
-                        dto.getTripulacion().isEmpty()
-        ) {
-
+        if (dto.getTripulacionId() == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Debe seleccionar tripulación."
@@ -240,6 +234,17 @@ public class VueloService {
         vuelo.setAsientosDisponibles(
                 totalAsientos
         );
+
+        PaqTripulacion paquete =
+                tripulacionPaqueteRepository.findById(dto.getTripulacionId())
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Paquete de tripulación no encontrado"
+                                )
+                        );
+
+        vuelo.setTripulacion(paquete);
 
         // AUDITORÍA
         vuelo.setFechaHoraCreacion(
@@ -679,4 +684,5 @@ public class VueloService {
 
         return pasajeros;
     }
+
 }

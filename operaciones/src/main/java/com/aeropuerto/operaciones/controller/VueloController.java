@@ -89,15 +89,21 @@ public class VueloController {
     }
 
     @GetMapping("/consulta-vuelo/{id}")
-    public ResponseEntity<ConsultaVueloDTO>
-    consultarVueloPorId(
-
+    public ResponseEntity<?> consultarVueloPorId(
             @PathVariable Long id
     ) {
 
-        return ResponseEntity.ok(
-                vueloService.consultarVueloPorId(id)
-        );
+        ConsultaVueloDTO vuelo =
+                vueloService.consultarVueloPorId(id);
+
+        if (vuelo == null) {
+
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+
+        return ResponseEntity.ok(vuelo);
     }
 
     @GetMapping("/pasajeros/{vueloId}")

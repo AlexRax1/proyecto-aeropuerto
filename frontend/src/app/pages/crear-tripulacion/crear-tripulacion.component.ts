@@ -25,6 +25,8 @@ export class CrearTripulacionComponent
 
   tripulacion = {
 
+    nombrePaquete: '',
+
     piloto: '',
 
     copiloto: '',
@@ -182,7 +184,7 @@ export class CrearTripulacionComponent
       ) {
 
         alert(
-          'Solo puede seleccionar 3 tripulantes de cabina'
+          'Solo puede seleccionar 3 sobrecargos'
         );
 
         return;
@@ -199,6 +201,7 @@ export class CrearTripulacionComponent
   guardarTripulacion() {
 
     if (
+      !this.tripulacion.nombrePaquete ||
       !this.tripulacion.piloto ||
       !this.tripulacion.copiloto ||
       !this.tripulacion.ingeniero ||
@@ -206,13 +209,16 @@ export class CrearTripulacionComponent
     ) {
 
       alert(
-        'Debe ingresar los campos obligatorios'
+        'Debe ingresar todos los campos obligatorios'
       );
 
       return;
     }
 
     const payload = {
+
+      nombrePaquete:
+      this.tripulacion.nombrePaquete,
 
       pilotoId:
       this.tripulacion.piloto,
@@ -223,28 +229,45 @@ export class CrearTripulacionComponent
       ingenieroId:
       this.tripulacion.ingeniero,
 
-      sobrecargos:
-      this.tripulacion.cabina,
+      sobrecargo1Id:
+        this.tripulacion.cabina[0],
 
-      usuario:
-        'admin'
+      sobrecargo2Id:
+        this.tripulacion.cabina[1],
+
+      sobrecargo3Id:
+        this.tripulacion.cabina[2]
     };
 
     console.log(
-      'Tripulación creada:',
+      'Paquete enviado:',
       payload
     );
 
-    // ============================================
-    // CUANDO TENGAS EL ENDPOINT:
-    // this.vueloService.crearTripulacion(payload)
-    // ============================================
+    this.vueloService
+      .crearPaqueteTripulacion(payload)
+      .subscribe({
 
-    alert(
-      'Se creó con éxito la tripulación'
-    );
+        next: (response) => {
 
-    this.router.navigate(['/login']);
+          console.log(response);
+
+          alert(
+            'Paquete de tripulación creado correctamente'
+          );
+
+          this.limpiarFormulario();
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert(
+            'Error al crear el paquete de tripulación'
+          );
+        }
+      });
   }
 
   // ============================================
@@ -254,6 +277,8 @@ export class CrearTripulacionComponent
   limpiarFormulario() {
 
     this.tripulacion = {
+
+      nombrePaquete: '',
 
       piloto: '',
 

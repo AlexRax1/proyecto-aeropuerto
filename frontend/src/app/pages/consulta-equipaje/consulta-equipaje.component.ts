@@ -3,6 +3,10 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-consulta-equipaje',
@@ -90,15 +94,114 @@ export class ConsultaEquipajeComponent {
 
   }
 
+  // PDF
   imprimirPDF() {
 
-    alert('Generando archivo PDF...');
+    if (this.equipajes.length === 0) {
 
+      alert(
+        'No hay equipajes para imprimir'
+      );
+
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    doc.text(
+      'Consulta de Equipajes',
+      14,
+      15
+    );
+
+    autoTable(doc, {
+
+      startY: 25,
+
+      head: [[
+        'Pasajero',
+        'Maleta',
+        'Peso'
+      ]],
+
+      body: this.equipajes.map(e => [
+
+        e.pasajero,
+        e.maleta,
+        e.peso
+
+      ])
+
+    });
+
+    doc.save(
+      'consulta-equipaje.pdf'
+    );
+
+    alert(
+      'PDF generado correctamente'
+    );
   }
 
+  // EXCEL
   exportarExcel() {
 
-    alert('Generando archivo Excel...');
+    if (this.equipajes.length === 0) {
 
+      alert(
+        'No hay equipajes para exportar'
+      );
+
+      return;
+    }
+
+    const datos = this.equipajes.map(e => ({
+
+      pasajero: e.pasajero,
+
+      maleta: e.maleta,
+
+      peso: e.peso
+
+    }));
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(
+        datos
+      );
+
+    const workbook = {
+
+      Sheets: {
+        'Equipajes': worksheet
+      },
+
+      SheetNames: ['Equipajes']
+    };
+
+    const excelBuffer =
+      XLSX.write(workbook, {
+
+        bookType: 'xlsx',
+
+        type: 'array'
+      });
+
+    const data = new Blob(
+      [excelBuffer],
+      {
+        type:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+      }
+    );
+
+    FileSaver.saveAs(
+      data,
+      'consulta-equipaje.xlsx'
+    );
+
+    alert(
+      'Excel generado correctamente'
+    );
   }
 }

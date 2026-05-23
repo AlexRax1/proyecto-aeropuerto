@@ -5,16 +5,28 @@ import {VueloService} from '../services/vuelo.service';
 
 @Component({
   selector: 'app-consulta-agregar-vuelo',
+
   standalone: true,
+
   imports: [
     CommonModule,
     FormsModule
   ],
-  templateUrl: './consulta-agregar-vuelo.component.html',
-  styleUrls: ['./consulta-agregar-vuelo.component.css']
+
+  templateUrl:
+    './consulta-agregar-vuelo.component.html',
+
+  styleUrls: [
+    './consulta-agregar-vuelo.component.css'
+  ]
 })
+
 export class ConsultaAgregarVueloComponent
   implements OnInit {
+
+  // =====================================================
+  // VARIABLES
+  // =====================================================
 
   aerolineaSeleccionada = 1;
 
@@ -24,7 +36,11 @@ export class ConsultaAgregarVueloComponent
 
   avionesDisponibles: any[] = [];
 
-  tripulantesDisponibles: any[] = [];
+  paquetesTripulacion: any[] = [];
+
+  // =====================================================
+  // MODELO VUELO
+  // =====================================================
 
   vuelo = {
 
@@ -46,7 +62,7 @@ export class ConsultaAgregarVueloComponent
 
     precioEjecutiva: '',
 
-    tripulacion: [] as number[]
+    paqueteTripulacionId: 0
   };
 
   constructor(
@@ -60,8 +76,6 @@ export class ConsultaAgregarVueloComponent
   ngOnInit(): void {
 
     this.cargarAeropuertos();
-
-    //this.cargarTripulacion();
   }
 
   // =====================================================
@@ -114,6 +128,11 @@ export class ConsultaAgregarVueloComponent
 
         next: (data: any[]) => {
 
+          console.log(
+            'AVIONES:',
+            data
+          );
+
           this.avionesDisponibles = data;
         },
 
@@ -129,49 +148,53 @@ export class ConsultaAgregarVueloComponent
 
     console.log({
 
-      aerolineaId: this.aerolineaSeleccionada,
+      aerolineaId:
+      this.aerolineaSeleccionada,
 
-      fechaSalida: this.vuelo.fechaSalida,
-
-      horaSalida: this.vuelo.horaSalida,
-
-      fechaLlegada: this.vuelo.fechaLlegada,
-
-      horaLlegada: this.vuelo.horaLlegada
-    });
-  }
-
-  // =====================================================
-  // CARGAR TRIPULACIÓN
-  // =====================================================
-
-  cargarTripulacion() {
-
-    this.vueloService.obtenerTripulacionDisponible(
-
+      fechaSalida:
       this.vuelo.fechaSalida,
-      this.vuelo.horaSalida + ':00',
+
+      horaSalida:
+      this.vuelo.horaSalida,
+
+      fechaLlegada:
       this.vuelo.fechaLlegada,
-      this.vuelo.horaLlegada + ':00'
 
-    ).subscribe({
-
-      next: (data: any[]) => {
-
-        console.log('TRIPULACION:', data);
-
-        this.tripulantesDisponibles = data;
-      },
-
-      error: (err: any) => {
-
-        console.error(err);
-
-        alert('Error cargando tripulación');
-      }
+      horaLlegada:
+      this.vuelo.horaLlegada
     });
   }
 
+  // =====================================================
+  // CARGAR PAQUETES
+  // =====================================================
+
+  cargarPaquetesTripulacion() {
+
+    this.vueloService
+      .obtenerPaquetesTripulacion()
+      .subscribe({
+
+        next: (data: any[]) => {
+
+          console.log(
+            'PAQUETES:',
+            data
+          );
+
+          this.paquetesTripulacion = data;
+        },
+
+        error: (err: any) => {
+
+          console.error(err);
+
+          alert(
+            'Error cargando paquetes de tripulación'
+          );
+        }
+      });
+  }
 
   // =====================================================
   // PASO 1
@@ -180,11 +203,17 @@ export class ConsultaAgregarVueloComponent
   siguientePaso() {
 
     if (
+
       !this.vuelo.aeropuertoSalida ||
+
       !this.vuelo.aeropuertoLlegada ||
+
       !this.vuelo.fechaSalida ||
+
       !this.vuelo.horaSalida ||
+
       !this.vuelo.fechaLlegada ||
+
       !this.vuelo.horaLlegada
     ) {
 
@@ -196,8 +225,10 @@ export class ConsultaAgregarVueloComponent
     }
 
     if (
+
       this.vuelo.aeropuertoSalida ===
       this.vuelo.aeropuertoLlegada
+
     ) {
 
       alert(
@@ -208,11 +239,15 @@ export class ConsultaAgregarVueloComponent
     }
 
     const salida = new Date(
+
       `${this.vuelo.fechaSalida}T${this.vuelo.horaSalida}`
+
     );
 
     const llegada = new Date(
+
       `${this.vuelo.fechaLlegada}T${this.vuelo.horaLlegada}`
+
     );
 
     if (llegada <= salida) {
@@ -227,7 +262,9 @@ export class ConsultaAgregarVueloComponent
     const ahora = new Date();
 
     const diferenciaHoras =
+
       (salida.getTime() - ahora.getTime())
+
       / (1000 * 60 * 60);
 
     if (diferenciaHoras < 5) {
@@ -239,9 +276,9 @@ export class ConsultaAgregarVueloComponent
       return;
     }
 
-    // ============================================
-    // CARGAR AVIONES DISPONIBLES
-    // ============================================
+    // =====================================================
+    // CARGAR AVIONES
+    // =====================================================
 
     this.cargarAviones();
 
@@ -265,41 +302,35 @@ export class ConsultaAgregarVueloComponent
 
     if (!this.vuelo.avionSeleccionado) {
 
-      alert('Debe seleccionar un avión');
+      alert(
+        'Debe seleccionar un avión'
+      );
 
       return;
     }
 
     if (
+
       !this.vuelo.precioEconomica ||
+
       !this.vuelo.precioEjecutiva
+
     ) {
 
-      alert('Debe ingresar los precios');
+      alert(
+        'Debe ingresar los precios'
+      );
 
       return;
     }
-    this.cargarTripulacion();
+
+    // =====================================================
+    // CARGAR PAQUETES
+    // =====================================================
+
+    this.cargarPaquetesTripulacion();
+
     this.pasoActual = 3;
-  }
-
-  // =====================================================
-  // TOGGLE TRIPULANTE
-  // =====================================================
-
-  toggleTripulante(id: number) {
-
-    const index =
-      this.vuelo.tripulacion.indexOf(id);
-
-    if (index >= 0) {
-
-      this.vuelo.tripulacion.splice(index, 1);
-
-    } else {
-
-      this.vuelo.tripulacion.push(id);
-    }
   }
 
   // =====================================================
@@ -309,11 +340,11 @@ export class ConsultaAgregarVueloComponent
   guardarVuelo() {
 
     if (
-      this.vuelo.tripulacion.length === 0
+      !this.vuelo.paqueteTripulacionId
     ) {
 
       alert(
-        'Debe seleccionar tripulación'
+        'Debe seleccionar un paquete de tripulación'
       );
 
       return;
@@ -348,12 +379,17 @@ export class ConsultaAgregarVueloComponent
       precioEjecutiva:
       this.vuelo.precioEjecutiva,
 
-      tripulacion:
-      this.vuelo.tripulacion,
+      tripulacionId:
+      this.vuelo.paqueteTripulacionId,
 
       usuario:
         'admin'
     };
+
+    console.log(
+      'PAYLOAD:',
+      payload
+    );
 
     this.vueloService
       .crearVuelo(payload)
@@ -373,7 +409,9 @@ export class ConsultaAgregarVueloComponent
           console.error(err);
 
           alert(
-            err.error.message ||
+
+            err.error?.message ||
+
             'Error al crear vuelo'
           );
         }
@@ -406,7 +444,7 @@ export class ConsultaAgregarVueloComponent
 
       precioEjecutiva: '',
 
-      tripulacion: []
+      paqueteTripulacionId: 0
     };
 
     this.pasoActual = 1;

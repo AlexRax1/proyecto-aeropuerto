@@ -1,22 +1,25 @@
 <div class="contenedor">
 
   <h1>Agregar Vuelo</h1>
-
-  <!-- PASO 1 -->
   <div
     *ngIf="pasoActual === 1"
     class="card">
 
-    <h2>Información del Vuelo</h2>
+    <h2>
+      Información del Vuelo
+    </h2>
 
     <div class="grid">
 
       <!-- AEROPUERTO SALIDA -->
       <div>
 
-        <label>Aeropuerto Salida</label>
+        <label>
+          Aeropuerto Salida
+        </label>
 
-        <select [(ngModel)]="vuelo.aeropuertoSalida">
+        <select
+          [(ngModel)]="vuelo.aeropuertoSalida">
 
           <option value="">
             Seleccione aeropuerto
@@ -26,7 +29,7 @@
             *ngFor="let aeropuerto of aeropuertos"
             [value]="aeropuerto.id">
 
-            {{ aeropuerto.labelCompleto}}
+            {{ aeropuerto.labelCompleto }}
 
           </option>
 
@@ -37,9 +40,12 @@
       <!-- AEROPUERTO LLEGADA -->
       <div>
 
-        <label>Aeropuerto Llegada</label>
+        <label>
+          Aeropuerto Llegada
+        </label>
 
-        <select [(ngModel)]="vuelo.aeropuertoLlegada">
+        <select
+          [(ngModel)]="vuelo.aeropuertoLlegada">
 
           <option value="">
             Seleccione aeropuerto
@@ -60,7 +66,9 @@
       <!-- FECHA SALIDA -->
       <div>
 
-        <label>Fecha Salida</label>
+        <label>
+          Fecha Salida
+        </label>
 
         <input
           type="date"
@@ -71,7 +79,9 @@
       <!-- HORA SALIDA -->
       <div>
 
-        <label>Hora Salida</label>
+        <label>
+          Hora Salida
+        </label>
 
         <input
           type="time"
@@ -82,7 +92,9 @@
       <!-- FECHA LLEGADA -->
       <div>
 
-        <label>Fecha Llegada</label>
+        <label>
+          Fecha Llegada
+        </label>
 
         <input
           type="date"
@@ -93,7 +105,9 @@
       <!-- HORA LLEGADA -->
       <div>
 
-        <label>Hora Llegada</label>
+        <label>
+          Hora Llegada
+        </label>
 
         <input
           type="time"
@@ -125,8 +139,13 @@
 
   </div>
 
+  <!-- ===================================================== -->
   <!-- PASO 2 -->
-  <div *ngIf="pasoActual === 2" class="contenedor-aviones">
+  <!-- ===================================================== -->
+
+  <div
+    *ngIf="pasoActual === 2"
+    class="contenedor-aviones">
 
     <h2>
       Seleccionar Avión
@@ -134,12 +153,16 @@
 
     <div
       *ngFor="let avion of avionesDisponibles"
+
       class="card-avion"
+
       [class.seleccionado]="
-      vuelo.avionSeleccionado === avion.avionId
-    "
-      (click)="seleccionarAvion(avion.avionId)"
-    >
+        vuelo.avionSeleccionado === avion.avionId
+      "
+
+      (click)="
+        seleccionarAvion(avion.avionId)
+      ">
 
       <h3>
         {{ avion.modeloAvion.nombre }}
@@ -147,32 +170,41 @@
 
       <p>
         <strong>Marca:</strong>
+
         {{ avion.marca }}
       </p>
 
       <p>
         <strong>Año:</strong>
+
         {{ avion.ano }}
       </p>
 
       <p>
         <strong>Estado:</strong>
+
         {{ avion.estado }}
       </p>
 
       <p>
         <strong>Clase Económica:</strong>
+
         {{ avion.cantAsientosEconomica }}
+
         asientos
       </p>
 
       <p>
         <strong>Clase Ejecutiva:</strong>
+
         {{ avion.cantAsientosEjecutiva }}
+
         asientos
       </p>
 
     </div>
+
+    <!-- PRECIOS -->
 
     <div class="precios">
 
@@ -182,7 +214,11 @@
 
       <input
         type="number"
-        [(ngModel)]="vuelo.precioEconomica"
+
+        [(ngModel)]="
+          vuelo.precioEconomica
+        "
+
         placeholder="Ingrese precio"
       >
 
@@ -192,7 +228,11 @@
 
       <input
         type="number"
-        [(ngModel)]="vuelo.precioEjecutiva"
+
+        [(ngModel)]="
+          vuelo.precioEjecutiva
+        "
+
         placeholder="Ingrese precio"
       >
 
@@ -202,63 +242,144 @@
 
       <button
         class="btn cancelar"
-        (click)="cancelar()"
-      >
+        (click)="cancelar()">
+
         Cancelar
+
       </button>
 
       <button
         class="btn siguiente"
-        (click)="irTripulacion()"
-      >
+        (click)="irTripulacion()">
+
         Siguiente
+
       </button>
 
     </div>
 
   </div>
 
+  <!-- ===================================================== -->
   <!-- PASO 3 -->
+  <!-- ===================================================== -->
+
   <div
     *ngIf="pasoActual === 3"
     class="card">
 
-    <h2>Seleccionar Tripulación</h2>
+    <h2>
+      Seleccionar Paquete de Tripulación
+    </h2>
 
-    <div
-      class="tripulante-card"
-      *ngFor="let tripulante of tripulantesDisponibles"
-    >
+    <!-- SELECT PAQUETES -->
+
+    <div class="campo">
 
       <label>
-
-        <input
-          type="checkbox"
-
-          [checked]="
-        vuelo.tripulacion.includes(
-          tripulante.personalTripulacionId
-        )
-      "
-
-          (change)="
-        toggleTripulante(
-          tripulante.personalTripulacionId
-        )
-      "
-        />
-
-        <strong>
-          {{ tripulante.nombre }}
-        </strong>
-
-        -
-
-        {{ tripulante.rol?.nombreRol }}
-
+        Paquete de Tripulación
       </label>
 
+      <select
+        [(ngModel)]="
+          vuelo.paqueteTripulacionId
+        ">
+
+        <option value="0">
+
+          Seleccione un paquete
+
+        </option>
+
+        <option
+          *ngFor="
+            let paquete of paquetesTripulacion
+          "
+
+          [value]="
+            paquete.paqTripulacionId
+          ">
+
+          {{ paquete.nombrePaquete }}
+
+        </option>
+
+      </select>
+
     </div>
+
+    <!-- MOSTRAR DETALLE -->
+
+    <div
+      class="tripulacion-detalle"
+
+      *ngFor="
+        let paquete of paquetesTripulacion
+      ">
+
+      <div
+        *ngIf="
+          vuelo.paqueteTripulacionId ==
+          paquete.paqTripulacionId
+        ">
+
+        <h3>
+          Integrantes del Paquete
+        </h3>
+
+        <p>
+
+          <strong>Piloto:</strong>
+
+          {{ paquete.piloto?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Copiloto:</strong>
+
+          {{ paquete.copiloto?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Ingeniero:</strong>
+
+          {{ paquete.ingeniero?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Sobrecargo 1:</strong>
+
+          {{ paquete.sobrecargo1?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Sobrecargo 2:</strong>
+
+          {{ paquete.sobrecargo2?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Sobrecargo 3:</strong>
+
+          {{ paquete.sobrecargo3?.nombre }}
+
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
 
     <div class="acciones">
 

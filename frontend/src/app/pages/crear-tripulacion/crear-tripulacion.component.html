@@ -2,7 +2,22 @@
 
   <div class="card">
 
-    <h1>Crear Tripulación</h1>
+    <h1>Crear Paquete de Tripulación</h1>
+
+    <!-- NOMBRE DEL PAQUETE -->
+    <div class="campo nombre-paquete">
+
+      <label>
+        Nombre del Paquete
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="tripulacion.nombrePaquete"
+        placeholder="Ejemplo: Equipo Jaguar"
+      >
+
+    </div>
 
     <div class="grid">
 
@@ -84,11 +99,11 @@
     <div class="cabina-container">
 
       <h2>
-        Tripulantes de Cabina
+        Sobrecargos
       </h2>
 
       <p>
-        Seleccione 3 tripulantes
+        Seleccione exactamente 3 sobrecargos
       </p>
 
       <div class="cabina-grid">
@@ -129,6 +144,29 @@
 
     </div>
 
+    <!-- RESUMEN -->
+    <div
+      class="resumen"
+      *ngIf="
+        tripulacion.piloto &&
+        tripulacion.copiloto &&
+        tripulacion.ingeniero &&
+        tripulacion.cabina.length === 3
+      "
+    >
+
+      <h2>
+        Resumen del Paquete
+      </h2>
+
+      <p>
+        El paquete quedará listo para ser
+        utilizado posteriormente en la
+        creación de vuelos.
+      </p>
+
+    </div>
+
     <!-- BOTONES -->
     <div class="acciones">
 
@@ -144,7 +182,7 @@
         class="btn guardar"
         (click)="guardarTripulacion()">
 
-        Guardar
+        Guardar Paquete
 
       </button>
 

@@ -24,7 +24,7 @@ public class CrearVueloDTO {
     private BigDecimal precioEconomica;
     private BigDecimal precioEjecutiva;
 
-    private List<Integer> tripulacion;
-
     private String usuario;
+
+    private Integer tripulacionId;
 }
