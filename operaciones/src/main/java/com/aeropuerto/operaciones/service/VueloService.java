@@ -244,6 +244,10 @@ public class VueloService {
                                 )
                         );
 
+
+        paquete.setEstado("OCUPADO");
+        tripulacionPaqueteRepository.save(paquete);
+
         vuelo.setTripulacion(paquete);
 
         // AUDITORÍA

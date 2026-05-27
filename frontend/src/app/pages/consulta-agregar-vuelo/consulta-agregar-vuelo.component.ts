@@ -224,6 +224,37 @@ export class ConsultaAgregarVueloComponent
       return;
     }
 
+    const hoy = new Date();
+
+    hoy.setHours(0, 0, 0, 0);
+
+    const fechaSalida = new Date(
+      this.vuelo.fechaSalida
+    );
+
+    if (fechaSalida < hoy) {
+
+      alert(
+        'No se pueden crear vuelos con fechas anteriores al día de hoy.'
+      );
+
+      return;
+    }
+
+    if (
+
+      this.vuelo.aeropuertoSalida ===
+      this.vuelo.aeropuertoLlegada
+
+    ) {
+
+      alert(
+        'No se puede seleccionar el mismo aeropuerto de salida y llegada.'
+      );
+
+      return;
+    }
+
     if (
 
       this.vuelo.aeropuertoSalida ===

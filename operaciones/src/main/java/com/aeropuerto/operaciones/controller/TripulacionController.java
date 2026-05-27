@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TripulacionController {
 
-    private final TripulacionService service;
+    private final PersonalTripulacionController service;
 
     @PostMapping("/paquete")
     public ResponseEntity<PaqTripulacion>
@@ -26,7 +26,7 @@ public class TripulacionController {
     ) {
 
         return ResponseEntity.ok(
-                service.crearPaquete(dto)
+                service.crearPaquete(dto).getBody()
         );
     }
 
