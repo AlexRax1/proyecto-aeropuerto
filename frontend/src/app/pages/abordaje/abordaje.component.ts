@@ -37,7 +37,7 @@ export class AbordajeComponent implements OnInit {
   async cargarVuelos() {
     try {
       const data = await firstValueFrom(
-        this.http.get<any[]>('http://localhost:8083/vuelos/pendientesAbordar')
+        this.http.get<any[]>('http://localhost:8080/vuelos/pendientesAbordar')
       );
 
       console.log('Vuelos recibidos desde el backend:', data); // Verifícalo en F12
@@ -103,7 +103,7 @@ export class AbordajeComponent implements OnInit {
 
       const usuario: any = await firstValueFrom(
         this.http.get(
-          `http://localhost:8082/usuarios/pasaporte/${this.pasaporte}`
+          `http://localhost:8080/usuarios/pasaporte/${this.pasaporte}`
         )
       );
 
@@ -199,7 +199,7 @@ export class AbordajeComponent implements OnInit {
 
 
       const respuestaActualizarVuelo = await firstValueFrom(
-        this.http.put(`http://localhost:8083/vuelos/${idVuelo}/estado-abordado`, {}, { responseType: 'text' })
+        this.http.put(`http://localhost:8080/vuelos/${idVuelo}/estado-abordado`, {}, { responseType: 'text' })
       );
 
       // 4. Mostrar mensaje consolidado (FA06)
