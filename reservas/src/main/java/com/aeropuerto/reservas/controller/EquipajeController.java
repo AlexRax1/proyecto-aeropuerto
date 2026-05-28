@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/equipajes")
-@CrossOrigin("*")
 public class EquipajeController {
 
     private final EquipajeService equipajeService;

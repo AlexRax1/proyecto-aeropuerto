@@ -22,7 +22,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservas")
-//@CrossOrigin("*")
 public class ReservaController {
 
     private final BoletoService boletoService;

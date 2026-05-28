@@ -15,23 +15,29 @@ public class GatewayRoutingConfig {
                         .path("/auth/**")
                         .uri("http://localhost:8081"))
 
-                /*
-                // agregar mas rutas
-                .route("operaciones-service", r -> r
-                        .path("/operaciones/**")
+                // Usuarios
+                .route("usuarios-service", r -> r
+                        .path("/usuarios/**")
                         .uri("http://localhost:8082"))
-                */
 
-                // agregar mas rutas
+                // Operaciones (¡Aquí agrupamos todos los endpoints de tu puerto 8083!)
                 .route("operaciones-service", r -> r
-                        .path("/aviones/**")
+                        .path(
+                                "/aerolineas/**",
+                                "/aeropuertos/**",
+                                "/aviones/**",
+                                "/consulta-aerolineas/**",
+                                "/consulta-destinos/**",
+                                "/api/operaciones/destinos/**",
+                                "/tripulacion/**",
+                                "/vuelos/**"
+                        )
                         .uri("http://localhost:8083"))
 
-                // agregar mas rutas
+                // Reservas
                 .route("reservas-service", r -> r
-                        .path("/api/reservas/**")
+                        .path("/api/reservas/**", "/equipajes/**")
                         .uri("http://localhost:8084"))
-
 
                 .build();
     }

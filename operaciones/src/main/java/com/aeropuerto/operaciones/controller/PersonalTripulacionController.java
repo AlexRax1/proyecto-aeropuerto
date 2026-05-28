@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/tripulacion")
 @RequiredArgsConstructor
-@CrossOrigin("*")
 public class PersonalTripulacionController {
 
     private final PersonalTripulacionService personalTripulacionService;
