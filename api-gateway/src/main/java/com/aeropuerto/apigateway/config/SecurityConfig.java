@@ -23,41 +23,39 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
-                .cors(Customizer.withDefaults())
+                .cors(Customizer.withDefaults()) // Toma la configuración de tu CorsConfig
                 .csrf(csrf -> csrf.disable())
-
                 .authorizeExchange(exchanges -> exchanges
 
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Permite el tráfico a tu servicio de autenticación para que puedas hacer login/registro
-                        .pathMatchers("/auth/**").permitAll()
 
-                        //pruebas
-                        .pathMatchers("/aviones/**").permitAll()
+                        // 2. Seguridad y Usuarios
+                        .pathMatchers(
+                                "/auth/**",
+                                "/usuarios/register"
+                        ).permitAll()
 
-                        //ya no permitira todo, solo lo hara antes de pagar ahi si te pedira login si o si
-                        //.pathMatchers("/api/reservas/**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/reservas/vuelo/*/ocupados").permitAll()
-                        /*
-                        // 2. Rutas públicas de Operaciones (Ejemplo: listar vuelos)
-                        .pathMatchers(HttpMethod.GET, "/operaciones/vuelos/listar").permitAll()*/
-                        // 2. Rutas públicas de Operaciones (Ejemplo: listar vuelos)
-                        //.pathMatchers( "/aviones/**").permitAll()
+                        // 3. Operaciones y Catálogos (Abiertos por completo con /** para ir rápido)
+                        .pathMatchers(
+                                "/aerolineas/**",
+                                "/aeropuertos/**",
+                                "/aviones/**",
+                                "/consulta-aerolineas/**",
+                                "/consulta-destinos/**",
+                                "/api/operaciones/destinos/**",
+                                "/vuelos/**"
+                        ).permitAll()
 
-
-
-                        /* agregar rutas que requieran de roles en especifico :
-                        // Rutas que SOLO un ADMIN puede tocar (Ej: registrar un avión nuevo)
-                        .pathMatchers(HttpMethod.POST, "/aviones/crear").hasAuthority("ADMIN")
-
-                        // Rutas que un PILOTO o ADMIN pueden ver
-                        .pathMatchers(HttpMethod.GET, "/aviones/rutas").hasAnyAuthority("ADMIN", "PILOTO")
-                            */
+                        // 4. Excepciones específicas de Reservas (Solo lo necesario para el mapa)
+                        .pathMatchers(
+                                "/api/reservas/vuelo/*/ocupados"
+                        ).permitAll()
 
 
-                        // a todos los demas no declarados aca si les pedira token de autorizacion
                         .anyExchange().authenticated()
-                ).addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION);
+                )
+                // Inyectamos el filtro de JWT
+                .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 
         return http.build();
     }

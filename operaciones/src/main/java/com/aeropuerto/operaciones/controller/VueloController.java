@@ -57,10 +57,12 @@ public class VueloController {
     public ResponseEntity<Vuelo> crearVuelo(
             @RequestBody CrearVueloDTO dto
     ) {
+        Vuelo nuevoVuelo = vueloService.crearVuelo(dto);
+        return ResponseEntity.ok()
+                // Inyectamos el ID en el header
+                .header("X-Afectado-Id", String.valueOf(nuevoVuelo.getVueloId()))
+                .body(nuevoVuelo);
 
-        return ResponseEntity.ok(
-                vueloService.crearVuelo(dto)
-        );
     }
 
     @GetMapping("/disponibles")

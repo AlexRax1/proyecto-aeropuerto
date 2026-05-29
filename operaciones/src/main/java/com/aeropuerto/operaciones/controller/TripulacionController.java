@@ -17,16 +17,12 @@ public class TripulacionController {
     private final PersonalTripulacionController service;
 
     @PostMapping("/paquete")
-    public ResponseEntity<PaqTripulacion>
-    crearPaquete(
-
-            @RequestBody
-            CrearPaqTripulacionDTO dto
-    ) {
-
-        return ResponseEntity.ok(
-                service.crearPaquete(dto).getBody()
-        );
+    public ResponseEntity<PaqTripulacion> crearPaquete(@RequestBody CrearPaqTripulacionDTO dto) {
+        PaqTripulacion paquete = service.crearPaquete(dto).getBody();
+        return ResponseEntity.ok()
+                // Inyectamos el ID del nuevo paquete
+                .header("X-Afectado-Id", String.valueOf(paquete.getPaqTripulacionId()))
+                .body(paquete);
     }
 
 }

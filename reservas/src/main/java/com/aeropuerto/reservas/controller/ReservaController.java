@@ -147,7 +147,10 @@ public class ReservaController {
             }
         }
 
-        return ResponseEntity.ok("Abordaje registrado con éxito");
+        return ResponseEntity.ok()
+                // Inyectamos el ID del pasajero o del boleto abordado
+                .header("X-Afectado-Id", String.valueOf(request.getIdusuario()))
+                .body("Abordaje registrado con éxito");
     }
 
     @PutMapping("/vuelo/{vueloId}/finalizar")
