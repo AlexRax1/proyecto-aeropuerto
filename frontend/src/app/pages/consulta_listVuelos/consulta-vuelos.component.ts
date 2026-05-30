@@ -55,6 +55,23 @@ export class ConsultaVuelosComponent {
       .set('fechaDesde', this.filtros.fechaDesde)
       .set('fechaHasta', this.filtros.fechaHasta);
 
+    // Validar rango máximo de 30 días
+    const fechaDesde = new Date(this.filtros.fechaDesde);
+    const fechaHasta = new Date(this.filtros.fechaHasta);
+
+    const diferenciaMs = fechaHasta.getTime() - fechaDesde.getTime();
+    const diferenciaDias = diferenciaMs / (1000 * 60 * 60 * 24);
+
+    if (diferenciaDias > 30) {
+      alert('El rango máximo de consulta es de 30 días');
+      return;
+    }
+
+    if (fechaHasta < fechaDesde) {
+      alert('La fecha hasta no puede ser menor que la fecha desde');
+      return;
+    }
+
     this.http.get<any[]>(this.apiUrl, { params })
       .subscribe({
 

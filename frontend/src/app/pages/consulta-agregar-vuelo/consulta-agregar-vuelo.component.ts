@@ -141,7 +141,7 @@ export class ConsultaAgregarVueloComponent
           console.error(err);
 
           alert(
-            'No hay aviones disponibles'
+            'No hay aviones disponibles para el vuelo seleccionado.'
           );
         }
       });
@@ -177,12 +177,18 @@ export class ConsultaAgregarVueloComponent
 
         next: (data: any[]) => {
 
-          console.log(
-            'PAQUETES:',
-            data
-          );
-
           this.paquetesTripulacion = data;
+
+          if (data.length === 0) {
+
+            alert(
+              'No hay tripulantes disponibles para el vuelo seleccionado.'
+            );
+
+            return;
+          }
+
+          this.pasoActual = 3;
         },
 
         error: (err: any) => {
@@ -341,6 +347,18 @@ export class ConsultaAgregarVueloComponent
     }
 
     if (
+      Number(this.vuelo.precioEconomica) <= 0 ||
+      Number(this.vuelo.precioEjecutiva) <= 0
+    ) {
+
+      alert(
+        'Los precios deben ser mayores a cero.'
+      );
+
+      return;
+    }
+
+    if (
 
       !this.vuelo.precioEconomica ||
 
@@ -361,7 +379,7 @@ export class ConsultaAgregarVueloComponent
 
     this.cargarPaquetesTripulacion();
 
-    this.pasoActual = 3;
+    //this.pasoActual = 3;
   }
 
   // =====================================================
