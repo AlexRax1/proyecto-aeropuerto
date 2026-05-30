@@ -4,20 +4,24 @@ import com.aeropuerto.operaciones.dto.AvionRequestDTO;
 import com.aeropuerto.operaciones.model.Avion;
 import com.aeropuerto.operaciones.repository.AvionRepository;
 import com.aeropuerto.operaciones.service.AvionService;
+import com.aeropuerto.operaciones.service.VueloService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/aviones")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class AvionController {
 
     private final AvionService avionService;
+    private final VueloService vueloService;
 
     @Autowired
     private AvionRepository avionRepository;
@@ -49,6 +53,29 @@ public class AvionController {
         return new ResponseEntity<>(
                 nuevoAvion,
                 HttpStatus.CREATED
+        );
+    }
+
+    @GetMapping("/disponibles")
+    public List<Avion> obtenerAvionesDisponibles(
+
+            @RequestParam Integer aerolineaId,
+
+            @RequestParam LocalDate fechaSalida,
+
+            @RequestParam LocalTime horaSalida,
+
+            @RequestParam LocalDate fechaLlegada,
+
+            @RequestParam LocalTime horaLlegada
+    ) {
+
+        return vueloService.obtenerAvionesDisponibles(
+                aerolineaId,
+                fechaSalida,
+                horaSalida,
+                fechaLlegada,
+                horaLlegada
         );
     }
 }

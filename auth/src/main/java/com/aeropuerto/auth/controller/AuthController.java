@@ -1,11 +1,10 @@
 package com.aeropuerto.auth.controller;
 
-import com.aeropuerto.auth.dto.AuthResponse;
-import com.aeropuerto.auth.dto.LoginRequest;
+import com.aeropuerto.auth.dto.*;
+import com.aeropuerto.auth.model.Bitacora;
 import com.aeropuerto.auth.model.Credencial;
+import com.aeropuerto.auth.repository.BitacoraRepository;
 import com.aeropuerto.auth.repository.CredencialRepository;
-import com.aeropuerto.auth.dto.RegisterRequest;
-import com.aeropuerto.auth.dto.RegisterResponse;
 import com.aeropuerto.auth.model.RolUser;
 import com.aeropuerto.auth.repository.RolUserRepository;
 import com.aeropuerto.auth.service.JwtService;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
 public class AuthController {
 
     @Autowired
@@ -31,6 +29,9 @@ public class AuthController {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private BitacoraRepository bitacoraRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -83,6 +84,47 @@ public class AuthController {
     @DeleteMapping("/delete/{userId}")
     public ResponseEntity<?> rollbackCredencial(@PathVariable Integer userId) {
         credencialRepository.deleteById(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+
+        // 1. Buscamos al usuario directamente por su ID
+        Credencial usuario = credencialRepository.findById(request.getUserId()).orElse(null);
+
+        if (usuario == null) {
+            return ResponseEntity.badRequest().body("Usuario no encontrado");
+        }
+
+        // 2. Hasheamos la nueva contraseña (¡nunca en texto plano!)
+        usuario.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        // 3. Guardamos los cambios
+        credencialRepository.save(usuario);
+
+        return ResponseEntity.ok().body("Contraseña restablecida exitosamente");
+    }
+
+    @PostMapping("/bitacora/registrar")
+    public ResponseEntity<?> registrarBitacora(@RequestBody BitacoraDTO dto) {
+
+        Bitacora bitacora = new Bitacora();
+
+        // Si viene el userId, lo asociamos (asumiendo que tu entidad maneja la relación)
+        if (dto.getUserId() != null) {
+            Credencial usuario = credencialRepository.findById(dto.getUserId()).orElse(null);
+            bitacora.setUsuario(usuario);
+        }
+
+        bitacora.setMicroservicioAfectado(dto.getMicroservicioAfectado());
+        bitacora.setEndpoint(dto.getEndpoint());
+        bitacora.setAccion(dto.getAccion());
+        bitacora.setFechaHora(java.time.LocalDateTime.now());
+        bitacora.setAccion(dto.getAccion());
+        bitacora.setIdAfectado(dto.getIdAfectado());
+
+        bitacoraRepository.save(bitacora);
         return ResponseEntity.ok().build();
     }
 }

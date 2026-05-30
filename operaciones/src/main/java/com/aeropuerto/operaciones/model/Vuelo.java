@@ -62,4 +62,8 @@ public class Vuelo extends Auditoria {
 
     @Column(name = "asientos_disponibles")
     private Integer asientosDisponibles;
+
+    @ManyToOne
+    @JoinColumn(name = "tripulacion_id")
+    private PaqTripulacion tripulacion;
 }

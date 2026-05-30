@@ -14,7 +14,7 @@ public class PersonalTripulacion extends Auditoria{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "personal_tripulacion_id")
-    private Long id;
+    private Integer personalTripulacionId;
 
     @ManyToOne
     @JoinColumn(name = "aerolinea_id")

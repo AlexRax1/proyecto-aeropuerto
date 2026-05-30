@@ -38,7 +38,7 @@ export class ConsultaAerolineasComponent {
   cargarAeropuertos() {
 
     this.http.get<any[]>(
-      'http://localhost:8083/aeropuertos'
+      'http://localhost:8080/aeropuertos'
     )
       .subscribe({
 
@@ -73,7 +73,7 @@ export class ConsultaAerolineasComponent {
     }
 
     this.http.get<any[]>(
-      `http://localhost:8083/consulta-aerolineas/${this.aeropuertoSeleccionado}`
+      `http://localhost:8080/consulta-aerolineas/${this.aeropuertoSeleccionado}`
     )
       .subscribe({
 

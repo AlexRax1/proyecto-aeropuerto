@@ -15,77 +15,162 @@ import {AbordajeComponent} from './pages/abordaje/abordaje.component';
 import {ReservarVueloComponent} from './pages/reservar-vuelo/reservar-vuelo.component';
 import {ConsultaAgregarVueloComponent} from './pages/consulta-agregar-vuelo/consulta-agregar-vuelo.component';
 import {CrearTripulacionComponent} from './pages/crear-tripulacion/crear-tripulacion.component';
+import {ConsultaVueloComponent} from './pages/consulta-vuelo/consulta-vuelo.component';
+import {AdminLayoutComponent} from './shared/layout/admin-layout.component';
+import {ClienteLayoutComponent} from './shared/layout/cliente-layout.component';
+import {UserLayoutComponent} from './shared/layout/user-layout.component';
+import {RegisterComponent} from './pages/register/register.component';
+import {LoginComponent} from './pages/login/login.component';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { VuelosPendientesComponent } from './pages/vuelos-pendientes/vuelos-pendientes.component';
 
 export const routes: Routes = [
+
+  // =====================================
+  // PÚBLICAS
+  // =====================================
+
   {
     path: '',
-    component: HomeComponent
-  },
-  {
-    path: 'aviones',
-    component: AvionSelectionComponent
-  },
-  {
-    path: 'asientos',
-    component: SeatSelectionComponent
-  },
-  {
-    path: 'pago',
-    component: PaymentComponent
-  },
-  {
-    path: 'confirmacion',
-    component: ConfirmationComponent
-  },
-  {
-    path: 'consulta-vuelos',
-    component: ConsultaVuelosComponent
+    redirectTo: 'cliente',
+    pathMatch: 'full'
   },
 
   {
-    path: 'consulta-aerolineas',
-    component: ConsultaAerolineasComponent
+    path: 'login',
+    component: LoginComponent
   },
 
   {
-    path: 'consulta-aviones',
-    component: ConsultaAvionesComponent
+    path: 'registro',
+    component: RegisterComponent
   },
 
-  {
-    path: 'consulta-pasajeros-vuelo',
-    component: ConsultaPasajerosVueloComponent
-  },
+  // =====================================
+  // ADMIN
+  // =====================================
 
   {
-    path: 'consulta-destinos',
-    component: ConsultaDestinosComponent
+    path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { expectedRoles: ['ROLE_ADMIN'] },
+    children: [
+
+      {
+        path: '',
+        redirectTo: 'consulta-vuelo',
+        pathMatch: 'full'
+      },
+
+      {
+        path: 'consulta-vuelo',
+        component: ConsultaVueloComponent
+      },
+
+      {
+        path: 'consulta-vuelos',
+        component: ConsultaVuelosComponent
+      },
+
+      {
+        path: 'consulta-aerolineas',
+        component: ConsultaAerolineasComponent
+      },
+
+      {
+        path: 'consulta-aviones',
+        component: ConsultaAvionesComponent
+      },
+
+      {
+        path: 'consulta-pasajeros-vuelo',
+        component: ConsultaPasajerosVueloComponent
+      },
+
+      {
+        path: 'consulta-destinos',
+        component: ConsultaDestinosComponent
+      },
+
+      {
+        path: 'consulta-equipaje',
+        component: ConsultaEquipajeComponent
+      }
+
+    ]
   },
 
-  {
-    path: 'abordaje',
-    component: AbordajeComponent
-  },
+  // =====================================
+  // USER
+  // =====================================
 
   {
-    path: 'consulta-equipaje',
-    component: ConsultaEquipajeComponent
+    path: 'user',
+    component: UserLayoutComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { expectedRoles: ['ROLE_MANAGER'] }, // Manager maneja abordajes, tripulación, y agregar-vuelo
+    children: [
+
+      {
+        path: '',
+        redirectTo: 'crear-vuelo',
+        pathMatch: 'full'
+      },
+
+      {
+        path: 'abordaje',
+        component: AbordajeComponent
+      },
+
+      {
+        path: 'crear-tripulacion',
+        component: CrearTripulacionComponent
+      },
+
+      {
+        path: 'crear-vuelo',
+        component: ConsultaAgregarVueloComponent
+      }
+
+    ]
   },
 
-  {
-    path: 'reservar-vuelo',
-    component: ReservarVueloComponent
-  },
+  // =====================================
+  // CLIENTE
+  // =====================================
 
   {
-    path: 'consulta-agregar-vuelo',
-    component: ConsultaAgregarVueloComponent
+    path: 'cliente',
+    component: ClienteLayoutComponent,
+    children: [
+
+      // Removed default redirect to vuelos-pendientes as requested
+
+      {
+        path: 'vuelos-pendientes',
+        component: VuelosPendientesComponent
+      },
+
+      {
+        path: 'reservar-vuelo',
+        component: ReservarVueloComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRoles: ['ROLE_USER'] }
+      }
+
+    ]
   },
 
+  // =====================================
+  // REDIRECCIÓN
+  // =====================================
+
   {
-    path: 'crear-tripulacion',
-    component: CrearTripulacionComponent
+    path: '**',
+    redirectTo: 'cliente'
   }
 
-
 ];
+

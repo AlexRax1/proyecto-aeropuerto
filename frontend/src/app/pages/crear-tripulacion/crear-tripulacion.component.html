@@ -2,7 +2,22 @@
 
   <div class="card">
 
-    <h1>Crear Tripulación</h1>
+    <h1>Crear Paquete de Tripulación</h1>
+
+    <!-- NOMBRE DEL PAQUETE -->
+    <div class="campo nombre-paquete">
+
+      <label>
+        Nombre del Paquete
+      </label>
+
+      <input
+        type="text"
+        [(ngModel)]="tripulacion.nombrePaquete"
+        placeholder="Ejemplo: Equipo Jaguar"
+      >
+
+    </div>
 
     <div class="grid">
 
@@ -20,9 +35,9 @@
 
           <option
             *ngFor="let piloto of pilotos"
-            [value]="piloto">
+            [value]="piloto.personalTripulacionId">
 
-            {{ piloto }}
+            {{ piloto.nombre }}
 
           </option>
 
@@ -44,9 +59,9 @@
 
           <option
             *ngFor="let copiloto of copilotos"
-            [value]="copiloto">
+            [value]="copiloto.personalTripulacionId">
 
-            {{ copiloto }}
+            {{ copiloto.nombre }}
 
           </option>
 
@@ -68,9 +83,9 @@
 
           <option
             *ngFor="let ingeniero of ingenieros"
-            [value]="ingeniero">
+            [value]="ingeniero.personalTripulacionId">
 
-            {{ ingeniero }}
+            {{ ingeniero.nombre }}
 
           </option>
 
@@ -83,10 +98,12 @@
     <!-- CABINA -->
     <div class="cabina-container">
 
-      <h2>Tripulantes de Cabina</h2>
+      <h2>
+        Sobrecargos
+      </h2>
 
       <p>
-        Seleccione 3 tripulantes
+        Seleccione exactamente 3 sobrecargos
       </p>
 
       <div class="cabina-grid">
@@ -95,20 +112,58 @@
           *ngFor="let tripulante of tripulantesCabina"
           class="cabina-item">
 
-          <input
-            type="checkbox"
-            [checked]="tripulacion.cabina.includes(tripulante)"
-            (change)="toggleCabina(tripulante)">
+          <label class="checkbox-label">
 
-          <span>
+            <input
+              type="checkbox"
 
-            {{ tripulante }}
+              [checked]="
+                tripulacion.cabina.includes(
+                  tripulante.personalTripulacionId
+                )
+              "
 
-          </span>
+              (change)="
+                toggleCabina(
+                  tripulante.personalTripulacionId
+                )
+              "
+            >
+
+            <span>
+
+              {{ tripulante.nombre }}
+
+            </span>
+
+          </label>
 
         </div>
 
       </div>
+
+    </div>
+
+    <!-- RESUMEN -->
+    <div
+      class="resumen"
+      *ngIf="
+        tripulacion.piloto &&
+        tripulacion.copiloto &&
+        tripulacion.ingeniero &&
+        tripulacion.cabina.length === 3
+      "
+    >
+
+      <h2>
+        Resumen del Paquete
+      </h2>
+
+      <p>
+        El paquete quedará listo para ser
+        utilizado posteriormente en la
+        creación de vuelos.
+      </p>
 
     </div>
 
@@ -127,7 +182,7 @@
         class="btn guardar"
         (click)="guardarTripulacion()">
 
-        Guardar
+        Guardar Paquete
 
       </button>
 

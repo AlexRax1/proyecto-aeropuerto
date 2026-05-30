@@ -1,9 +1,9 @@
 package com.aeropuerto.operaciones.controller;
 
 
-import com.aeropuerto.operaciones.dto.ConsultaVueloDTO;
-import com.aeropuerto.operaciones.dto.EstructuraAvionDTO;
-import com.aeropuerto.operaciones.dto.VueloDisponibleDTO;
+import com.aeropuerto.operaciones.dto.*;
+import com.aeropuerto.operaciones.model.Avion;
+import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.service.VueloService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,16 +11,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/vuelos")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class VueloController {
 
     private final VueloService vueloService;
 
+    // buscar basado en destinos y fecha/hora de vuelo
     @GetMapping("/buscar")
     public ResponseEntity<List<VueloDisponibleDTO>> buscarVuelos(
             @RequestParam Long origenId,
@@ -38,6 +39,7 @@ public class VueloController {
         return ResponseEntity.ok(estructura);
     }
 
+    //buscar basado en fechas
     @GetMapping("/consulta")
     public List<ConsultaVueloDTO> consultarVuelos(
 
@@ -49,5 +51,94 @@ public class VueloController {
                 fechaDesde,
                 fechaHasta
         );
+    }
+
+    @PostMapping
+    public ResponseEntity<Vuelo> crearVuelo(
+            @RequestBody CrearVueloDTO dto
+    ) {
+        Vuelo nuevoVuelo = vueloService.crearVuelo(dto);
+        return ResponseEntity.ok()
+                // Inyectamos el ID en el header
+                .header("X-Afectado-Id", String.valueOf(nuevoVuelo.getVueloId()))
+                .body(nuevoVuelo);
+
+    }
+
+    @GetMapping("/disponibles")
+    public List<Avion> obtenerAvionesDisponibles(
+            @RequestParam Integer aerolineaId,
+
+            @RequestParam LocalDate fechaSalida,
+
+            @RequestParam LocalTime horaSalida,
+
+            @RequestParam LocalDate fechaLlegada,
+
+            @RequestParam LocalTime horaLlegada
+    ) {
+
+        return vueloService.obtenerAvionesDisponibles(
+                aerolineaId,
+                fechaSalida,
+                horaSalida,
+                fechaLlegada,
+                horaLlegada
+        );
+    }
+
+    @GetMapping("/consulta-vuelo/{id}")
+    public ResponseEntity<?> consultarVueloPorId(
+            @PathVariable Long id
+    ) {
+
+        ConsultaVueloDTO vuelo =
+                vueloService.consultarVueloPorId(id);
+
+        if (vuelo == null) {
+
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+
+        return ResponseEntity.ok(vuelo);
+    }
+
+    @GetMapping("/pasajeros/{vueloId}")
+    public List<ConsultaPasajerosVueloDTO>
+    consultarPasajerosPorVuelo(
+
+            @PathVariable Long vueloId
+    ) {
+
+        return vueloService
+                .consultarPasajerosPorVuelo(
+                        vueloId
+                );
+    }
+
+    //buscar vuelos "PENDIENTE DE ABORDAR"
+    @GetMapping("/pendientesAbordar")
+    public List<Vuelo> vuelosAbordaje() {
+        return vueloService.obtenerPendientesAbordaje();
+
+    };
+
+    @PutMapping("/{id}/estado-abordado")
+    public ResponseEntity<String> cambiarEstadoAAbordado(@PathVariable Long id) {
+        try {
+            vueloService.actualizarEstadoVuelo(id, "ABORDADO");
+            return ResponseEntity.ok("Estado del vuelo actualizado a ABORDADO en Operaciones");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    //validar choques en horarios, consultado desde reservas
+    @PostMapping("/validar-choque")
+    public ResponseEntity<Boolean> validarChoqueHorarios(@RequestBody ValidacionChoqueHorarioDTO peticion) {
+        boolean hayChoque = vueloService.existeChoqueHorarios(peticion);
+        return ResponseEntity.ok(hayChoque);
     }
 }

@@ -1,32 +1,35 @@
 <div class="contenedor">
 
   <h1>Agregar Vuelo</h1>
-
-  <!-- PASO 1 -->
   <div
     *ngIf="pasoActual === 1"
     class="card">
 
-    <h2>Información del Vuelo</h2>
+    <h2>
+      Información del Vuelo
+    </h2>
 
     <div class="grid">
 
       <!-- AEROPUERTO SALIDA -->
       <div>
 
-        <label>Aeropuerto Salida</label>
+        <label>
+          Aeropuerto Salida
+        </label>
 
-        <select [(ngModel)]="vuelo.aeropuertoSalida">
+        <select
+          [(ngModel)]="vuelo.aeropuertoSalida">
 
           <option value="">
-            Seleccione
+            Seleccione aeropuerto
           </option>
 
           <option
             *ngFor="let aeropuerto of aeropuertos"
-            [value]="aeropuerto">
+            [value]="aeropuerto.id">
 
-            {{ aeropuerto }}
+            {{ aeropuerto.labelCompleto }}
 
           </option>
 
@@ -37,19 +40,22 @@
       <!-- AEROPUERTO LLEGADA -->
       <div>
 
-        <label>Aeropuerto Llegada</label>
+        <label>
+          Aeropuerto Llegada
+        </label>
 
-        <select [(ngModel)]="vuelo.aeropuertoLlegada">
+        <select
+          [(ngModel)]="vuelo.aeropuertoLlegada">
 
           <option value="">
-            Seleccione
+            Seleccione aeropuerto
           </option>
 
           <option
             *ngFor="let aeropuerto of aeropuertos"
-            [value]="aeropuerto">
+            [value]="aeropuerto.id">
 
-            {{ aeropuerto }}
+            {{ aeropuerto.labelCompleto }}
 
           </option>
 
@@ -60,7 +66,9 @@
       <!-- FECHA SALIDA -->
       <div>
 
-        <label>Fecha Salida</label>
+        <label>
+          Fecha Salida
+        </label>
 
         <input
           type="date"
@@ -71,7 +79,9 @@
       <!-- HORA SALIDA -->
       <div>
 
-        <label>Hora Salida</label>
+        <label>
+          Hora Salida
+        </label>
 
         <input
           type="time"
@@ -82,7 +92,9 @@
       <!-- FECHA LLEGADA -->
       <div>
 
-        <label>Fecha Llegada</label>
+        <label>
+          Fecha Llegada
+        </label>
 
         <input
           type="date"
@@ -93,7 +105,9 @@
       <!-- HORA LLEGADA -->
       <div>
 
-        <label>Hora Llegada</label>
+        <label>
+          Hora Llegada
+        </label>
 
         <input
           type="time"
@@ -125,80 +139,102 @@
 
   </div>
 
+  <!-- ===================================================== -->
   <!-- PASO 2 -->
+  <!-- ===================================================== -->
+
   <div
     *ngIf="pasoActual === 2"
-    class="card">
+    class="contenedor-aviones">
 
-    <h2>Seleccionar Avión</h2>
+    <h2>
+      Seleccionar Avión
+    </h2>
 
-    <table>
+    <div
+      *ngFor="let avion of avionesDisponibles"
 
-      <thead>
+      class="card-avion"
 
-      <tr>
+      [class.seleccionado]="
+        vuelo.avionSeleccionado === avion.avionId
+      "
 
-        <th>ID</th>
-        <th>Modelo</th>
-        <th>Capacidad</th>
-        <th>Estado</th>
-        <th>Seleccionar</th>
+      (click)="
+        seleccionarAvion(avion.avionId)
+      ">
 
-      </tr>
+      <h3>
+        {{ avion.modeloAvion.nombre }}
+      </h3>
 
-      </thead>
+      <p>
+        <strong>Marca:</strong>
 
-      <tbody>
+        {{ avion.marca }}
+      </p>
 
-      <tr *ngFor="let avion of avionesDisponibles">
+      <p>
+        <strong>Año:</strong>
 
-        <td>{{ avion.id }}</td>
+        {{ avion.ano }}
+      </p>
 
-        <td>{{ avion.modelo }}</td>
+      <p>
+        <strong>Estado:</strong>
 
-        <td>{{ avion.capacidad }}</td>
+        {{ avion.estado }}
+      </p>
 
-        <td>{{ avion.estado }}</td>
+      <p>
+        <strong>Clase Económica:</strong>
 
-        <td>
+        {{ avion.cantAsientosEconomica }}
 
-          <button
-            class="btn"
-            (click)="seleccionarAvion(avion.id)">
+        asientos
+      </p>
 
-            Seleccionar
+      <p>
+        <strong>Clase Ejecutiva:</strong>
 
-          </button>
+        {{ avion.cantAsientosEjecutiva }}
 
-        </td>
+        asientos
+      </p>
 
-      </tr>
+    </div>
 
-      </tbody>
-
-    </table>
+    <!-- PRECIOS -->
 
     <div class="precios">
 
-      <div>
+      <label>
+        Precio Clase Económica
+      </label>
 
-        <label>Precio Clase Económica</label>
+      <input
+        type="number"
 
-        <input
-          type="number"
-          [(ngModel)]="vuelo.precioEconomica">
+        [(ngModel)]="
+          vuelo.precioEconomica
+        "
 
-      </div>
+        placeholder="Ingrese precio"
+      >
 
-      <div>
+      <label>
+        Precio Clase Ejecutiva
+      </label>
 
-        <label>Precio Clase Ejecutiva</label>
+      <input
+        type="number"
 
-        <input
-          type="number"
-          [(ngModel)]="vuelo.precioEjecutiva">
+        [(ngModel)]="
+          vuelo.precioEjecutiva
+        "
 
-      </div>
+        placeholder="Ingrese precio"
+      >
 
     </div>
 
@@ -206,14 +242,14 @@
 
       <button
         class="btn cancelar"
-        (click)="nuevoVuelo()">
+        (click)="cancelar()">
 
         Cancelar
 
       </button>
 
       <button
-        class="btn"
+        class="btn siguiente"
         (click)="irTripulacion()">
 
         Siguiente
@@ -224,33 +260,126 @@
 
   </div>
 
+  <!-- ===================================================== -->
   <!-- PASO 3 -->
+  <!-- ===================================================== -->
+
   <div
     *ngIf="pasoActual === 3"
     class="card">
 
-    <h2>Seleccionar Tripulación</h2>
+    <h2>
+      Seleccionar Paquete de Tripulación
+    </h2>
 
-    <div class="tripulacion">
+    <!-- SELECT PAQUETES -->
+
+    <div class="campo">
+
+      <label>
+        Paquete de Tripulación
+      </label>
+
+      <select
+        [(ngModel)]="
+          vuelo.paqueteTripulacionId
+        ">
+
+        <option value="0">
+
+          Seleccione un paquete
+
+        </option>
+
+        <option
+          *ngFor="
+            let paquete of paquetesTripulacion
+          "
+
+          [value]="
+            paquete.paqTripulacionId
+          ">
+
+          {{ paquete.nombrePaquete }}
+
+        </option>
+
+      </select>
+
+    </div>
+
+    <!-- MOSTRAR DETALLE -->
+
+    <div
+      class="tripulacion-detalle"
+
+      *ngFor="
+        let paquete of paquetesTripulacion
+      ">
 
       <div
-        *ngFor="let tripulante of tripulantesDisponibles"
-        class="tripulante">
+        *ngIf="
+          vuelo.paqueteTripulacionId ==
+          paquete.paqTripulacionId
+        ">
 
-        <input
-          type="checkbox"
-          [checked]="vuelo.tripulacion.includes(tripulante)"
-          (change)="toggleTripulante(tripulante)">
+        <h3>
+          Integrantes del Paquete
+        </h3>
 
-        <span>
+        <p>
 
-          {{ tripulante }}
+          <strong>Piloto:</strong>
 
-        </span>
+          {{ paquete.piloto?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Copiloto:</strong>
+
+          {{ paquete.copiloto?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Ingeniero:</strong>
+
+          {{ paquete.ingeniero?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Sobrecargo 1:</strong>
+
+          {{ paquete.sobrecargo1?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Sobrecargo 2:</strong>
+
+          {{ paquete.sobrecargo2?.nombre }}
+
+        </p>
+
+        <p>
+
+          <strong>Sobrecargo 3:</strong>
+
+          {{ paquete.sobrecargo3?.nombre }}
+
+        </p>
 
       </div>
 
     </div>
+
+    <!-- BOTONES -->
 
     <div class="acciones">
 

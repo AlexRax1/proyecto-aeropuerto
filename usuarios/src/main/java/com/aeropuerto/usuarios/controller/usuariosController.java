@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class usuariosController {
     private final UsuarioRepository usuarioRepository;
@@ -41,4 +40,15 @@ public class usuariosController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/pasaporte/{numPasaporte}")
+    public ResponseEntity<Usuario> obtenerPorPasaporte(@PathVariable String numPasaporte){
+        Usuario usuario = usuarioService.buscarPorPasaporte(numPasaporte);
+
+        if (usuario != null) {
+            return ResponseEntity.ok(usuario);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    };
 }

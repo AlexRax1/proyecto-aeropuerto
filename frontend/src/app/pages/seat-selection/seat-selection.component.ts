@@ -29,10 +29,10 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   @Output() asientosConfirmados = new EventEmitter<any[]>();
 
   seats: Seat[][] = [];
-  maxSelection = 5;
+  maxSelection = 1;
   pollingSub!: Subscription;
   selectedSeatInfo: Seat[] = [];
-  
+
   // Novedad: Guardamos qué letras preceden a un pasillo
   letrasConPasilloADerecha: string[] = [];
 
@@ -42,7 +42,7 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
     if (this.vueloId) {
       this.loadSeats(this.vueloId);
       this.pollingSub = interval(3000).subscribe(() => {
-        this.actualizarEstados(this.vueloId); 
+        this.actualizarEstados(this.vueloId);
       });
     }
   }
@@ -87,9 +87,9 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
     selectedSeatsObjects.forEach(seat => {
       const payload = {
         vueloId: this.vueloId,
-        asientoId: seat.idAsiento, 
+        asientoId: seat.idAsiento,
         codigoAsiento: seat.label,
-        cantMaletas: 1, 
+        cantMaletas: 1,
         costoBoleto: seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00 // Ejemplo básico
       };
 
@@ -102,21 +102,21 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
       next: (res) => {
         console.log("Asientos bloqueados con éxito.");
         this.asientosConfirmados.emit(selectedSeatsObjects);
-        this.cerrar.emit(); 
+        this.cerrar.emit();
       },
       error: (err) => {
         console.error("Error al bloquear", err);
         alert("Alguien más está intentando reservar. Por favor, elige otros.");
         this.loadSeats(this.vueloId);
-        this.selectedSeatInfo = []; 
+        this.selectedSeatInfo = [];
       }
     });
   }
 
   loadSeats(vueloId: number) {
-    const reqOperaciones = this.http.get<any>(`http://localhost:8083/vuelos/${vueloId}/asientos`);
+    const reqOperaciones = this.http.get<any>(`http://localhost:8080/vuelos/${vueloId}/asientos`);
     const reqReservas = this.http.get<any>(`http://localhost:8080/api/reservas/vuelo/${vueloId}/ocupados`);
-    
+
     forkJoin({ mapa: reqOperaciones, estado: reqReservas }).subscribe({
       next: (data) => {
           // Lógica para detectar el pasillo basada en "ABC-DEF"
@@ -180,7 +180,7 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
               }
             });
           });
-          this.cdr.detectChanges(); 
+          this.cdr.detectChanges();
         },
         error: (err) => console.error("Error en polling", err)
       });

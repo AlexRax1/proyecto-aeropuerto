@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import {Router} from '@angular/router';
+import {VueloService} from '../services/vuelo.service';
+
 
 @Component({
   selector: 'app-crear-tripulacion',
@@ -10,50 +12,166 @@ import { Router } from '@angular/router';
   templateUrl: './crear-tripulacion.component.html',
   styleUrls: ['./crear-tripulacion.component.css']
 })
-export class CrearTripulacionComponent {
+export class CrearTripulacionComponent
+  implements OnInit {
 
-  pilotos = [
-    'Carlos Méndez',
-    'Juan Pérez',
-    'Luis García'
-  ];
+  pilotos: any[] = [];
 
-  copilotos = [
-    'Mario López',
-    'Andrés Soto',
-    'Kevin Ruiz'
-  ];
+  copilotos: any[] = [];
 
-  ingenieros = [
-    'José Ramírez',
-    'Fernando Díaz',
-    'Ricardo Morales'
-  ];
+  ingenieros: any[] = [];
 
-  tripulantesCabina = [
-    'Ana Torres',
-    'María Gómez',
-    'Sofía Morales',
-    'Laura Castillo',
-    'Daniela Flores',
-    'Paula Hernández'
-  ];
+  tripulantesCabina: any[] = [];
 
   tripulacion = {
+
+    nombrePaquete: '',
+
     piloto: '',
+
     copiloto: '',
+
     ingeniero: '',
-    cabina: [] as string[]
+
+    cabina: [] as number[]
   };
 
   constructor(
-    private router: Router
+    private router: Router,
+    private vueloService: VueloService
   ) {}
 
-  toggleCabina(nombre: string) {
+  // ============================================
+  // INIT
+  // ============================================
+
+  ngOnInit(): void {
+
+    this.cargarPilotos();
+
+    this.cargarCopilotos();
+
+    this.cargarIngenieros();
+
+    this.cargarSobrecargos();
+  }
+
+  // ============================================
+  // CARGAR PILOTOS
+  // ============================================
+
+  cargarPilotos() {
+
+    this.vueloService
+      .obtenerTripulacionPorRol('Piloto')
+      .subscribe({
+
+        next: (data) => {
+
+          this.pilotos = data;
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert(
+            'Error cargando pilotos'
+          );
+        }
+      });
+  }
+
+  // ============================================
+  // CARGAR COPILOTOS
+  // ============================================
+
+  cargarCopilotos() {
+
+    this.vueloService
+      .obtenerTripulacionPorRol('Copiloto')
+      .subscribe({
+
+        next: (data) => {
+
+          this.copilotos = data;
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert(
+            'Error cargando copilotos'
+          );
+        }
+      });
+  }
+
+  // ============================================
+  // CARGAR INGENIEROS
+  // ============================================
+
+  cargarIngenieros() {
+
+    this.vueloService
+      .obtenerTripulacionPorRol(
+        'Ingeniero de Vuelo'
+      )
+      .subscribe({
+
+        next: (data) => {
+
+          this.ingenieros = data;
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert(
+            'Error cargando ingenieros'
+          );
+        }
+      });
+  }
+
+  // ============================================
+  // CARGAR SOBRECARGOS
+  // ============================================
+
+  cargarSobrecargos() {
+
+    this.vueloService
+      .obtenerTripulacionPorRol(
+        'Sobrecargo'
+      )
+      .subscribe({
+
+        next: (data) => {
+
+          this.tripulantesCabina = data;
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert(
+            'Error cargando sobrecargos'
+          );
+        }
+      });
+  }
+
+  // ============================================
+  // TOGGLE CABINA
+  // ============================================
+
+  toggleCabina(id: number) {
 
     const index =
-      this.tripulacion.cabina.indexOf(nombre);
+      this.tripulacion.cabina.indexOf(id);
 
     if (index >= 0) {
 
@@ -61,22 +179,29 @@ export class CrearTripulacionComponent {
 
     } else {
 
-      if (this.tripulacion.cabina.length >= 3) {
+      if (
+        this.tripulacion.cabina.length >= 3
+      ) {
 
         alert(
-          'Solo puede seleccionar 3 tripulantes de cabina'
+          'Solo puede seleccionar 3 sobrecargos'
         );
 
         return;
       }
 
-      this.tripulacion.cabina.push(nombre);
+      this.tripulacion.cabina.push(id);
     }
   }
+
+  // ============================================
+  // GUARDAR
+  // ============================================
 
   guardarTripulacion() {
 
     if (
+      !this.tripulacion.nombrePaquete ||
       !this.tripulacion.piloto ||
       !this.tripulacion.copiloto ||
       !this.tripulacion.ingeniero ||
@@ -84,30 +209,83 @@ export class CrearTripulacionComponent {
     ) {
 
       alert(
-        'Debe ingresar los campos obligatorios'
+        'Debe ingresar todos los campos obligatorios'
       );
 
       return;
     }
 
+    const payload = {
+
+      nombrePaquete:
+      this.tripulacion.nombrePaquete,
+
+      pilotoId:
+      this.tripulacion.piloto,
+
+      copilotoId:
+      this.tripulacion.copiloto,
+
+      ingenieroId:
+      this.tripulacion.ingeniero,
+
+      sobrecargo1Id:
+        this.tripulacion.cabina[0],
+
+      sobrecargo2Id:
+        this.tripulacion.cabina[1],
+
+      sobrecargo3Id:
+        this.tripulacion.cabina[2]
+    };
+
     console.log(
-      'Tripulación creada:',
-      this.tripulacion
+      'Paquete enviado:',
+      payload
     );
 
-    alert(
-      'Se creó con éxito la tripulación'
-    );
+    this.vueloService
+      .crearPaqueteTripulacion(payload)
+      .subscribe({
 
-    this.router.navigate(['/login']);
+        next: (response) => {
+
+          console.log(response);
+
+          alert(
+            'Paquete de tripulación creado correctamente'
+          );
+
+          this.limpiarFormulario();
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          alert(
+            'Error al crear el paquete de tripulación'
+          );
+        }
+      });
   }
+
+  // ============================================
+  // LIMPIAR
+  // ============================================
 
   limpiarFormulario() {
 
     this.tripulacion = {
+
+      nombrePaquete: '',
+
       piloto: '',
+
       copiloto: '',
+
       ingeniero: '',
+
       cabina: []
     };
   }

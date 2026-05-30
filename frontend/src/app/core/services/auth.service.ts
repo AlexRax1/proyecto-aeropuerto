@@ -35,4 +35,28 @@ export class AuthService {
     const datos = this.obtenerDatosUsuario();
     return datos ? datos.sub : ''; 
   }
+
+  isLoggedIn(): boolean {
+    const token = this.obtenerToken();
+    // Podrías validar también la fecha de expiración si lo deseas
+    return token !== null;
+  }
+
+  getRoles(): string[] {
+    const datos = this.obtenerDatosUsuario();
+    if (datos && datos.roles) {
+      // Como los roles vienen separados por coma (e.g. "ROLE_ADMIN,ROLE_USER")
+      return datos.roles.split(',');
+    }
+    return [];
+  }
+
+  hasRole(expectedRole: string): boolean {
+    const roles = this.getRoles();
+    return roles.includes(expectedRole);
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+  }
 }

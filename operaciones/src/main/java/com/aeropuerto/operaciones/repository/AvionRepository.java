@@ -15,4 +15,8 @@ public interface AvionRepository
             Integer aerolineaId
     );
 
+    List<Avion> findByAerolineaAerolineaIdAndEstadoIgnoreCase(
+            Integer aerolineaId,
+            String estado
+    );
 }

@@ -26,7 +26,7 @@ export interface Vuelo {
 @Component({
   selector: 'app-reservar-vuelo',
   standalone: true,
-  imports: [CommonModule, FormsModule, SeatSelectionComponent], 
+  imports: [CommonModule, FormsModule, SeatSelectionComponent],
   templateUrl: './reservar-vuelo.component.html',
   styleUrls: ['./reservar-vuelo.component.css']
 })
@@ -34,12 +34,16 @@ export class ReservarVueloComponent implements OnInit {
 
   aeropuertos: Destino[] = [];
   vuelosDisponibles: Vuelo[] = [];
-  
+
   filtros = {
-    origen: '', 
+    origen: '',
     destino: '',
     fechaSalida: ''
   };
+
+  fechaMinima = new Date()
+    .toISOString()
+    .split('T')[0];
 
   vueloSeleccionado: any = null;
   cantidadMaletas: number | null = null;
@@ -58,7 +62,7 @@ export class ReservarVueloComponent implements OnInit {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.http.get<Destino[]>('http://localhost:8083/api/operaciones/destinos/select')
+    this.http.get<Destino[]>('http://localhost:8080/api/operaciones/destinos/select')
       .subscribe({
         next: (data) => {
           this.aeropuertos = data;
@@ -76,6 +80,24 @@ export class ReservarVueloComponent implements OnInit {
       return;
     }
 
+    const hoy = new Date();
+
+    // quitar horas para comparar solo fechas
+    hoy.setHours(0, 0, 0, 0);
+
+    const fechaBusqueda = new Date(
+      this.filtros.fechaSalida
+    );
+
+    if (fechaBusqueda < hoy) {
+
+      alert(
+        'No se pueden buscar vuelos con fechas anteriores al día de hoy.'
+      );
+
+      return;
+    }
+
     if (this.filtros.origen === this.filtros.destino) {
       alert('No se puede seleccionar el mismo aeropuerto de salida y llegada.');
       return;
@@ -83,12 +105,12 @@ export class ReservarVueloComponent implements OnInit {
 
     this.consultaRealizada = true;
 
-    const url = `http://localhost:8083/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
+    const url = `http://localhost:8080/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
 
     this.http.get<Vuelo[]>(url).subscribe({
       next: (data) => {
         this.vuelosDisponibles = data;
-        
+
         if (this.vuelosDisponibles.length === 0) {
           alert('No se encontraron vuelos según los parámetros ingresados');
         }
@@ -132,28 +154,44 @@ export class ReservarVueloComponent implements OnInit {
 
 
   calcularTotal(): number {
-    let total = 0;
-    this.asientosSeleccionados.forEach(seat => {
-      // Estos valores los puedes ajustar según tu lógica de negocio
-      total += seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
-    });
-    return total;
+  let total = 0;
+  this.asientosSeleccionados.forEach(seat => {
+    total += this.getPrecioAsiento(seat.categoria);
+  });
+  return total;
+}
+
+  private getPrecioAsiento(categoria: string): number {
+    if (!this.vueloSeleccionado || !categoria) return 0;
+
+    const catNormalizada = categoria.trim().toUpperCase();
+
+    let precioString = catNormalizada === 'EJECUTIVA'
+      ? this.vueloSeleccionado.ejecutiva
+      : this.vueloSeleccionado.economica;
+
+    if (!precioString) return 0;
+
+    precioString = String(precioString).replace(/[^0-9.]+/g, "");
+
+    const precio = parseFloat(precioString);
+
+    return isNaN(precio) ? 0 : precio;
   }
 
 
 
-  // NUEVO: Ejecuta la transacción final
+  // ejecuta la transacción final
   procesarPago() {
     if (!this.datosPago.nombre || !this.datosPago.tarjeta || !this.datosPago.vencimiento || !this.datosPago.cvv) {
       alert("Por favor, ingrese todos los datos de la tarjeta.");
       return;
     }
 
-
     const peticionesPago: Observable<any>[] = [];
 
     this.asientosSeleccionados.forEach(seat => {
-      const costoAsiento = seat.categoria === 'EJECUTIVA' ? 300.00 : 150.00;
+      const costoAsiento = this.getPrecioAsiento(seat.categoria);
       const payload = {
         vueloId: this.vueloSeleccionado.numeroVuelo,
         asientoId: seat.idAsiento,
@@ -169,12 +207,22 @@ export class ReservarVueloComponent implements OnInit {
 
     forkJoin(peticionesPago).subscribe({
       next: (res) => {
-        alert("¡Pago exitoso! El pase de abordar se ha generado y tus asientos están confirmados.");
-        this.nuevaBusqueda(); // Limpiamos todo
+        // RN06: Generar el pase de abordar antes de limpiar la búsqueda
+        this.generarPaseDeAbordar();
+        this.nuevaBusqueda(); // Limpiamos todo después de mostrar el pase
       },
       error: (err) => {
         console.error("Error al procesar el pago", err);
-        alert("Hubo un error al procesar tu pago. Intenta nuevamente.");
+        const mensajeError = typeof err.error === 'string' ? err.error : "";
+
+        // FA06: Ya posee vuelo para la fecha y hora seleccionada
+        // Aquí asumimos que tu backend de Spring Boot devuelve este string o un código HTTP específico (ej. 409 Conflict)
+        if (mensajeError.includes("ya tiene vuelos") || err.status === 409) {
+          alert("No se puede seleccionar el vuelo porque ya tiene vuelos asignados");
+        } else {
+          // Fallback para otros errores de la API
+          alert(mensajeError || "Hubo un error al procesar tu pago. Intenta nuevamente.");
+        }
       }
     });
   }
@@ -186,9 +234,28 @@ export class ReservarVueloComponent implements OnInit {
     this.cantidadMaletas = null;
     this.consultaRealizada = false;
     this.mostrarModalAsientos = false;
-    
+
     // Limpiamos también variables de pago
     this.asientosSeleccionados = [];
     this.datosPago = { nombre: '', tarjeta: '', vencimiento: '', cvv: '' };
+  }
+
+  generarPaseDeAbordar() {
+    const asientosStr = this.obtenerNombresAsientos();
+
+    const pase = `=================================\n` +
+                 `        PASE DE ABORDAR        \n` +
+                 `=================================\n` +
+                 `Pasajero: ${this.datosPago.nombre}\n` +
+                 `Vuelo: ${this.vueloSeleccionado.modelo} - #${this.vueloSeleccionado.numeroVuelo}\n` +
+                 `Origen: ${this.vueloSeleccionado.origen}\n` +
+                 `Destino: ${this.vueloSeleccionado.destino}\n` +
+                 `Salida: ${this.vueloSeleccionado.salida}\n` +
+                 `Llegada: ${this.vueloSeleccionado.llegada}\n` +
+                 `Asiento(s): ${asientosStr}\n` +
+                 `Maletas registradas: ${this.cantidadMaletas}\n` +
+                 `=================================`;
+
+    alert(pase);
   }
 }
