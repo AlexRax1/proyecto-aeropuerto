@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/consulta-aerolineas")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class ConsultaAerolineaController {
 

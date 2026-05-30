@@ -116,7 +116,7 @@ export class RegisterComponent {
     // REGISTRAR USUARIO
 
     this.http.post(
-      'http://localhost:8082/usuarios/register',
+      'http://localhost:8080/usuarios/register',
       this.registerData,
       {
         responseType: 'text'

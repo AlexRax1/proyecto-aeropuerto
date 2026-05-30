@@ -36,7 +36,7 @@ export class ConsultaVuelosComponent {
   consultaRealizada = false;
 
   // SOLO URL BASE
-  apiUrl = 'http://localhost:8083/vuelos/consulta';
+  apiUrl = 'http://localhost:8080/vuelos/consulta';
 
   buscarVuelos() {
 

@@ -11,27 +11,34 @@ public class GatewayRoutingConfig {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
+                // 1. Auth
                 .route("auth-service", r -> r
                         .path("/auth/**")
                         .uri("http://localhost:8081"))
 
-                /*
-                // agregar mas rutas
-                .route("operaciones-service", r -> r
-                        .path("/operaciones/**")
+                // 2. Usuarios
+                .route("usuarios-service", r -> r
+                        .path("/usuarios/**")
                         .uri("http://localhost:8082"))
-                */
 
-                // agregar mas rutas
+                // 3. Operaciones (Agrupamos todos los endpoints del puerto 8083)
                 .route("operaciones-service", r -> r
-                        .path("/aviones/**")
+                        .path(
+                                "/aerolineas/**",
+                                "/aeropuertos/**",
+                                "/aviones/**",
+                                "/consulta-aerolineas/**",
+                                "/consulta-destinos/**",
+                                "/api/operaciones/destinos/**",
+                                "/tripulacion/**",
+                                "/vuelos/**"
+                        )
                         .uri("http://localhost:8083"))
 
-                // agregar mas rutas
+                // 4. Reservas
                 .route("reservas-service", r -> r
-                        .path("/api/reservas/**")
+                        .path("/api/reservas/**", "/equipajes/**")
                         .uri("http://localhost:8084"))
-
 
                 .build();
     }

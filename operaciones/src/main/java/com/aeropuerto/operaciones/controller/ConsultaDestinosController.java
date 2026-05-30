@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/consulta-destinos")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class ConsultaDestinosController {
 

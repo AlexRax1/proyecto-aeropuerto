@@ -164,7 +164,7 @@ public class VueloService {
             );
         }
 
-        // VALIDAR CONFLICTO DE HORARIOS
+        // VALIDAR CONFLICTO DE HORARIOS (Choque exacto)
         boolean conflicto =
                 vueloRepository.existeConflictoHorario(
                         avion.getAvionId(),
@@ -179,6 +179,39 @@ public class VueloService {
                     "El avión ya tiene un vuelo programado en ese horario."
             );
         }
+
+        // --- validacion de las 24h despues de la llegada---
+        List<Vuelo> vuelosDelAvion = vueloRepository.findByAvionAvionId(avion.getAvionId());
+
+        for (Vuelo vExistente : vuelosDelAvion) {
+            LocalDateTime inicioExistente = LocalDateTime.of(vExistente.getFechaSalida(), vExistente.getHoraSalida());
+            LocalDateTime finExistente = LocalDateTime.of(vExistente.getFechaLlegada(), vExistente.getHoraLlegada());
+
+            // Escenario A: El vuelo existente es ANTES del nuevo vuelo
+            if (!finExistente.isAfter(salida)) {
+                long horasDescanso = Duration.between(finExistente, salida).toHours();
+                if (horasDescanso < 24) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "El avión requiere 24h de descanso. Solo hay " + horasDescanso +
+                                    "h de descanso desde su ultimo aterrizaje."
+                    );
+                }
+            }
+
+            // Escenario B: El vuelo existente es DESPUÉS del nuevo vuelo
+            if (!inicioExistente.isBefore(llegada)) {
+                long horasDescanso = Duration.between(llegada, inicioExistente).toHours();
+                if (horasDescanso < 24) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "El avion requiere 24h de descanso antes de su siguiente vuelo. Solo hay " +
+                                    horasDescanso + "h de margen tras este aterrizaje."
+                    );
+                }
+            }
+        }
+        // ----------------------------------------------
 
         // VALIDAR TRIPULACIÓN
         if (dto.getTripulacionId() == null) {
@@ -244,7 +277,6 @@ public class VueloService {
                                 )
                         );
 
-
         paquete.setEstado("OCUPADO");
         tripulacionPaqueteRepository.save(paquete);
 
@@ -261,6 +293,9 @@ public class VueloService {
 
         return vueloRepository.save(vuelo);
     }
+
+
+
 
     // OBTENER AVIONES ACTIVOS
     public List<Avion> obtenerAvionesActivos(

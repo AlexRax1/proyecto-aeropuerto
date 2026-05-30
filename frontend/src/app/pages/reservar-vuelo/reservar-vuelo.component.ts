@@ -62,7 +62,7 @@ export class ReservarVueloComponent implements OnInit {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.http.get<Destino[]>('http://localhost:8083/api/operaciones/destinos/select')
+    this.http.get<Destino[]>('http://localhost:8080/api/operaciones/destinos/select')
       .subscribe({
         next: (data) => {
           this.aeropuertos = data;
@@ -105,7 +105,7 @@ export class ReservarVueloComponent implements OnInit {
 
     this.consultaRealizada = true;
 
-    const url = `http://localhost:8083/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
+    const url = `http://localhost:8080/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
 
     this.http.get<Vuelo[]>(url).subscribe({
       next: (data) => {

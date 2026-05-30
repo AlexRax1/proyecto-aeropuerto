@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/aerolineas")
-@CrossOrigin(origins = "http://localhost:4200")
 public class AerolineaController {
 
     private final AerolineaRepository aerolineaRepository;
