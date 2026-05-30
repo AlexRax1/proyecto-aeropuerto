@@ -1,11 +1,11 @@
 package com.aeropuerto.operaciones.repository;
 
-import com.aeropuerto.operaciones.dto.ConsultaVueloDTO;
 import com.aeropuerto.operaciones.model.Vuelo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,4 +78,6 @@ AND (
     );
 
     Optional<Vuelo> findByVueloId(Long vueloId);
+
+    List<Vuelo> findByAvionAvionId(Integer avionId);
 }
