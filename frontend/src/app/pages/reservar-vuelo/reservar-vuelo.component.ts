@@ -41,6 +41,10 @@ export class ReservarVueloComponent implements OnInit {
     fechaSalida: ''
   };
 
+  fechaMinima = new Date()
+    .toISOString()
+    .split('T')[0];
+
   vueloSeleccionado: any = null;
   cantidadMaletas: number | null = null;
 
@@ -58,7 +62,7 @@ export class ReservarVueloComponent implements OnInit {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.http.get<Destino[]>('http://localhost:8083/api/operaciones/destinos/select')
+    this.http.get<Destino[]>('http://localhost:8080/api/operaciones/destinos/select')
       .subscribe({
         next: (data) => {
           this.aeropuertos = data;
@@ -76,6 +80,24 @@ export class ReservarVueloComponent implements OnInit {
       return;
     }
 
+    const hoy = new Date();
+
+    // quitar horas para comparar solo fechas
+    hoy.setHours(0, 0, 0, 0);
+
+    const fechaBusqueda = new Date(
+      this.filtros.fechaSalida
+    );
+
+    if (fechaBusqueda < hoy) {
+
+      alert(
+        'No se pueden buscar vuelos con fechas anteriores al día de hoy.'
+      );
+
+      return;
+    }
+
     if (this.filtros.origen === this.filtros.destino) {
       alert('No se puede seleccionar el mismo aeropuerto de salida y llegada.');
       return;
@@ -83,7 +105,7 @@ export class ReservarVueloComponent implements OnInit {
 
     this.consultaRealizada = true;
 
-    const url = `http://localhost:8083/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
+    const url = `http://localhost:8080/vuelos/buscar?origenId=${this.filtros.origen}&destinoId=${this.filtros.destino}&fechaSalida=${this.filtros.fechaSalida}`;
 
     this.http.get<Vuelo[]>(url).subscribe({
       next: (data) => {
@@ -144,8 +166,8 @@ export class ReservarVueloComponent implements OnInit {
 
     const catNormalizada = categoria.trim().toUpperCase();
 
-    let precioString = catNormalizada === 'EJECUTIVA' 
-      ? this.vueloSeleccionado.ejecutiva 
+    let precioString = catNormalizada === 'EJECUTIVA'
+      ? this.vueloSeleccionado.ejecutiva
       : this.vueloSeleccionado.economica;
 
     if (!precioString) return 0;
@@ -153,7 +175,7 @@ export class ReservarVueloComponent implements OnInit {
     precioString = String(precioString).replace(/[^0-9.]+/g, "");
 
     const precio = parseFloat(precioString);
-      
+
     return isNaN(precio) ? 0 : precio;
   }
 
@@ -192,7 +214,7 @@ export class ReservarVueloComponent implements OnInit {
       error: (err) => {
         console.error("Error al procesar el pago", err);
         const mensajeError = typeof err.error === 'string' ? err.error : "";
-        
+
         // FA06: Ya posee vuelo para la fecha y hora seleccionada
         // Aquí asumimos que tu backend de Spring Boot devuelve este string o un código HTTP específico (ej. 409 Conflict)
         if (mensajeError.includes("ya tiene vuelos") || err.status === 409) {
@@ -220,7 +242,7 @@ export class ReservarVueloComponent implements OnInit {
 
   generarPaseDeAbordar() {
     const asientosStr = this.obtenerNombresAsientos();
-    
+
     const pase = `=================================\n` +
                  `        PASE DE ABORDAR        \n` +
                  `=================================\n` +
@@ -233,7 +255,7 @@ export class ReservarVueloComponent implements OnInit {
                  `Asiento(s): ${asientosStr}\n` +
                  `Maletas registradas: ${this.cantidadMaletas}\n` +
                  `=================================`;
-                 
+
     alert(pase);
   }
 }

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class usuariosController {
     private final UsuarioRepository usuarioRepository;

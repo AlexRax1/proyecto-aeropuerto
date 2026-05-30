@@ -3,8 +3,6 @@ package com.aeropuerto.operaciones.controller;
 
 import com.aeropuerto.operaciones.dto.*;
 import com.aeropuerto.operaciones.model.Avion;
-import com.aeropuerto.operaciones.dto.ValidacionChoqueHorarioDTO;
-import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.model.Vuelo;
 import com.aeropuerto.operaciones.service.VueloService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/vuelos")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class VueloController {
 
@@ -60,10 +57,12 @@ public class VueloController {
     public ResponseEntity<Vuelo> crearVuelo(
             @RequestBody CrearVueloDTO dto
     ) {
+        Vuelo nuevoVuelo = vueloService.crearVuelo(dto);
+        return ResponseEntity.ok()
+                // Inyectamos el ID en el header
+                .header("X-Afectado-Id", String.valueOf(nuevoVuelo.getVueloId()))
+                .body(nuevoVuelo);
 
-        return ResponseEntity.ok(
-                vueloService.crearVuelo(dto)
-        );
     }
 
     @GetMapping("/disponibles")

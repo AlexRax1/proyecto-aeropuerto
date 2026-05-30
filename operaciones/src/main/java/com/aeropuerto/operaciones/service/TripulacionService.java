@@ -17,7 +17,7 @@ public class TripulacionService {
 
     private final PersonalTripulacionRepository personalRepo;
 
-    public PaqTripulacion crearPaquete(
+    public PaqTripulacion crearPaquete12(
             CrearPaqTripulacionDTO dto
     ) {
 

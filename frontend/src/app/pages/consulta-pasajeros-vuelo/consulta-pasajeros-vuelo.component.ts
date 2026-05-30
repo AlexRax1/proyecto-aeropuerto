@@ -41,7 +41,7 @@ export class ConsultaPasajerosVueloComponent {
   pasajeros: any[] = [];
 
   apiUrl =
-    'http://localhost:8083/vuelos/pasajeros';
+    'http://localhost:8080/vuelos/pasajeros';
 
   // =========================================
   // BUSCAR

@@ -57,7 +57,7 @@ export class ConsultaVueloComponent {
   // =========================================
 
   apiUrl =
-    'http://localhost:8083/vuelos/consulta-vuelo';
+    'http://localhost:8080/vuelos/consulta-vuelo';
 
   // =========================================
   // BUSCAR VUELO

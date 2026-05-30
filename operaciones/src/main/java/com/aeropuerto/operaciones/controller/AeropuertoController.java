@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/aeropuertos")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class AeropuertoController {
 

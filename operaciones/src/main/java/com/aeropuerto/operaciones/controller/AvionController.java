@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/aviones")
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class AvionController {
 

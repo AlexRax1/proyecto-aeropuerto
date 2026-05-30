@@ -19,12 +19,14 @@ CREATE TABLE credenciales(
 );
 
 CREATE TABLE bitacora (
-	registro_id serial primary key,
-	user_id int references credenciales(user_id),
-	fecha_hora_regitro timestamp,
-	accion varchar(100)
+    registro_id serial primary key,
+    user_id int references credenciales(user_id),
+    microservicio_afectado varchar(50),
+    endpoint varchar(150),
+    accion varchar(200),
+    id_afectado varchar(150),
+    fecha_hora timestamp default current_timestamp
 );
-
 --usuario
 
 CREATE TABLE usuarios(

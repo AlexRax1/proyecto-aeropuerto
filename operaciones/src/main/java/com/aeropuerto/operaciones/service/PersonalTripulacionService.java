@@ -91,7 +91,6 @@ public class PersonalTripulacionService {
     // =====================================
     // CREAR PAQUETE
     // =====================================
-
     public PaqTripulacion crearPaquete(
             CrearPaqTripulacionDTO dto
     ) {
@@ -104,40 +103,48 @@ public class PersonalTripulacionService {
         );
 
         paquete.setPiloto(
-                personalTripulacionRepository.findById(
-                        Long.valueOf(dto.getPilotoId())
-                ).orElseThrow()
+                actualizarEstadoTripulacion(
+                        Integer.valueOf(dto.getPilotoId()),
+                        "EN VUELO"
+                )
         );
 
         paquete.setCopiloto(
-                personalTripulacionRepository.findById(
-                        Long.valueOf(dto.getCopilotoId())
-                ).orElseThrow()
+                actualizarEstadoTripulacion(
+                        Integer.valueOf(dto.getCopilotoId()),
+                        "EN VUELO"
+                )
         );
 
         paquete.setIngeniero(
-                personalTripulacionRepository.findById(
-                        Long.valueOf(dto.getIngenieroId())
-                ).orElseThrow()
+                actualizarEstadoTripulacion(
+                        Integer.valueOf(dto.getIngenieroId()),
+                        "EN VUELO"
+                )
         );
 
         paquete.setSobrecargo1(
-                personalTripulacionRepository.findById(
-                        Long.valueOf(dto.getSobrecargo1Id())
-                ).orElseThrow()
+                actualizarEstadoTripulacion(
+                        Integer.valueOf(dto.getSobrecargo1Id()),
+                        "EN VUELO"
+                )
         );
 
         paquete.setSobrecargo2(
-                personalTripulacionRepository.findById(
-                        Long.valueOf(dto.getSobrecargo2Id())
-                ).orElseThrow()
+                actualizarEstadoTripulacion(
+                        Integer.valueOf(dto.getSobrecargo2Id()),
+                        "EN VUELO"
+                )
         );
 
         paquete.setSobrecargo3(
-                personalTripulacionRepository.findById(
-                        Long.valueOf(dto.getSobrecargo3Id())
-                ).orElseThrow()
+                actualizarEstadoTripulacion(
+                        Integer.valueOf(dto.getSobrecargo3Id()),
+                        "EN VUELO"
+                )
         );
+
+        paquete.setEstado("DISPONIBLE");
 
         return paqTripulacionRepository.save(paquete);
     }
@@ -146,10 +153,25 @@ public class PersonalTripulacionService {
     // LISTAR PAQUETES
     // =====================================
 
-    public List<PaqTripulacion>
-    obtenerPaquetes() {
+    public List<PaqTripulacion> obtenerPaquetes() {
 
         return paqTripulacionRepository
-                .findAll();
+                .findByEstado("DISPONIBLE");
+    }
+
+    private PersonalTripulacion actualizarEstadoTripulacion(
+            Integer id,
+            String estado
+    ) {
+
+        PersonalTripulacion persona =
+                personalTripulacionRepository
+                        .findById(Long.valueOf(id))
+                        .orElseThrow();
+
+        persona.setEstado(estado);
+
+        return personalTripulacionRepository
+                .save(persona);
     }
 }

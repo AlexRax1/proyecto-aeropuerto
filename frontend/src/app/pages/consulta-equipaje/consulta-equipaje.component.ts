@@ -48,7 +48,7 @@ export class ConsultaEquipajeComponent {
       const respuesta: any[] = await firstValueFrom(
 
         this.http.get<any[]>(
-          `http://localhost:8084/equipajes/vuelo/${vueloId}`
+          `http://localhost:8080/equipajes/vuelo/${vueloId}`
         )
 
       );

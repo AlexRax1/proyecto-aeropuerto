@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class VueloService {
 
   private apiUrl =
-    'http://localhost:8083';
+    'http://localhost:8080';
 
   constructor(
     private http: HttpClient
@@ -24,7 +24,7 @@ export class VueloService {
     Observable<any[]> {
 
     return this.http.get<any[]>(
-      `http://localhost:8083/api/operaciones/destinos/select`
+      `http://localhost:8080/api/operaciones/destinos/select`
     );
   }
 
@@ -115,7 +115,7 @@ export class VueloService {
   obtenerTripulacionPorRol(rol: string) {
 
     return this.http.get<any[]>(
-      `http://localhost:8083/tripulacion/rol?rol=${rol}`
+      `http://localhost:8080/tripulacion/rol?rol=${rol}`
     );
   }
 
@@ -123,7 +123,7 @@ export class VueloService {
 
     return this.http.post(
 
-      'http://localhost:8083/tripulacion/paquete',
+      'http://localhost:8080/tripulacion/paquete',
 
       payload
     );
@@ -133,7 +133,7 @@ export class VueloService {
 
     return this.http.get<any[]>(
 
-      'http://localhost:8083/tripulacion/paquetes'
+      'http://localhost:8080/tripulacion/paquetes'
 
     );
   }

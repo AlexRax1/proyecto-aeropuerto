@@ -32,7 +32,7 @@ export class VuelosPendientesComponent implements OnInit {
     try {
       this.loading = true;
       const data = await firstValueFrom(
-        this.http.get<any[]>('http://localhost:8083/vuelos/pendientesAbordar')
+        this.http.get<any[]>('http://localhost:8080/vuelos/pendientesAbordar')
       );
 
       console.log('Vuelos recibidos desde el backend:', data);
